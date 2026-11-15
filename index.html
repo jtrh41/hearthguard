@@ -2379,6 +2379,7 @@ input[type=text]{font:inherit;color:var(--parch);background:#0f0a08;border:2px s
 .chip{font-size:12px;padding:1px 8px;border-radius:99px;border:1px solid var(--line);background:#0f0a08;color:var(--gold)}
 #toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#0f0a08;border:2px solid var(--gold);
   border-radius:10px;padding:10px 14px;max-width:min(90vw,460px);text-align:center;z-index:20;box-shadow:0 4px 0 #000}
+.aura{position:absolute;z-index:0;border-radius:50%;opacity:.6;pointer-events:none}
 .feat{font-size:14px;border-top:1px solid var(--line);padding-top:6px}
 .feat:first-child{border-top:0;padding-top:0}
 @media (prefers-reduced-motion:reduce){.lunge,.lungeL,.shake,.bob,button.pow{animation:none}.bar i{transition:none}}
@@ -2511,6 +2512,21 @@ const potionPrice=()=>12+4*H.lvl;
 const raidLeft=()=>H.raidDay===today()?Math.max(0,3-(H.raidTries||0)):3;
 function raidHp(){let d=0; for(const id in heroes){const h=id===me&&H?H:heroes[id]; if(h&&h.raidNo===world.no)d+=h.raidDmg||0} return Math.max(0,raidMax(world.no)-d)}
 const wpnName=(h,t)=>WPN_TIER[t]+' '+CLASSES[h.cls].weapon[look(t)];
+const gearName=(h,k,t)=>k==='weapon'?wpnName(h,t):ARM_TIER[t]+' Armor';
+/* Looks: every 5 hero levels is a rank (aura + size); every weapon level brightens its glow; armor adds a gold sheen. */
+const RANKS=['Recruit','Adventurer','Veteran','Champion','Hero','Paragon','Legend'], RANK_COL=['','#c98a4a','#d8dde6','#f2c35b','#ff7a3c','#b070ff','#aef0ff'];
+const WGLOW=['','#d8d0c0','#9fd0ff','#ffffff','#b070ff','#ff8a3c','#fff3a0'];
+const rank=h=>Math.min(6,Math.floor(h.lvl/5));
+const heroFx=h=>`filter:drop-shadow(0 5px 3px rgba(0,0,0,.45))${h.weapon?` drop-shadow(0 0 ${2+h.weapon*1.5}px ${WGLOW[h.weapon]})`:''}${h.armor>1?` drop-shadow(0 0 ${h.armor}px #f2c35b)`:''};`;
+const aura=(h,css)=>rank(h)?`<div class="aura" style="${css};background:radial-gradient(closest-side,${RANK_COL[rank(h)]},transparent)"></div>`:'';
+/* Gear levels 1-7 (stored 0-6). It earns gear XP from every victory; gold in the shop pays off whatever is left. */
+const gearNeed=nx=>Math.round(GEAR_PRICE[nx]*.9);
+const gxKey=k=>k==='weapon'?'wxp':'axp';
+const gearCost=k=>{const nx=H[k]+1; return Math.max(1,Math.ceil(GEAR_PRICE[nx]*(1-Math.min(1,(H[gxKey(k)]||0)/gearNeed(nx)))))};
+function gearUp(k){ const nx=H[k]+1; H[k]=nx; if(k==='armor')H.hp=Math.min(stats(H).hp,H.hp+ARMOR_HP[nx]-ARMOR_HP[nx-1]); }
+function addGearXp(x){ const ups=[]; for(const k of ['weapon','armor']){ const xk=gxKey(k); H[xk]=(H[xk]||0)+x;
+    while(H[k]<6){ const nx=H[k]+1; if(H[xk]<gearNeed(nx))break; if(H.lvl<GEAR_LVL[nx]){H[xk]=gearNeed(nx);break} H[xk]-=gearNeed(nx); gearUp(k); ups.push({k,look:look(nx)!==look(nx-1)}); }
+    if(H[k]>=6)H[xk]=0; } return ups; }
 
 /* ============ SAVE / SYNC ============ */
 let saving=false,dirty=false;
@@ -2542,7 +2558,7 @@ function cloudDb(url,key){
     subs.world.forEach(f=>f({exists:true,data:()=>st.world})); subs.gifts.forEach(f=>f({docs:st.gifts.map(g=>({id:g.id,data:()=>g}))})); };
   const call=body=>{ const p=busy.then(async()=>{ if(dead)throw {code:'key'};
       const r=await fetch(url+'/hg',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({key},body))});
-      if(r.status===403){ dead=true; clearInterval(tick); lsSet('hg_key',null); db=null; S.lockMsg='That password did not work. Try again.'; B=null; S.screen='lock'; render(); throw {code:'key'} }
+      if(r.status===403){ dead=true; clearInterval(tick); lsSet('hg_key',null); try{document.cookie='hg-key=; max-age=0; path='+location.pathname}catch(e){} db=null; S.lockMsg='That password did not work. Try again.'; B=null; S.screen='lock'; render(); throw {code:'key'} }
       const j=await r.json(); if(!j.ok)throw {code:j.error}; emit(j); return j; });
     busy=p.catch(()=>{}); return p; };
   const poll=()=>{ if(!dead&&document.visibilityState==='visible')call({op:'get'}).catch(()=>{}) };
@@ -2633,7 +2649,7 @@ function finish(win,flew){ const st=stats(H);
   if(win){ let g=Math.round(R.gold*rnd(.85,1.15)*(B.boss?5:1)*((H.relics||[]).includes(0)?1.2:1)), xp=R.xp*(B.boss?4:1);
     H.gold+=g; H.kills=(H.kills||0)+1; res.gold=g; res.xp=xp;
     if(B.stage>=0&&B.stage===H.prog[B.r]){ H.prog[B.r]++; if(B.boss){ if(!H.relics.includes(B.r)){H.relics.push(B.r);res.relic=B.r} feat('defeated '+R.boss.n+' in '+R.n) } }
-    res.ups=addXp(xp); if(H.relics.includes(2)&&!res.ups)H.hp=Math.min(stats(H).hp,H.hp+Math.round(stats(H).hp*.15));
+    const r0=rank(H); res.ups=addXp(xp); if(rank(H)>r0)res.rank=rank(H); res.gear=addGearXp(Math.round(R.gold*(B.boss?5:1))); if(H.relics.includes(2)&&!res.ups)H.hp=Math.min(stats(H).hp,H.hp+Math.round(stats(H).hp*.15));
     sfx.win(); }
   else { H.hp=st.hp; sfx.lose(); }
   save(); B.result=res; render(); }
@@ -2646,7 +2662,7 @@ function vLock(){ return `<div class="col" style="text-align:center;padding-top:
   <input type="text" id="fampw" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false"><button class="go" data-act="unlock">Enter the realm</button></div>`; }
 function vWho(){
   const rows=SLOTS.map(s=>{const h=heroes[s.id]||(s.id===me?H:null);
-    return `<button class="card" data-act="pick" data-id="${s.id}" ${loaded?'':'disabled'}>${h?`<img class="spr sm" alt="" src="${heroImg(h)}">`:`<span class="spr sm"></span>`}
+    return `<button class="card" data-act="pick" data-id="${s.id}" ${loaded?'':'disabled'}>${h?`<img class="spr sm" alt="" src="${heroImg(h)}" style="${heroFx(h)}">`:`<span class="spr sm"></span>`}
       <span class="grow"><b>${esc(s.label)}</b><span class="sub">${h?esc(h.name)+' · Level '+h.lvl+' '+CLASSES[h.cls].name:'No hero yet. Tap to create one.'}</span></span></button>`}).join('');
   return `<div class="col" style="text-align:center;padding-top:8px"><h1>Hearthguard</h1><p class="dim">One family. One guild. A realm that needs saving.</p></div>
     ${lineup()}
@@ -2664,13 +2680,13 @@ function vCreate(){ const cur=S.cls||'knight';
 function heroCard(){ const st=stats(H);
   return `<div class="panel col" style="gap:5px">
     <div class="stat"><b>${esc(H.name)}</b><span class="gold">${H.gold} gold</span></div>
-    <div class="stat small dim"><span>Level ${H.lvl} ${CLASSES[H.cls].name}</span><span>${H.potions} potion${H.potions===1?'':'s'}</span></div>
+    <div class="stat small dim"><span>Level ${H.lvl} ${CLASSES[H.cls].name} · ${RANKS[rank(H)]}</span><span>${H.potions} potion${H.potions===1?'':'s'}</span></div>
     ${bar(H.hp,st.hp)}<div class="stat small dim"><span>Health</span><span>${H.hp} / ${st.hp}</span></div>
     ${bar(H.xp,need(H.lvl),'xp')}<div class="stat small dim"><span>Experience</span><span>${H.lvl>=30?'Max level':H.xp+' / '+need(H.lvl)}</span></div></div>`;
 }
 function vCamp(){ const st=stats(H), left=raidLeft();
   return `<div class="top"><h2>The Camp</h2><span class="row"><button class="ghost" data-act="mute">${muted?'Sound off':'Sound on'}</button><button class="ghost" data-act="go" data-to="who">Switch hero</button></span></div>
-  <div class="hero-stage">${scene(6)}<img class="h bob" alt="${esc(H.name)}" src="${heroImg(H)}"></div>${heroCard()}
+  <div class="hero-stage">${scene(6)}${aura(H,'left:24%;right:24%;bottom:0;height:24%')}<img class="h bob" alt="" src="${heroImg(H)}" style="height:${80+rank(H)*2}%;${heroFx(H)}"></div>${heroCard()}
   <button class="go" data-act="go" data-to="map">Adventure<span class="sub">Explore the realm and fight monsters</span></button>
   <div class="grid2">
     <button data-act="rest" ${H.hp>=st.hp?'disabled':''}>Rest by the fire<span class="sub">${H.hp>=st.hp?'Fully rested':'Heal to full, free'}</span></button>
@@ -2688,21 +2704,22 @@ function vMap(){
         :`<button class="go" style="grid-column:1/-1" data-act="fight" data-r="${r}" data-s="${p}">${p===4?'Face '+R.boss.n:'Stage '+(p+1)+' of 5'}</button>`}</div>`:''}</div>`}).join('')}`;
 }
 function vShop(){
-  const gear=(kind)=>{ const t=H[kind], nx=t+1; if(nx>6)return `<div class="panel"><b>${kind==='weapon'?wpnName(H,t):ARM_TIER[t]+' Armor'}</b><div class="small dim">The finest there is.</div></div>`;
-    const name=kind==='weapon'?wpnName(H,nx):ARM_TIER[nx]+' Armor';
+  const gear=(kind)=>{ const t=H[kind], nx=t+1, xp=H[gxKey(kind)]||0;
+    if(nx>6)return `<div class="panel"><b>${gearName(H,kind,t)} · Level 7</b><div class="small dim">The finest there is.</div></div>`;
     const gain=kind==='weapon'?'+'+(WEAPON_ATK[nx]-WEAPON_ATK[t])+' attack':'+'+(ARMOR_HP[nx]-ARMOR_HP[t])+' health, +'+(ARMOR_DEF[nx]-ARMOR_DEF[t])+' defense';
-    const lock=H.lvl<GEAR_LVL[nx], poor=H.gold<GEAR_PRICE[nx], newLook=look(nx)!==look(t);
-    return `<div class="panel row"><img class="spr sm" alt="" src="${kind==='weapon'?heroImg(H,false,nx,null):heroImg(H,false,null,nx)}"><div class="grow"><b>${name}</b><div class="small dim">${gain}${newLook?' · <span class="gold">new look!</span>':''}${lock?' · needs level '+GEAR_LVL[nx]:''}</div></div><button class="${lock||poor?'':'go'}" data-act="buy" data-id="${kind}" ${lock||poor?'disabled':''}>${GEAR_PRICE[nx]} gold</button></div>`; };
+    const lock=H.lvl<GEAR_LVL[nx], cost=gearCost(kind), poor=H.gold<cost, newLook=look(nx)!==look(t);
+    return `<div class="panel col" style="gap:6px"><div class="row"><img class="spr sm" alt="" src="${kind==='weapon'?heroImg(H,false,nx,null):heroImg(H,false,null,nx)}"><div class="grow"><b>${gearName(H,kind,t)} · Level ${t+1}</b><div class="small dim">Next: ${gearName(H,kind,nx)}, ${gain}${newLook?' · <span class="gold">new look!</span>':''}</div></div></div>
+      ${bar(xp,gearNeed(nx),'xp')}<div class="row"><span class="grow small dim">${lock?'Levels up once your hero is level '+GEAR_LVL[nx]:'Levels up as you win battles'}</span><button class="${lock||poor?'':'go'}" data-act="buy" data-id="${kind}" ${lock||poor?'disabled':''}>Upgrade now<span class="sub">${cost} gold</span></button></div></div>`; };
   return `<div class="top"><h2>The Shop</h2><button class="ghost" data-act="go" data-to="camp">Camp</button></div>
-  <div class="hero-stage">${scene(6)}<img class="h bob" alt="" src="${heroImg(H)}"></div>
-  <p class="gold">You have ${H.gold} gold.</p>${gear('weapon')}${gear('armor')}
+  <div class="hero-stage">${scene(6)}${aura(H,'left:24%;right:24%;bottom:0;height:24%')}<img class="h bob" alt="" src="${heroImg(H)}" style="height:${80+rank(H)*2}%;${heroFx(H)}"></div>
+  <p><span class="gold">You have ${H.gold} gold.</span> <span class="dim small">Gear levels up as you fight. Gold gets it there sooner.</span></p>${gear('weapon')}${gear('armor')}
   <div class="panel row"><div class="grow"><b>Healing Potion</b><div class="small dim">Heals 40% in battle · you carry ${H.potions} of 9</div></div><button class="${H.gold<potionPrice()||H.potions>=9?'':'go'}" data-act="buy" data-id="potion" ${H.gold<potionPrice()||H.potions>=9?'disabled':''}>${potionPrice()} gold</button></div>`;
 }
 function vHero(){ const st=stats(H), c=CLASSES[H.cls];
   return `<div class="top"><h2>${esc(H.name)}</h2><button class="ghost" data-act="go" data-to="camp">Camp</button></div>
-  <div class="hero-stage">${scene(6)}<img class="h bob" alt="" src="${heroImg(H)}"></div>${heroCard()}
+  <div class="hero-stage">${scene(6)}${aura(H,'left:24%;right:24%;bottom:0;height:24%')}<img class="h bob" alt="" src="${heroImg(H)}" style="height:${80+rank(H)*2}%;${heroFx(H)}"></div>${heroCard()}
   <div class="panel col" style="gap:4px"><h3>Strength</h3><div class="stat"><span>Attack</span><b>${st.atk}</b></div><div class="stat"><span>Defense</span><b>${st.def}</b></div><div class="stat"><span>Critical chance</span><b>${Math.round(st.crit*100)}%</b></div>
-    <div class="stat"><span>Weapon</span><b>${wpnName(H,H.weapon)}</b></div><div class="stat"><span>Armor</span><b>${ARM_TIER[H.armor]} Armor</b></div><div class="stat"><span>Monsters defeated</span><b>${H.kills||0}</b></div><div class="stat"><span>Titan Shards</span><b>${H.scales||0}</b></div></div>
+    <div class="stat"><span>Weapon</span><b>${wpnName(H,H.weapon)} · level ${H.weapon+1}</b></div><div class="stat"><span>Armor</span><b>${ARM_TIER[H.armor]} Armor · level ${H.armor+1}</b></div><div class="stat"><span>Monsters defeated</span><b>${H.kills||0}</b></div><div class="stat"><span>Titan Shards</span><b>${H.scales||0}</b></div></div>
   <div class="panel col"><h3>Power move</h3><div><b class="gold">${c.power.n}</b><div class="small dim">${c.power.d}. Your power bar fills as you give and take hits; when it is full, unleash it.</div></div>${bar(H.pow||0,100,'pw')}</div>
   <div class="panel col"><h3>Skills</h3>${c.skills.map(s=>`<div class="${H.lvl<s.lv?'locked':''}"><b>${s.n}</b> <span class="small dim">${H.lvl<s.lv?'unlocks at level '+s.lv:'ready every '+s.cd+' turns'}</span><div class="small dim">${s.d}</div></div>`).join('')}</div>
   <div class="panel col"><h3>Relics</h3>${H.relics.length?H.relics.map(r=>`<div><b class="gold">${REGIONS[r].relic}</b><div class="small dim">${REGIONS[r].rd}</div></div>`).join(''):'<p class="dim small">Defeat a region’s boss to win its relic.</p>'}</div>`;
@@ -2714,7 +2731,7 @@ function vGuild(){ const all=SLOTS.map(s=>({s,h:s.id===me?H:heroes[s.id]})).filt
   return `<div class="top"><h2>Guild Hall</h2><button class="ghost" data-act="go" data-to="camp">Camp</button></div>
   <div class="panel col"><div class="row"><img class="spr" alt="" src="${mobImg(RAID.id)}"><div class="grow col" style="gap:5px"><b>${RAID.n}</b><div class="small dim">Family raid ${world.no}. Everyone’s damage adds up.</div>${bar(hp,max,'raid')}<div class="stat small dim"><span>${hp} / ${max}</span><span>You: ${mineDmg}</span></div></div></div>
     <button class="go" data-act="raid" ${left<1?'disabled':''}>Strike Ashmaw<span class="sub">${left<1?'Come back tomorrow':left+' of 3 strikes left today'}</span></button></div>
-  <div class="panel col"><h3>The Hearthguard</h3>${all.map(x=>`<div class="row" style="flex-wrap:wrap"><img class="spr sm" alt="" src="${heroImg(x.h)}"><div class="grow"><b>${esc(x.h.name)}</b>${x.s.id===me?' <span class="chip">you</span>':''}<div class="small dim">Level ${x.h.lvl} ${CLASSES[x.h.cls].name} · ${(x.h.relics||[]).length} relic${(x.h.relics||[]).length===1?'':'s'}</div></div>
+  <div class="panel col"><h3>The Hearthguard</h3>${all.map(x=>`<div class="row" style="flex-wrap:wrap"><img class="spr sm" alt="" src="${heroImg(x.h)}" style="${heroFx(x.h)}"><div class="grow"><b>${esc(x.h.name)}</b>${x.s.id===me?' <span class="chip">you</span>':''}<div class="small dim">Level ${x.h.lvl} ${CLASSES[x.h.cls].name} · ${(x.h.relics||[]).length} relic${(x.h.relics||[]).length===1?'':'s'}</div></div>
       ${x.s.id!==me&&db?`<button class="ghost" data-act="gift" data-id="${x.s.id}" data-k="potion">Give potion</button><button class="ghost" data-act="gift" data-id="${x.s.id}" data-k="gold">Give 25 gold</button>`:''}</div>`).join('')}
     ${all.length<2?'<p class="dim small">When the rest of the family makes heroes, they will appear here.</p>':''}</div>
   <div class="panel col"><h3>Chronicle</h3>${feats.length?feats.slice(0,10).map(f=>`<div class="feat">${esc(f.x)}</div>`).join(''):'<p class="dim small">Great deeds will be written here.</p>'}</div>`;
@@ -2726,7 +2743,7 @@ function vBattle(){ const e=B.e, st=stats(H), c=CLASSES[H.cls], res=B.result, pw
   if(res){ let t='',btn='';
     if(res.raid){ t=`<h2>${res.win?'Ashmaw falls!':res.flew?'Time is up':'Knocked back'}</h2><p>You dealt <b class="gold">${res.dealt}</b> damage for the family.</p>`; btn=`<button class="go" data-act="go" data-to="guild">Back to the Guild Hall</button>`; }
     else if(res.win){ const more=B.stage>=0&&H.prog[B.r]<5;
-      t=`<h2>Victory!</h2><p>+${res.gold} gold · +${res.xp} XP</p>${res.ups?`<p class="gold">Level up! You are now level ${H.lvl}.</p>`:''}${res.relic!=null?`<p class="gold">Relic found: ${REGIONS[res.relic].relic} (${REGIONS[res.relic].rd})</p>`:''}`;
+      t=`<h2>Victory!</h2><p>+${res.gold} gold · +${res.xp} XP</p>${res.ups?`<p class="gold">Level up! You are now level ${H.lvl}.</p>`:''}${res.rank?`<p class="gold">New rank: ${RANKS[res.rank]}! Your hero looks stronger.</p>`:''}${(res.gear||[]).map(g=>`<p class="gold">Your ${g.k} grew to level ${H[g.k]+1}: ${gearName(H,g.k,H[g.k])}.${g.look?' New look!':''}</p>`).join('')}${res.relic!=null?`<p class="gold">Relic found: ${REGIONS[res.relic].relic} (${REGIONS[res.relic].rd})</p>`:''}`;
       btn=`<div class="grid2"><button class="go" data-act="fight" data-r="${B.r}" data-s="${more?H.prog[B.r]:-1}">${more?(H.prog[B.r]===4?'Face the boss':'Next stage'):'Hunt again'}</button><button data-act="go" data-to="camp">Camp</button></div>`; }
     else { t=`<h2>Knocked out</h2><p class="dim">Your friends carry you back to the fire. Rest, gear up, and try again.</p>`; btn=`<button class="go" data-act="go" data-to="camp">Back to camp</button>`; }
     bottom=`<div class="panel col" style="text-align:center">${t}</div>${btn}`;
@@ -2738,7 +2755,7 @@ function vBattle(){ const e=B.e, st=stats(H), c=CLASSES[H.cls], res=B.result, pw
       <button data-act="act" data-k="potion" ${B.busy||H.potions<1?'disabled':''}>Potion<span class="sub">${H.potions} left</span></button></div>`;
   }
   return `<div class="stage">${scene(B.sc)}<div class="tag"><div class="stat"><span>${esc(e.n)}</span><span>${e.hp} / ${e.max}</span></div>${bar(e.hp,e.max,B.raid?'raid':'foe')}</div>
-    <img class="you ${res&&!res.win&&!res.raid?'':'bob'}" alt="Your hero" src="${heroImg(H)}" style="${res&&!res.win&&!res.raid?'opacity:.5':''}"><img class="foe ${B.boss?'big':''} ${e.hp>0?'bob':''}" alt="${esc(e.n)}" src="${mobImg(e.id)}" style="animation-delay:-1.1s;${e.hp<=0?'opacity:.2':''}"></div>
+    ${aura(H,'left:2%;width:40%;bottom:0;height:18%')}<img class="you ${res&&!res.win&&!res.raid?'':'bob'}" alt="Your hero" src="${heroImg(H)}" style="width:${37+rank(H)*1.5}%;${heroFx(H)}${res&&!res.win&&!res.raid?'opacity:.5':''}"><img class="foe ${B.boss?'big':''} ${e.hp>0?'bob':''}" alt="${esc(e.n)}" src="${mobImg(e.id)}" style="animation-delay:-1.1s;${e.hp<=0?'opacity:.2':''}"></div>
   <div class="col" style="gap:5px"><div class="stat"><b>${esc(H.name)} · Level ${H.lvl}</b><span>${H.hp} / ${st.hp}</span></div>${bar(H.hp,st.hp)}
     <div class="row"><span class="small ${pw>=100?'gold':'dim'}" style="width:52px">Power</span><div class="grow">${bar(pw,100,'pw'+(pw>=100?' full':''))}</div></div><div class="chips">${chips.map(x=>`<span class="chip">${x}</span>`).join('')}</div></div>${bottom}`;
 }
@@ -2771,7 +2788,7 @@ app.addEventListener('click',ev=>{ const b=ev.target.closest('[data-act]'); if(!
   else if(a==='fight'){ startBattle(+d.r,+d.s); window.scrollTo(0,0); }
   else if(a==='raid'){ startRaid(); window.scrollTo(0,0); }
   else if(a==='buy'){ if(d.id==='potion'){ if(H.gold<potionPrice()||H.potions>=9)return; H.gold-=potionPrice(); H.potions++; }
-    else { const nx=H[d.id]+1; if(nx>6||H.gold<GEAR_PRICE[nx]||H.lvl<GEAR_LVL[nx])return; const changed=look(nx)!==look(nx-1); H.gold-=GEAR_PRICE[nx]; H[d.id]=nx; if(d.id==='armor')H.hp=Math.min(stats(H).hp,H.hp+ARMOR_HP[nx]-ARMOR_HP[nx-1]);
+    else { const nx=H[d.id]+1; if(nx>6||H.lvl<GEAR_LVL[nx])return; const cost=gearCost(d.id); if(H.gold<cost)return; const changed=look(nx)!==look(nx-1); H.gold-=cost; H[gxKey(d.id)]=0; gearUp(d.id);
       if(changed){toast('Your hero has a new look!');sfx.win()} }
     sfx.heal(); save(); render(); }
   else if(a==='gift'){ sendGift(d.id,d.k); }
