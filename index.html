@@ -2436,7 +2436,7 @@ const WPN_TIER=['Worn','Iron','Steel','Silver','Runed','Dragonbone','Starforged'
 const ARM_TIER=['Traveler’s','Leather','Chain','Plate','Runed','Gilded','Starforged','Mythic','Celestial'];
 const CLASSES={
   knight:{name:'Knight',hp:1.3,atk:.9,crit:.08,weapon:['Sword','Sword and Shield','Greatsword'],ranged:[0,0,0],blurb:'Tough as a castle wall. Stuns foes and shrugs off hits.',
-    skills:[{n:'Shield Bash',lv:1,cd:3,mult:1.2,stun:1,d:'Hit and stun for a turn'},
+    skills:[{n:'Stunning Blow',lv:1,cd:3,mult:1.2,stun:1,d:'Hit and stun for a turn'},
             {n:'Iron Guard',lv:3,cd:4,guard:3,heal:.1,d:'Halve damage for 3 turns'},
             {n:'Whirl Slash',lv:6,cd:5,mult:2.4,d:'A huge spinning strike'}],
     power:{n:'Lionheart',mult:4,stun:1,guard:2,d:'A mighty blow that stuns'}},
@@ -2800,7 +2800,7 @@ function drawGate(c,g,open,t){ const x=g.x, y=g.y+40; circ(c,'rgba(0,0,0,.25)',x
 "use strict";
 /* Hearthguard battle screen: turn-based. You pick a move, your hero plays its attack animation, then the enemy takes its turn.
    battle(foe, {raid}) switches to the battle screen and resolves with {win, ...} when the player taps Continue. */
-const BU=17.5;   // % of stage height per Blender unit of a sprite
+const BU=12.5;   // % of stage height per Blender unit of a sprite
 const $b=id=>document.getElementById(id);
 function battle(foe,opt){ opt=opt||{};
   return new Promise(resolve=>{
@@ -2812,9 +2812,9 @@ function vBattle(){ const e=B.e, big=e.big||B.raid, rig=e.id.startsWith('sk_'), 
   return `<div class="bt"><div class="stage" id="bstage">${scene(B.raid?6:e.scene)}
     <div class="tag l"><div class="stat"><span>${esc(H.name)} · Lv ${H.lvl}</span><span id="bhpT"></span></div><div class="bar"><i id="bhp"></i></div><div class="bar pw" id="bpwb"><i id="bpw"></i></div></div>
     <div class="tag r"><div class="stat"><span>${esc(e.n)}</span><span id="bfT"></span></div><div class="bar ${B.raid?'raid':'foe'}"><i id="bfhp"></i></div></div>
-    ${aura(H,'left:14%;width:20%;top:80%;height:12%')}
-    ${heroSpr(H,'bsp',`height:${hs}%;top:${86-.776*hs}%;left:24%;`,null,null,'id="bh"')}
-    ${mobSpr(e.id,'bsp',`height:${fs}%;top:${87-foot*fs}%;left:${big?72:76}%;`,'id="bf"')}
+    ${aura(H,'left:23%;width:14%;top:79%;height:9%')}
+    ${heroSpr(H,'bsp',`height:${hs}%;top:${84-.776*hs}%;left:30%;`,null,null,'id="bh"')}
+    ${mobSpr(e.id,'bsp',`height:${fs}%;top:${85-foot*fs}%;left:${big?68:70}%;`,'id="bf"')}
   </div><div class="side" id="bside"></div></div>`; }
 let bIdle=0;
 function mountBattle(){ clearInterval(bIdle); let t=0;
