@@ -2362,7 +2362,7 @@ input[type=text]{font:inherit;color:var(--parch);background:#0c0e11;border:2px s
 .scene{position:absolute;inset:0;width:100%;height:100%}
 .aura{position:absolute;z-index:0;border-radius:50%;opacity:.6;pointer-events:none}
 .hero-stage{position:relative;height:100%;min-height:0;border:2px solid var(--line);border-radius:10px;overflow:hidden}
-.hero-stage .sp.h{position:absolute;left:50%;bottom:-14%;transform:translateX(-50%);z-index:1}
+.hero-stage .sp.h{position:absolute;left:50%;bottom:5%;transform:translate(-50%,18%);z-index:1}
 /* world map */
 .lvls{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:6px}
 .lv{padding:4px 2px;min-height:46px;font-size:14px} .lv.done{border-color:#8a6a1e;color:var(--gold)} .lv .sub{font-size:10px;color:var(--blood)}
@@ -2952,8 +2952,8 @@ const bar=(v,m,cls)=>`<div class="bar ${cls||''}"><i style="width:${Math.max(0,M
 const KIT={cls:'knight',weapon:1,armor:1,lvl:1};
 const kit=cls=>Object.assign({},KIT,{cls});
 /* left pane: a hero (or the four classes) standing in the camp */
-const heroPane=(h,w,a)=>`<div class="hero-stage">${scene(5)}${aura(h,'left:28%;right:28%;bottom:2%;height:16%')}${heroSpr(h,'h idle',`height:${94+rank(h)*2.5}%;`,w,a)}</div>`;
-const lineup=()=>`<div class="hero-stage">${scene(5)}${['knight','wizard','ranger','barbarian'].map((k,i)=>heroSpr(kit(k),'h idle',`height:74%;left:${20+i*20}%;animation-delay:-${i*.3}s;`)).join('')}</div>`;
+const heroPane=(h,w,a)=>`<div class="hero-stage">${scene(5)}${aura(h,'left:28%;right:28%;bottom:2%;height:16%')}${heroSpr(h,'h idle',`height:${94+rank(h)*2.5}%;max-height:${270+rank(h)*8}px;`,w,a)}</div>`;
+const lineup=()=>`<div class="hero-stage">${scene(5)}${['knight','wizard','ranger','barbarian'].map((k,i)=>heroSpr(kit(k),'h idle',`height:74%;max-height:230px;left:${20+i*20}%;animation-delay:-${i*.3}s;`)).join('')}</div>`;
 const page=(left,right)=>`<div class="pg">${left}<div class="scroll col">${right}</div></div>`;
 const topBar=(title,btns)=>`<div class="top"><h2>${title}</h2><span class="row">${btns||'<button class="ghost" data-act="go" data-to="camp">Camp</button>'}</span></div>`;
 
@@ -3025,7 +3025,7 @@ function vGuild(){ const all=SLOTS.map(s=>({s,h:s.id===me?H:heroes[s.id]})).filt
   const hp=raidHp(), max=raidMax(world.no), left=raidLeft();
   const feats=[]; all.forEach(x=>(x.h.feats||[]).forEach(f=>feats.push({t:f.t,x:x.h.name+' '+f.x}))); feats.sort((a,b)=>b.t-a.t);
   const mineDmg=H.raidNo===world.no?(H.raidDmg||0):0;
-  return page(`<div class="hero-stage">${scene(6)}${mobSpr(RAID[1],'h idle8','height:120%;bottom:-22%;')}</div>`,`${topBar('Guild Hall')}
+  return page(`<div class="hero-stage">${scene(6)}${mobSpr(RAID[1],'h idle8','height:120%;max-height:300px;')}</div>`,`${topBar('Guild Hall')}
   <div class="panel col"><b>${RAID[0]}</b><div class="small dim">Family raid ${world.no}. Everyone’s damage adds up.</div>${bar(hp,max,'raid')}<div class="stat small dim"><span>${hp} / ${max}</span><span>You: ${mineDmg}</span></div>
     <button class="go" data-act="raid" ${left<1?'disabled':''}>Strike Ashmaw<span class="sub">${left<1?'Come back tomorrow':left+' of 3 strikes left today'}</span></button></div>
   <div class="panel col"><h3>The Hearthguard</h3>${all.map(x=>`<div class="row" style="flex-wrap:wrap">${heroSpr(x.h,'mini')}<div class="grow"><b>${esc(x.h.name)}</b>${x.s.id===me?' <span class="chip">you</span>':''}<div class="small dim">Level ${x.h.lvl} ${CLASSES[x.h.cls].name} · ${x.h.cleared||0} levels · ${(x.h.relics||[]).length} relic${(x.h.relics||[]).length===1?'':'s'}</div></div>
