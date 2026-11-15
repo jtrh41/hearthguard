@@ -2551,6 +2551,7 @@ function processGifts(){ if(!H||B||!db)return; let got=false;
     db.doc('gifts/'+g.id).delete().catch(()=>{}); }
   if(got){sfx.heal();save();softRender()} }
 /* Home-screen (GitHub Pages) build: window.HG_CLOUD is the save server. This shim gives it the same shape as the claude.ai db. */
+const canonPw=v=>String(v).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
 async function sha256hex(t){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t)); return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('')}
 function cloudDb(url,key){
   const subs={heroes:[],world:[],gifts:[]}; let busy=Promise.resolve(), last='', dead=false;
@@ -2797,7 +2798,7 @@ app.addEventListener('click',ev=>{ const b=ev.target.closest('[data-act]'); if(!
     if(navigator.share){ navigator.share({title:'Hearthguard',text:'Join our guild in Hearthguard',url}).catch(()=>{}); }
     else if(navigator.clipboard){ navigator.clipboard.writeText(url).then(()=>toast('Link copied. Paste it in a message.'),()=>toast('Could not copy the link. Use the QR code.')); }
     else toast('Use the QR code to share.'); }
-  else if(a==='unlock'){ const i=document.getElementById('fampw'), v=(i?i.value:'').trim(); if(!v)return; sha256hex(v).then(k=>{ lsSet('hg_key',k); S.lockMsg=''; S.screen='who'; render(); connect(); keepInvite(k); }); }
+  else if(a==='unlock'){ const i=document.getElementById('fampw'), v=canonPw(i?i.value:''); if(!v)return; sha256hex(v).then(k=>{ lsSet('hg_key',k); S.lockMsg=''; S.screen='who'; render(); connect(); keepInvite(k); }); }
 });
 async function sendGift(to,kind){ if(!db)return; const who=(heroes[to]||{}).name||'them';
   if(kind==='potion'){ if(H.potions<1)return toast('You have no potions to give.'); H.potions--; } else { if(H.gold<25)return toast('You need 25 gold to give.'); H.gold-=25; }
@@ -2829,7 +2830,7 @@ if(window.HG_CLOUD){
   let m=/[#&]key=([0-9a-f]{64})/.exec(location.hash), j=/[#&]join=([^&]+)/.exec(location.hash), c=null;
   try{c=/(?:^|; )hg-key=([0-9a-f]{64})/.exec(document.cookie)}catch(e){}
   if(m){lsSet('hg_key',m[1]);boot()}
-  else if(j){render(); sha256hex(decodeURIComponent(j[1])).then(k=>{lsSet('hg_key',k);boot()})}
+  else if(j){render(); sha256hex(canonPw(decodeURIComponent(j[1]))).then(k=>{lsSet('hg_key',k);boot()})}
   else { if(!lsGet('hg_key')&&c)lsSet('hg_key',c[1]); boot(); }
 } else boot();
 </script>
