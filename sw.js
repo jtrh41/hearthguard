@@ -1,5 +1,5 @@
 // Hearthguard offline helper. VERSION changes with every build so updates arrive on their own.
-const VERSION = 'hg-7638e8242c51';
+const VERSION = 'hg-4e830cbaee0c';
 const CORE = ['./', 'index.html', 'manifest.webmanifest', 'icon-180.png', 'icon-512.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(VERSION).then(c => c.addAll(CORE)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => {
