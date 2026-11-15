@@ -2382,29 +2382,34 @@ input[type=text]{font:inherit;color:var(--parch);background:#0c0e11;border:2px s
 .bt{display:grid;grid-template-columns:minmax(0,1fr) minmax(230px,34%);gap:10px;height:100%}
 .stage{position:relative;height:100%;min-height:0;border:2px solid var(--line);border-radius:10px;overflow:hidden}
 .side{display:flex;flex-direction:column;gap:6px;min-height:0;overflow-y:auto;justify-content:flex-end}
-.stage .tag{position:absolute;top:8px;width:40%;display:flex;flex-direction:column;gap:4px;z-index:2;text-shadow:0 1px 3px #000,0 0 6px #000;font-weight:800}
+.stage .tag{position:absolute;top:8px;width:40%;display:flex;flex-direction:column;gap:4px;z-index:100;text-shadow:0 1px 3px #000,0 0 6px #000;font-weight:800}
 .stage .tag.l{left:8px} .stage .tag.r{right:8px}
-.bsp{position:absolute;z-index:1;transform:translateX(calc(-50% + var(--dx,0px)));transition:transform .19s ease-out;animation:breathe 2.8s ease-in-out infinite;transform-origin:50% 78%}
-#bf{animation-delay:-1.3s}
+.bsp{position:absolute;z-index:1;transform:translateX(calc(-50% + var(--dx,0px)));transition:transform .25s ease-out;animation:breathe 2.8s ease-in-out infinite;transform-origin:50% 78%}
+.bsp.foe{cursor:pointer;transition:transform .25s ease-out,opacity .6s}
+.bsp.gone,.fbar.gone{opacity:0;pointer-events:none}
+.fbar{position:absolute;z-index:99;width:9%;min-width:46px;height:8px;transform:translateX(-50%);background:#0c0e11;border:2px solid var(--line);border-radius:99px;overflow:visible;pointer-events:none;transition:opacity .5s}
+.fbar i{display:block;height:100%;background:var(--blood);border-radius:99px;transition:width .3s}
+.fbar.on{border-color:var(--gold);box-shadow:0 0 8px #f2c35b}
+.fbar.on:before{content:"";position:absolute;left:50%;top:-16px;margin-left:-7px;border:7px solid transparent;border-top:10px solid var(--gold);filter:drop-shadow(0 1px 1px #000)}
 .hitfx{animation:hitfx .3s}
 @keyframes hitfx{0%{filter:brightness(1.9)}25%{translate:-3% 0}50%{translate:3% 0;filter:brightness(1.3)}75%{translate:-2% 0}100%{translate:0 0}}
-.proj{position:absolute;z-index:3;transition:transform .23s linear;pointer-events:none}
+.proj{position:absolute;z-index:101;transition:transform .23s linear;pointer-events:none}
 .proj.orb{width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:50%;background:radial-gradient(circle,#fff 0 25%,var(--c) 60%);box-shadow:0 0 22px 8px var(--c),-18px 0 16px 2px var(--c)}
 .proj.orb.flip{box-shadow:0 0 22px 8px var(--c),18px 0 16px 2px var(--c)}
 .proj.bolt{width:64px;height:6px;margin:-3px 0 0 -52px;border-radius:3px;background:linear-gradient(90deg,transparent,var(--c) 55%,#fff);filter:drop-shadow(0 0 6px var(--c))}
 .proj.bolt:after{content:"";position:absolute;right:-7px;top:-4px;border:7px solid transparent;border-left:11px solid #fff}
 .proj.bolt.flip{margin-left:-12px;transform-origin:center;background:linear-gradient(270deg,transparent,var(--c) 55%,#fff)} .proj.bolt.flip:after{right:auto;left:-7px;border-left-color:transparent;border-right:11px solid #fff}
-.slash{position:absolute;z-index:3;width:var(--sz);height:var(--sz);margin:calc(var(--sz) / -2) 0 0 calc(var(--sz) / -2);border-radius:50%;border:0 solid transparent;border-right:calc(var(--sz) / 6) solid #fff;filter:drop-shadow(0 0 8px var(--c)) drop-shadow(0 0 3px var(--c));animation:slash .36s ease-out forwards;pointer-events:none}
+.slash{position:absolute;z-index:101;width:var(--sz);height:var(--sz);margin:calc(var(--sz) / -2) 0 0 calc(var(--sz) / -2);border-radius:50%;border:0 solid transparent;border-right:calc(var(--sz) / 6) solid #fff;filter:drop-shadow(0 0 8px var(--c)) drop-shadow(0 0 3px var(--c));animation:slash .36s ease-out forwards;pointer-events:none}
 .slash.flip{animation-name:slashL}
 @keyframes slash{from{transform:rotate(-70deg) scale(.6);opacity:1}60%{opacity:1}to{transform:rotate(60deg) scale(1.25);opacity:0}}
 @keyframes slashL{from{transform:scaleX(-1) rotate(-70deg) scale(.6);opacity:1}60%{opacity:1}to{transform:scaleX(-1) rotate(60deg) scale(1.25);opacity:0}}
-.burst{position:absolute;z-index:3;width:90px;height:90px;margin:-45px 0 0 -45px;border-radius:50%;background:radial-gradient(circle,#fff 0 12%,var(--c) 30%,transparent 62%);animation:burst .4s ease-out forwards;pointer-events:none}
+.burst{position:absolute;z-index:101;width:90px;height:90px;margin:-45px 0 0 -45px;border-radius:50%;background:radial-gradient(circle,#fff 0 12%,var(--c) 30%,transparent 62%);animation:burst .4s ease-out forwards;pointer-events:none}
 @keyframes burst{from{transform:scale(.2);opacity:1}to{transform:scale(1.6);opacity:0}}
-.flash{position:absolute;inset:0;z-index:4;background:radial-gradient(circle,#fff8d0,#f2c35b 60%,transparent);animation:flash .7s ease-out forwards;pointer-events:none}
+.flash{position:absolute;inset:0;z-index:102;background:radial-gradient(circle,#fff8d0,#f2c35b 60%,transparent);animation:flash .7s ease-out forwards;pointer-events:none}
 @keyframes flash{from{opacity:.95}to{opacity:0}}
-.shout{position:absolute;left:0;right:0;top:34%;text-align:center;z-index:5;font-family:var(--display);font-size:52px;color:#fff;text-shadow:0 3px 0 #2c3542,0 0 14px #e8c45e;animation:shout 1s ease-out forwards;pointer-events:none}
+.shout{position:absolute;left:0;right:0;top:34%;text-align:center;z-index:103;font-family:var(--display);font-size:52px;color:#fff;text-shadow:0 3px 0 #2c3542,0 0 14px #e8c45e;animation:shout 1s ease-out forwards;pointer-events:none}
 @keyframes shout{from{transform:scale(.5);opacity:0}25%{transform:scale(1.15);opacity:1}70%{opacity:1}to{transform:scale(1);opacity:0}}
-.pop{position:absolute;z-index:3;font-weight:800;font-size:28px;color:#fff;text-shadow:0 2px 0 #000,0 0 6px #000;animation:pop .9s ease-out forwards;pointer-events:none}
+.pop{position:absolute;z-index:104;font-weight:800;font-size:28px;color:#fff;text-shadow:0 2px 0 #000,0 0 6px #000;animation:pop .9s ease-out forwards;pointer-events:none}
 .pop.heal{color:#a8e88a} .pop.crit{color:var(--gold);font-size:40px}
 @keyframes pop{from{transform:translateY(0);opacity:1}to{transform:translateY(-54px);opacity:0}}
 .log{font-size:13px;display:flex;flex-direction:column;justify-content:flex-end;gap:1px;min-height:52px}
@@ -2440,23 +2445,23 @@ const CLASSES={
   knight:{name:'Knight',hp:1.3,atk:.9,crit:.08,weapon:['Sword','Sword and Shield','Greatsword'],ranged:[0,0,0],blurb:'Tough as a castle wall. Stuns foes and shrugs off hits.',
     skills:[{n:'Stunning Blow',lv:1,cd:3,mult:1.2,stun:1,d:'Hit and stun for a turn'},
             {n:'Iron Guard',lv:3,cd:4,guard:3,heal:.1,d:'Halve damage for 3 turns'},
-            {n:'Whirl Slash',lv:6,cd:5,mult:2.4,d:'A huge spinning strike'}],
+            {n:'Whirl Slash',lv:6,cd:5,mult:1.9,aoe:1,d:'A spinning strike that hits every foe'}],
     power:{n:'Lionheart',mult:4,stun:1,guard:2,d:'A mighty blow that stuns'}},
   wizard:{name:'Wizard',hp:.8,atk:1.25,crit:.08,weapon:['Wand','Staff','Arcane Staff'],ranged:[1,1,1],shot:'#ff8a3c',blurb:'Fragile, but hits harder than anyone.',
     skills:[{n:'Fireball',lv:1,cd:2,mult:1.8,d:'A blast of flame'},
             {n:'Frost Bind',lv:3,cd:4,mult:1.1,weak:3,shot:'#9fdcff',d:'Hit and weaken the enemy'},
-            {n:'Meteor',lv:6,cd:6,mult:3.2,d:'Call down a falling star'}],
-    power:{n:'Starfall',mult:5.5,shot:'#fff3a0',d:'The sky itself comes down'}},
+            {n:'Meteor',lv:6,cd:6,mult:2.5,aoe:1,d:'A falling star that hits every foe'}],
+    power:{n:'Starfall',mult:4.2,aoe:1,shot:'#fff3a0',d:'The sky comes down on every foe'}},
   ranger:{name:'Ranger',hp:1,atk:1.05,crit:.25,weapon:['Dagger','Crossbow','Heavy Crossbow'],ranged:[0,1,1],shot:'#e9edf1',blurb:'Quick and lucky. Lands critical hits often.',
-    skills:[{n:'Twin Shot',lv:1,cd:2,mult:.95,hits:2,d:'Two shots at once'},
+    skills:[{n:'Twin Shot',lv:1,cd:2,mult:.95,hits:2,spread:1,d:'Two shots, the second at any foe'},
             {n:'Venom Bolt',lv:3,cd:4,mult:1,poison:3,shot:'#8fe86a',d:'Poison that keeps hurting'},
             {n:'Eagle Eye',lv:6,cd:5,mult:1,eagle:3,d:'Next 3 hits are critical'}],
-    power:{n:'Arrow Storm',mult:.75,hits:5,allcrit:true,d:'Five critical shots in a row'}},
+    power:{n:'Arrow Storm',mult:.75,hits:5,spread:1,allcrit:true,d:'Five critical shots across the foes'}},
   barbarian:{name:'Barbarian',hp:1.15,atk:.95,crit:.1,weapon:['Hatchet','Battle Axe','Twin Axes'],ranged:[0,0,0],blurb:'Wild and hard to put down. Heals in the thick of a fight.',
     skills:[{n:'Cleave',lv:1,cd:2,mult:1.6,d:'A heavy chop'},
             {n:'Second Wind',lv:3,cd:3,heal:.4,d:'Heal a big chunk of health'},
             {n:'War Cry',lv:6,cd:5,bless:4,heal:.2,d:'Heal and hit harder for 4 turns'}],
-    power:{n:'Berserker Rage',mult:3.8,heal:.3,d:'A furious strike that heals you'}}
+    power:{n:'Berserker Rage',mult:3,aoe:1,heal:.3,d:'A furious blow to every foe that heals you'}}
 };
 /* 5 worlds x 10 levels. Level index n = 0..49. Stage 5 of a world has a mini-boss, stage 10 the world boss (both visible on the map). */
 const WORLDS=[
@@ -2470,16 +2475,25 @@ const LEVELS=50;
 const RAID=['Ashmaw the Ember Titan','golem_lava'];
 const raidMax=no=>Math.round(1200*Math.pow(1.6,no-1));
 const need=l=>25+l*l*8;
-/* Balance: a level expects a hero of about level .9n+1 with gear of tier n/6. A normal monster falls in about 4 hits and needs about 9 to beat you. */
+/* Balance (made harder 2026-11-15): a level expects a hero of about level .9n+1 with gear of tier n/6. A lone monster takes about 5 hits and needs about 7 to beat you;
+   groups of 2-3 are common later on. XP is about one hero level per level cleared, so you can't outgrow the levels by just playing through. */
 const expLv=n=>Math.round(.9*n+1), expTier=n=>Math.min(GEAR_MAX,Math.floor(n/6));
-const lvHp=n=>Math.round(3.6*(6+2.2*expLv(n)+WEAPON_ATK[expTier(n)])*(1+n*.01));
-const lvAtk=n=>(40+12*expLv(n)+ARMOR_HP[expTier(n)])/9+ARMOR_DEF[expTier(n)];
-const lvXp=n=>Math.round(need(expLv(n))/5.5), lvGold=n=>Math.round(6*Math.pow(1.09,n)*(1+n/10));
+const lvHp=n=>Math.round(4.6*(6+2.2*expLv(n)+WEAPON_ATK[expTier(n)])*(1+n*.01));
+const lvAtk=n=>(40+12*expLv(n)+ARMOR_HP[expTier(n)])/7+ARMOR_DEF[expTier(n)];
+const lvXp=n=>Math.round(need(expLv(n))/13), lvGold=n=>Math.round(6*Math.pow(1.09,n)*(1+n/10));
 const levelName=n=>WORLDS[Math.floor(n/10)].n+' '+(Math.floor(n/10)+1)+'-'+(n%10+1);
 const levelBoss=n=>n%10===9?'boss':n%10===4?'mini':null;
 function makeFoe(n,kind){ const W=WORLDS[Math.floor(n/10)], m=kind==='boss'?W.boss:kind==='mini'?W.mini:W.mobs[Math.floor(Math.random()*W.mobs.length)];
-  const hm=kind==='boss'?3.2:kind==='mini'?2.4:rnd(.9,1.15), am=kind==='boss'?1.45:kind==='mini'?1.3:1, hp=Math.round(lvHp(n)*hm);
+  const hm=kind==='boss'?4.2:kind==='mini'?3:rnd(.9,1.15), am=kind==='boss'?1.55:kind==='mini'?1.35:1, hp=Math.round(lvHp(n)*hm);
   return {n:m[0],id:m[1],hp,max:hp,atk:lvAtk(n)*am,kind,big:kind!=='mob',xp:lvXp(n)*(kind==='boss'?5:kind==='mini'?3:1),gold:lvGold(n)*(kind==='boss'?7:kind==='mini'?4:1),scene:Math.floor(n/10)}; }
+/* A fight: one monster, or a group. Groups get likelier each world; bosses bring minions from world 2 on. Group members are a bit weaker one by one. */
+function makeFoes(n,kind){ const w=Math.floor(n/10), out=[makeFoe(n,kind)]; let extra=0;
+  if(kind==='mob'){ if(n>=2){ const r=Math.random(); extra=r<(w>=2?.08*w:0)?2:r<.3+.08*w?1:0; } }
+  else extra=kind==='boss'?(w?2:1):(w?1:0);
+  const sc=(f,h,a,x)=>{f.hp=f.max=Math.max(1,Math.round(f.hp*h)); f.atk*=a; f.xp=Math.round(f.xp*x); f.gold=Math.round(f.gold*x); return f};
+  if(kind==='mob'&&extra)sc(out[0],.75,.7,.8);
+  for(let i=0;i<extra;i++)out.push(sc(makeFoe(n,'mob'),.75,.7,.8));
+  return out; }
 
 /* ---------- helpers ---------- */
 const app=document.getElementById('app');
@@ -2641,7 +2655,7 @@ function start(){
 "use strict";
 /* Hearthguard exploring: a wide side-view level you roam with a joystick (left/right and up/down), with branching trails,
    chests, surprise encounters, a visible boss on boss levels and an exit gate at the far end. */
-const CELL=160, ROWS=5, TOP=250, UNIT=77;   // world units: one trail cell, sky band height, units per Blender unit of a sprite
+const CELL=160, ROWS=7, VIEWROWS=5, TOP=250, UNIT=77;   // world units: one trail cell, sky band height, units per Blender unit of a sprite. The screen shows 5 of the 7 rows and follows the hero up and down.
 const THEMES={
  woods:{sky:['#7cc4e6','#dff2c4'],far:'#6fa878',ground:'#3f7a3a',dot:'#356b33',path:'#cdb67e',edge:'#a8905c',props:['tree','pine','bush','tree']},
  mines:{sky:['#17131c','#3a2f38'],far:'#2a242c',ground:'#353030',dot:'#2a2625',path:'#8f7f6f',edge:'#6e6055',props:['rock','stal','crystal','rock']},
@@ -2650,11 +2664,11 @@ const THEMES={
  spire:{sky:['#0e0b20','#4f2c72'],far:'#1e1838',ground:'#231d3a',dot:'#1a152c',path:'#62587f',edge:'#463d62',props:['pillar','pcrystal','wall','pillar']}
 };
 function seeded(seed){ let s=seed%2147483647; if(s<=0)s+=2147483646; return ()=>(s=s*16807%2147483647)/2147483647; }
-function genLevel(n){ const R=seeded(n*7919+17), C=30+(n%10)*2, g=[]; for(let r=0;r<ROWS;r++)g.push(new Uint8Array(C));
-  let r=2; const main=[];
+function genLevel(n){ const R=seeded(n*7919+17), C=44+(n%10)*3+Math.floor(n/10)*2, g=[]; for(let r=0;r<ROWS;r++)g.push(new Uint8Array(C));
+  let r=3; const main=[];
   for(let c=0;c<C;c++){ g[r][c]=1; main.push([c,r]);
     if(c>2&&c<C-5&&R()<.5){ const d=R()<.5?-1:1, len=1+Math.floor(R()*2); for(let k=0;k<len;k++){ const nr=r+d; if(nr<0||nr>=ROWS)break; r=nr; g[r][c]=1; main.push([c,r]); } } }
-  const chests=[], nb=3+Math.floor(C/9);
+  const chests=[], nb=4+Math.floor(C/7);
   for(let b=0;b<nb;b++){ let [c,rr]=main[3+Math.floor(R()*(main.length-14))]; if(c>C-7)continue; let len=3+Math.floor(R()*4), last=null;
     for(let k=0;k<len;k++){ const d=R(); let nc=c,nr=rr; if(d<.45)nr+=(R()<.5?-1:1); else if(d<.85)nc+=1; else nc-=1;
       if(nr<0||nr>=ROWS||nc<1||nc>C-6)continue; c=nc; rr=nr; if(!g[rr][c]){g[rr][c]=1; last=[c,rr]} }
@@ -2665,7 +2679,7 @@ function genLevel(n){ const R=seeded(n*7919+17), C=30+(n%10)*2, g=[]; for(let r=
   for(let c=-3;c<C+3;c++){ props.push({x:(c+R())*CELL,y:-6-R()*20,kind:T.props[0],s:.6+R()*.3}); props.push({x:(c+R())*CELL,y:ROWS*CELL+150+R()*50,kind:T.props[0],s:.7+R()*.3}); }
   props.sort((a,b)=>a.y-b.y);
   const er=main[main.length-1][1];
-  return {n,C,g,T,props,chests,start:{x:CELL*.5,y:2.5*CELL},exit:{x:(C-.5)*CELL,y:(er+.5)*CELL},boss:levelBoss(n)?{x:(C-3.5)*CELL,y:(er+.5)*CELL,kind:levelBoss(n)}:null};
+  return {n,C,g,T,props,chests,start:{x:CELL*.5,y:3.5*CELL},exit:{x:(C-.5)*CELL,y:(er+.5)*CELL},boss:levelBoss(n)?{x:(C-3.5)*CELL,y:(er+.5)*CELL,kind:levelBoss(n)}:null};
 }
 /* ----- scenery, drawn once per kind into a small canvas (200 x 320, base of the object at 100,300) ----- */
 const propCache={};
@@ -2726,14 +2740,14 @@ function walkable(x,y){ const L=EX.L; for(const ox of [-36,36])for(const oy of [
 function stepExplore(dt){ const E=EX; E.t+=dt; if(E.busy||E.done)return;
   let vx=E.joy.x+(E.keys.r?1:0)-(E.keys.l?1:0), vy=E.joy.y+(E.keys.d?1:0)-(E.keys.u?1:0); const m=Math.hypot(vx,vy); if(m>1){vx/=m;vy/=m}
   E.moving=m>.05; if(!E.moving)return;
-  const sp=390*dt, ox=E.x, oy=E.y; if(Math.abs(vx)>.05)E.face=vx>0?1:-1;
+  const sp=480*dt, ox=E.x, oy=E.y; if(Math.abs(vx)>.05)E.face=vx>0?1:-1;
   if(walkable(E.x+vx*sp,E.y))E.x+=vx*sp; if(walkable(E.x,E.y+vy*sp*.8))E.y+=vy*sp*.8;
   E.walk+=Math.hypot(E.x-ox,E.y-oy); const L=E.L;
   for(const c of L.chests)if(!c.open&&Math.hypot(c.x-E.x,c.y-E.y)<95)openChest(c);
   if(L.boss&&E.bossAlive&&Math.hypot(L.boss.x-E.x,(L.boss.y-E.y)*1.4)<150){ encounter(L.boss.kind); return; }
   if(Math.hypot(L.exit.x-E.x,L.exit.y-E.y)<80&&!E.bossAlive){ levelDone(); return; }
   const nearEnd=E.x>(L.C-5)*CELL;
-  if(E.walk>=E.next&&E.enc<7&&!nearEnd){ E.walk=0; E.next=rnd(1200,2200); E.enc++; encounter('mob'); }
+  if(E.walk>=E.next&&E.enc<Math.round(L.C/6)&&!nearEnd){ E.walk=0; E.next=rnd(1200,2200); E.enc++; encounter('mob'); }
 }
 function openChest(c){ c.open=true; sfx.chest(); const n=EX.n, r=Math.random(); let msg;
   if(r<.55){ const g=lvGold(n)*4; H.gold+=g; msg='Treasure! +'+g+' gold'; } else if(r<.8){ H.potions=Math.min(9,H.potions+1); msg='You found a healing potion'; }
@@ -2743,26 +2757,27 @@ function hudExplore(){ const st=stats(H), hp=document.getElementById('exhp'); if
 async function encounter(kind){ const E=EX; E.busy=true; E.joy={x:0,y:0}; E.keys={}; E.moving=false; sfx.alarm();
   const ex=document.querySelector('.ex'); if(ex){ const f=document.createElement('div'); f.className='encflash'; f.innerHTML='<b>!</b>'; ex.appendChild(f); }
   await sleep(750); if(EX!==E)return;
-  const res=await battle(makeFoe(E.n,kind)); if(EX!==E)return;
+  const res=await battle(makeFoes(E.n,kind)); if(EX!==E)return;
   if(!res.win){ stopExplore(); S.screen='camp'; render(); return; }
   if(kind!=='mob'){ E.bossAlive=false; const w=Math.floor(E.n/10);
     if(kind==='boss'&&!H.relics.includes(w)){ H.relics.push(w); E.relic=w; feat('defeated '+WORLDS[w].boss[0]+' and won '+WORLDS[w].relic); save(); toast('Relic won: '+WORLDS[w].relic+' ('+WORLDS[w].rd+')'); } }
   E.busy=false; E.walk=0; S.screen='explore'; render(); }
-function levelDone(){ const E=EX, n=E.n; E.done=true; const first=n>=H.cleared, bonus=lvGold(n)*(first?6:2); H.gold+=bonus; H.hp=stats(H).hp;
+function levelDone(){ const E=EX, n=E.n; E.done=true; const first=n>=H.cleared, bonus=lvGold(n)*(first?6:2), st=stats(H); H.gold+=bonus; H.hp=Math.min(st.hp,H.hp+Math.round(st.hp*.5));
   if(first){ H.cleared=Math.min(LEVELS,n+1); if(n%10===9)feat('cleared '+WORLDS[Math.floor(n/10)].n); if(n===LEVELS-1)feat('saved the realm'); }
   save(); sfx.win();
-  E.over=`<div class="panel col" style="text-align:center;min-width:280px"><h2>${n===LEVELS-1?'The realm is saved!':'Level complete!'}</h2><p>${esc(levelName(n))}</p><p class="gold">+${bonus} gold${first?' · first clear':''}</p>
+  E.over=`<div class="panel col" style="text-align:center;min-width:280px"><h2>${n===LEVELS-1?'The realm is saved!':'Level complete!'}</h2><p>${esc(levelName(n))}</p><p class="gold">+${bonus} gold${first?' · first clear':''}</p><p class="dim small">You catch your breath and heal half your health.</p>
     <div class="grid2">${n<LEVELS-1?`<button class="go" data-act="level" data-n="${n+1}">Next level</button>`:''}<button data-act="excamp" ${n<LEVELS-1?'':'style="grid-column:1/-1"'}>Camp</button></div></div>`;
   render(); }
 /* ----- drawing ----- */
-function drawExplore(cv){ const E=EX, L=E.L, T=L.T, c=cv.getContext('2d'), k=cv.height/(TOP+ROWS*CELL), vw=cv.width/k, W=L.C*CELL;
+function drawExplore(cv){ const E=EX, L=E.L, T=L.T, c=cv.getContext('2d'), vh=TOP+VIEWROWS*CELL, k=cv.height/vh, vw=cv.width/k, W=L.C*CELL;
   const cam=Math.max(0,Math.min(W-vw,E.x-vw*.42)); E.cam=cam;
+  const want=Math.max(0,Math.min(TOP+ROWS*CELL-vh,TOP+E.y-vh*.6)); E.camY=E.camY==null?want:E.camY+(want-E.camY)*.12; const camY=E.camY;
   const pr=document.getElementById('exprog'); if(pr)pr.style.width=Math.round(100*E.x/W)+'%';
-  c.setTransform(k,0,0,k,0,0);
+  c.setTransform(k,0,0,k,0,0); c.fillStyle=T.ground; c.fillRect(0,0,vw,vh); c.translate(0,-camY);
   const sky=c.createLinearGradient(0,0,0,TOP); sky.addColorStop(0,T.sky[0]); sky.addColorStop(1,T.sky[1]); c.fillStyle=sky; c.fillRect(0,0,vw,TOP+2);
   c.fillStyle=T.far; c.beginPath(); c.moveTo(0,TOP); const R=seeded(L.n+5), off=cam*.25; for(let i=0;i<80;i++){ const x=i*150-off, h=60+R()*110; if(x>-200&&x<vw+200){c.lineTo(x,TOP-h); c.lineTo(x+75,TOP-h*.55);} } c.lineTo(vw,TOP); c.closePath(); c.fill();
   c.translate(-cam,TOP);
-  c.fillStyle=T.ground; c.fillRect(cam-10,-4,vw+20,ROWS*CELL+10);
+  c.fillStyle=T.ground; c.fillRect(cam-10,-4,vw+20,ROWS*CELL+260);
   const c0=Math.max(0,Math.floor(cam/CELL)-1), c1=Math.min(L.C-1,Math.ceil((cam+vw)/CELL)+1);
   for(let r=0;r<ROWS;r++)for(let col=c0;col<=c1;col++){ const x=col*CELL, y=r*CELL; const h=(col*31+r*17)%7;
     if(L.g[r][col]){ c.fillStyle=T.path; c.fillRect(x-1,y-1,CELL+2,CELL+2); c.fillStyle=T.edge;
@@ -2800,43 +2815,57 @@ function drawGate(c,g,open,t){ const x=g.x, y=g.y+40; circ(c,'rgba(0,0,0,.25)',x
 </script>
 <script>
 "use strict";
-/* Hearthguard battle screen: turn-based. You pick a move, your hero plays its attack animation, then the enemy takes its turn.
-   battle(foe, {raid}) switches to the battle screen and resolves with {win, ...} when the player taps Continue. */
-const BU=12.5;   // % of stage height per Blender unit of a sprite
+/* Hearthguard battle screen: turn-based. You pick a move (tap a monster to choose who you hit), your hero plays its attack animation,
+   then every monster still standing takes its turn. battle(foes, {raid}) switches to the battle screen and resolves with {win, ...}
+   when the player taps Continue. foes is one monster or a list of up to 3. */
+const BU=11.5;   // % of stage height per Blender unit of a sprite
 const $b=id=>document.getElementById(id);
-function battle(foe,opt){ opt=opt||{};
+/* where monsters stand: by group size. x = % of stage width, y = feet (% of height), s = size. The first (the leader / boss) stands at the back. */
+const SLOTPOS=[[{x:72,y:85,s:1}],[{x:64,y:81,s:.94},{x:84,y:89,s:1}],[{x:74,y:79,s:.9},{x:59,y:90,s:1},{x:89,y:90,s:1}]];
+const HERO_X=16, HERO_Y=84;
+const alive=()=>B.es.filter(e=>e.hp>0);
+const fid=e=>'bf'+B.es.indexOf(e);
+function battle(foes,opt){ opt=opt||{}; if(!Array.isArray(foes))foes=[foes];
   return new Promise(resolve=>{
-    B=Object.assign({e:Object.assign({stun:0,weak:0,poison:0,pdmg:0,charge:false},foe),cd:[0,0,0],guard:0,bless:0,eagle:0,et:0,busy:false,anim:false,
-      log:[opt.raid?'Ashmaw towers over you. You have 8 turns to strike!':foe.kind==='mob'?'Ambush! '+foe.n+' attacks!':foe.n+' stands in your way!'],resolve},opt.raid?{raid:true,turns:8,dealt:0}:{});
-    loadImg(heroSheet(H)); loadImg(mobSheet(foe.id)); S.screen='battle'; render(); });
+    const es=foes.map((f,i)=>Object.assign({stun:0,weak:0,poison:0,pdmg:0,charge:false,et:i},f)), lead=es[0];
+    const intro=opt.raid?'Ashmaw towers over you. You have 8 turns to strike!':lead.kind==='mob'?(es.length>1?'Ambush! '+es.length+' monsters attack!':'Ambush! '+lead.n+' attacks!')
+      :lead.n+' stands in your way'+(es.length>1?' with '+(es.length-1)+' minion'+(es.length>2?'s':'')+'!':'!');
+    B=Object.assign({es,tgt:0,cd:[0,0,0],guard:0,bless:0,eagle:0,busy:false,anim:false,log:[intro].concat(es.length>1?['Tap a monster to choose who you strike.']:[]),resolve},opt.raid?{raid:true,turns:8,dealt:0}:{});
+    loadImg(heroSheet(H)); es.forEach(f=>loadImg(mobSheet(f.id))); S.screen='battle'; render(); });
 }
-function vBattle(){ const e=B.e, big=e.big||B.raid, rig=e.id.startsWith('sk_'), fs=(rig?4.4:5)*BU*(big?1.35:1), hs=4.4*BU*(1+rank(H)*.03), foot=rig?.776:.743;
-  return `<div class="bt"><div class="stage" id="bstage">${scene(B.raid?6:e.scene)}
+function foeGeom(e,i){ const P=SLOTPOS[B.es.length-1][i], big=e.big||B.raid, rig=e.id.startsWith('sk_'), fs=(rig?4.4:5)*BU*(big?1.3:1)*P.s, foot=rig?.776:.743;
+  return {x:P.x,y:P.y,fs,top:P.y-foot*fs,head:P.y-fs*(rig?.5:.6)}; }
+function vBattle(){ const hs=4.4*BU*(1+rank(H)*.03), multi=B.es.length>1;
+  return `<div class="bt"><div class="stage" id="bstage">${scene(B.raid?6:B.es[0].scene)}
     <div class="tag l"><div class="stat"><span>${esc(H.name)} · Lv ${H.lvl}</span><span id="bhpT"></span></div><div class="bar"><i id="bhp"></i></div><div class="bar pw" id="bpwb"><i id="bpw"></i></div></div>
-    <div class="tag r"><div class="stat"><span>${esc(e.n)}</span><span id="bfT"></span></div><div class="bar ${B.raid?'raid':'foe'}"><i id="bfhp"></i></div></div>
-    ${aura(H,'left:23%;width:14%;top:79%;height:9%')}
-    ${heroSpr(H,'bsp',`height:${hs}%;top:${84-.776*hs}%;left:30%;`,null,null,'id="bh"')}
-    ${mobSpr(e.id,'bsp',`height:${fs}%;top:${85-foot*fs}%;left:${big?68:70}%;`,'id="bf"')}
+    <div class="tag r"><div class="stat"><span id="bfN"></span><span id="bfT"></span></div><div class="bar ${B.raid?'raid':'foe'}"><i id="bfhp"></i></div></div>
+    ${aura(H,`left:${HERO_X-7}%;width:14%;top:${HERO_Y-5}%;height:9%`)}
+    ${heroSpr(H,'bsp',`height:${hs}%;top:${HERO_Y-.776*hs}%;left:${HERO_X}%;z-index:${HERO_Y};`,null,null,'id="bh"')}
+    ${B.es.map((e,i)=>{ const g=foeGeom(e,i);
+      return mobSpr(e.id,'bsp foe'+(e.hp<=0?' gone':''),`height:${g.fs}%;top:${g.top}%;left:${g.x}%;z-index:${g.y};animation-delay:-${(i*.9+1.3).toFixed(1)}s;`,`id="bf${i}" data-act="tgt" data-i="${i}" role="button" aria-label="Target ${esc(e.n)}"`)
+        +(multi?`<div class="fbar${e.hp<=0?' gone':''}" id="fb${i}" style="left:${g.x}%;top:${Math.max(16,g.head)}%"><i></i></div>`:''); }).join('')}
   </div><div class="side" id="bside"></div></div>`; }
 let bIdle=0;
-function mountBattle(){ clearInterval(bIdle); let t=0;
-  bIdle=setInterval(()=>{ if(!B||S.screen!=='battle'){clearInterval(bIdle);return} },2000);
-  battleUI(); }
+function mountBattle(){ clearInterval(bIdle); battleUI(); }
 function bFrame(el,f,n){ if(el)el.style.backgroundPositionX=fpos(f,n); }
-function battleUI(){ if(!B)return; const e=B.e, st=stats(H), c=CLASSES[H.cls], res=B.result, pw=H.pow||0, set=(id,v)=>{const x=$b(id); if(x)x.style.width=Math.max(0,Math.min(100,v))+'%'};
+function pickTarget(i){ if(!B||B.result||!B.es[i]||B.es[i].hp<=0)return; B.tgt=i; sfx.tap(); battleUI(); }
+function battleUI(){ if(!B)return; if(!B.es[B.tgt]||B.es[B.tgt].hp<=0){const a=B.es.findIndex(x=>x.hp>0); if(a>=0)B.tgt=a}
+  const e=B.es[B.tgt], st=stats(H), c=CLASSES[H.cls], res=B.result, pw=H.pow||0, set=(id,v)=>{const x=$b(id); if(x)x.style.width=Math.max(0,Math.min(100,v))+'%'};
   set('bhp',100*H.hp/st.hp); set('bpw',pw); set('bfhp',100*e.hp/e.max); const pb=$b('bpwb'); if(pb)pb.classList.toggle('full',pw>=100);
-  if($b('bhpT'))$b('bhpT').textContent=H.hp+' / '+st.hp; if($b('bfT'))$b('bfT').textContent=e.hp+' / '+e.max;
+  if($b('bhpT'))$b('bhpT').textContent=H.hp+' / '+st.hp; if($b('bfT'))$b('bfT').textContent=e.hp+' / '+e.max; if($b('bfN'))$b('bfN').textContent=e.n;
+  B.es.forEach((f,i)=>{ const fb=$b('fb'+i); if(fb){ fb.firstElementChild.style.width=Math.max(0,100*f.hp/f.max)+'%'; fb.classList.toggle('on',i===B.tgt&&!res); fb.classList.toggle('gone',f.hp<=0); } });
   const chips=[]; if(B.guard>0)chips.push('Guard '+B.guard); if(B.bless>0)chips.push('War Cry '+B.bless); if(B.eagle>0)chips.push('Eagle Eye '+B.eagle);
-  if(e.stun>0)chips.push('Enemy stunned'); if(e.weak>0)chips.push('Enemy weakened '+e.weak); if(e.poison>0)chips.push('Enemy poisoned '+e.poison); if(e.charge)chips.push('Mighty blow coming!'); if(B.raid&&!res)chips.push(B.turns+' turns left');
+  if(e.stun>0)chips.push('Stunned'); if(e.weak>0)chips.push('Weakened '+e.weak); if(e.poison>0)chips.push('Poisoned '+e.poison);
+  B.es.forEach(f=>{ if(f.hp>0&&f.charge)chips.push(f.n+': mighty blow coming!') }); if(B.raid&&!res)chips.push(B.turns+' turns left');
   let h;
   if(res){ let t;
     if(res.raid)t=`<h2>${res.win?'Ashmaw falls!':res.flew?'Time is up':'Knocked back'}</h2><p>You dealt <b class="gold">${res.dealt}</b> damage for the family.</p>`;
     else if(res.win)t=`<h2>Victory!</h2><p>+${res.gold} gold · +${res.xp} XP</p>${res.ups?`<p class="gold">Level up! You are now level ${H.lvl}.</p>`:''}${res.rank?`<p class="gold">New rank: ${RANKS[res.rank]}! Your hero looks stronger.</p>`:''}${(res.gear||[]).map(g=>`<p class="gold">Your ${g.k} grew to level ${H[g.k]+1}: ${esc(gearName(H,g.k,H[g.k]))}.${g.look?' New look!':''}</p>`).join('')}`;
-    else t=`<h2>Knocked out</h2><p class="dim">Your friends carry you back to the fire. Rest, gear up, and try again.</p>`;
+    else t=`<h2>Knocked out</h2><p class="dim">Your friends carry you back to the fire${res.lost?`, but you dropped <b class="gold">${res.lost} gold</b> on the way`:''}. Rest, gear up, and try again.</p>`;
     h=`<div class="panel col" style="text-align:center">${t}</div><button class="go" data-act="bdone">Continue</button>`;
   } else {
     const off=B.busy?'disabled':'';
-    h=`<div class="log">${B.log.map(l=>`<p>${esc(l)}</p>`).join('')}</div><div class="chips">${chips.map(x=>`<span class="chip">${x}</span>`).join('')}</div><div class="acts">
+    h=`<div class="log">${B.log.map(l=>`<p>${esc(l)}</p>`).join('')}</div><div class="chips">${chips.map(x=>`<span class="chip">${esc(x)}</span>`).join('')}</div><div class="acts">
       ${pw>=100?`<button class="pow" data-act="act" data-k="pow" ${off}>${c.power.n}!<span class="sub">${c.power.d}</span></button>`:''}
       <button class="go wide" data-act="act" data-k="atk" ${off}>Attack</button>
       ${c.skills.map((s,i)=>`<button data-act="act" data-k="${i}" ${B.busy||B.cd[i]>0||H.lvl<s.lv?'disabled':''}>${s.n}<span class="sub">${H.lvl<s.lv?'Level '+s.lv:B.cd[i]>0?'Ready in '+B.cd[i]:s.d}</span></button>`).join('')}
@@ -2855,62 +2884,79 @@ function burstFx(id,col){ const st=$b('bstage'), el=$b(id); if(!st||!el)return; 
   d.className='burst'; d.style.left=(a.left-s.left+a.width/2)+'px'; d.style.top=(a.top-s.top+a.height*.52)+'px'; d.style.setProperty('--c',col); st.appendChild(d); setTimeout(()=>d.remove(),420); }
 async function projectile(fromId,toId,col,kind){ const st=$b('bstage'), a=$b(fromId), b=$b(toId); if(!st||!a||!b)return; const s=st.getBoundingClientRect(), ra=a.getBoundingClientRect(), rb=b.getBoundingClientRect();
   const p=document.createElement('div'); p.className='proj '+(kind||'orb'); p.style.setProperty('--c',col); if(centerX(b)<centerX(a))p.classList.add('flip'); p.style.left=(centerX(a)-s.left)+'px'; p.style.top=(ra.top-s.top+ra.height*.5)+'px'; st.appendChild(p);
-  void p.offsetWidth; p.style.transform=`translate(${centerX(b)-centerX(a)}px,${(rb.top+rb.height*.55)-(ra.top+ra.height*.5)}px)`; await sleep(230); p.remove(); }
-/* plays 5 attack frames; melee attackers run up to the target first. onHit fires on the impact frame. */
-async function attackAnim(who,ranged,col,onHit,kind){ const hero=who==='h', el=$b(hero?'bh':'bf'), tgt=$b(hero?'bf':'bh'), base=hero?HF.atk:MF.atk, n=hero?HN:MN; if(!el||!tgt){onHit();return}
-  B.anim=true;
-  if(!ranged){ const d=centerX(tgt)-centerX(el); el.style.setProperty('--dx',(d-Math.sign(d)*el.offsetWidth*.36)+'px'); await sleep(190); }
-  for(let k=0;k<5;k++){ bFrame(el,base+k,n); if(k===1)sfx.swing(); if(k===2){ if(ranged){sfx.shot(); await projectile(hero?'bh':'bf',hero?'bf':'bh',col||'#fff',kind)} else slashFx(hero?'bf':'bh',col||'#fff',!hero); burstFx(hero?'bf':'bh',col||'#fff'); onHit(); } await sleep(85); }
-  el.style.setProperty('--dx','0px'); bFrame(el,0,n); await sleep(ranged?90:200); B.anim=false; }
-function strike(mult,forceCrit){ const st=stats(H); let d=st.atk*mult*rnd(.88,1.12); if(B.bless>0)d*=1.4;
+  void p.offsetWidth; p.style.transform=`translate(${centerX(b)-centerX(a)}px,${(rb.top+rb.height*.55)-(ra.top+ra.height*.5)}px)`; await sleep(260); p.remove(); }
+/* plays 5 attack frames; melee attackers run up to the target first (heroes play their run frames on the way). onHit fires on the impact frame. */
+async function attackAnim(fromId,toIds,ranged,col,onHit,kind,base){ const hero=fromId==='bh', el=$b(fromId), tg=toIds.map(x=>$b(x)).filter(Boolean), n=hero?HN:MN;
+  if(base==null)base=hero?HF.atk:MF.atk; if(!el||!tg.length){onHit();return}
+  B.anim=true; col=col||'#fff';
+  if(!ranged){ const tx=tg.reduce((a,t)=>a+centerX(t),0)/tg.length, d=tx-centerX(el); el.style.setProperty('--dx',(d-Math.sign(d)*el.offsetWidth*.34)+'px');
+    if(hero){ for(let k=0;k<4;k++){ bFrame(el,HF.walk+k,n); await sleep(62); } } else await sleep(250); }
+  for(let k=0;k<5;k++){ bFrame(el,base+k,n); if(k===1)sfx.swing();
+    if(k===2){ if(ranged){ sfx.shot(); await Promise.all(tg.map(t=>projectile(fromId,t.id,col,kind))); } else tg.forEach(t=>slashFx(t.id,col,!hero)); tg.forEach(t=>burstFx(t.id,col)); onHit(); }
+    await sleep(85); }
+  el.style.setProperty('--dx','0px'); if(!ranged&&hero){ for(let k=4;k<6;k++){ bFrame(el,HF.walk+k,n); await sleep(70); } } bFrame(el,0,n); await sleep(ranged?90:160); B.anim=false; }
+function strike(e,mult,forceCrit){ const st=stats(H); let d=st.atk*mult*rnd(.88,1.12); if(B.bless>0)d*=1.4;
   let crit=forceCrit||Math.random()<st.crit; if(!forceCrit&&B.eagle>0){crit=true;B.eagle--} if(crit)d*=1.8;
-  d=Math.max(1,Math.round(d)); B.e.hp=Math.max(0,B.e.hp-d); if(B.raid)B.dealt+=d; return {d,crit}; }
-async function heroAct(kind){ if(!B||B.busy||B.result)return; const st=stats(H), e=B.e, c=CLASSES[H.cls];
+  d=Math.max(1,Math.round(d)); const was=e.hp; e.hp=Math.max(0,e.hp-d); if(B.raid)B.dealt+=was-e.hp; return {d,crit}; }
+/* monsters that fell this turn fade away */
+function reap(){ B.es.forEach((e,i)=>{ if(e.hp<=0&&!e.dead){ e.dead=true; const el=$b('bf'+i); if(el)el.classList.add('gone'); if(B.es.length>1)blog(e.n+' is defeated!'); } }); battleUI(); }
+async function heroAct(kind){ if(!B||B.busy||B.result)return; const st=stats(H), c=CLASSES[H.cls];
   if(kind==='potion'){ if(H.potions<1)return toast('No potions left.'); if(H.hp>=st.hp)return toast('You are already at full health.'); }
   const sk=kind==='potion'?null:kind==='atk'?{n:'Attack',mult:1}:kind==='pow'?c.power:c.skills[kind], power=kind==='pow';
   if(power&&(H.pow||0)<100)return; if(typeof kind==='number'&&(B.cd[kind]>0||H.lvl<sk.lv))return;
   B.busy=true; for(let i=0;i<3;i++)if(B.cd[i]>0)B.cd[i]--; if(typeof kind==='number')B.cd[kind]=sk.cd; if(power)H.pow=0;
+  let tgt=B.es[B.tgt]; if(!tgt||tgt.hp<=0){ tgt=alive()[0]; B.tgt=B.es.indexOf(tgt); }
   battleUI();
   if(kind==='potion'){ H.potions--; const h=Math.round(st.hp*.4); H.hp=Math.min(st.hp,H.hp+h); blog('You drink a potion and heal '+h+'.'); bFrame($b('bh'),HF.cheer,HN); B.anim=true; bpop('bh','+'+h,'heal'); sfx.heal(); battleUI(); await sleep(550); B.anim=false; }
   else {
     if(power){ sfx.power(); const stg=$b('bstage'); if(stg){ const f=document.createElement('div'); f.className='flash'; stg.appendChild(f); const t=document.createElement('div'); t.className='shout'; t.textContent=c.power.n+'!'; stg.appendChild(t); setTimeout(()=>{f.remove();t.remove()},1000); } bFrame($b('bh'),HF.cheer,HN); B.anim=true; await sleep(450); B.anim=false; }
     let line=kind==='atk'?'You attack':'You use '+sk.n;
-    if(sk.mult){ let total=0, anyCrit=false;
-      const rg=!!c.ranged[look(H.weapon)]; await attackAnim('h',rg,rg?(sk.shot||c.shot):(sk.shot||WGLOW[H.weapon]||'#ffffff'),()=>{ for(let i=0;i<(sk.hits||1);i++){const s=strike(sk.mult,sk.allcrit); total+=s.d; anyCrit=anyCrit||s.crit}
-        bpop('bf','-'+total,anyCrit||power?'crit':''); bShake('bf',MF.hit,MN); anyCrit||power?sfx.crit():sfx.hit(); battleUI(); },H.cls==='ranger'?'bolt':'orb');
-      line+=' for '+total+(anyCrit?', a critical hit!':'.'); if(!power)H.pow=Math.min(100,(H.pow||0)+22);
+    const targets=sk.aoe?alive():[tgt];
+    if(sk.mult){ let total=0, anyCrit=false; const dmg=new Map();
+      const rg=!!c.ranged[look(H.weapon)], col=rg?(sk.shot||c.shot):(sk.shot||WGLOW[H.weapon]||'#ffffff');
+      await attackAnim('bh',targets.map(fid),rg,col,()=>{
+        for(const e of targets)for(let i=0;i<(sk.hits||1);i++){ let t=e; if(sk.spread&&i>0){ const al=alive(); if(!al.length)break; t=al[Math.floor(Math.random()*al.length)]; } if(t.hp<=0)continue;
+          const s=strike(t,sk.mult,sk.allcrit); dmg.set(t,(dmg.get(t)||0)+s.d); total+=s.d; anyCrit=anyCrit||s.crit; }
+        dmg.forEach((d,e)=>{ bpop(fid(e),'-'+d,anyCrit||power?'crit':''); bShake(fid(e),MF.hit,MN); }); anyCrit||power?sfx.crit():sfx.hit(); battleUI(); },H.cls==='ranger'?'bolt':'orb');
+      line+=(targets.length>1||dmg.size>1?' and hit '+dmg.size+' foes':'')+' for '+total+(anyCrit?', a critical hit!':'.'); if(!power)H.pow=Math.min(100,(H.pow||0)+22);
     } else { line+='.'; bFrame($b('bh'),HF.cheer,HN); B.anim=true; await sleep(300); B.anim=false; }
     if(sk.heal){ const h=Math.round(st.hp*sk.heal); H.hp=Math.min(st.hp,H.hp+h); bpop('bh','+'+h,'heal'); sfx.heal(); }
-    if(sk.stun&&!B.raid)e.stun=sk.stun; if(sk.weak)e.weak=sk.weak; if(sk.poison){e.poison=sk.poison;e.pdmg=Math.max(1,Math.round(st.atk*.45))}
+    for(const e of targets){ if(e.hp<=0)continue; if(sk.stun&&!B.raid)e.stun=sk.stun; if(sk.weak)e.weak=sk.weak; if(sk.poison){e.poison=sk.poison;e.pdmg=Math.max(1,Math.round(st.atk*.45))} }
     if(sk.guard)B.guard=sk.guard; if(sk.bless)B.bless=sk.bless; if(sk.eagle)B.eagle=sk.eagle;
     blog(line); }
-  battleUI(); await sleep(250); if(!B)return; if(e.hp<=0)return finishBattle(true);
+  reap(); await sleep(250); if(!B)return; if(!alive().length)return finishBattle(true);
   await enemyTurn(); if(!B||B.result)return; B.busy=false; battleUI(); }
-async function enemyTurn(){ const e=B.e, st=stats(H);
-  if(e.poison>0){ e.hp=Math.max(0,e.hp-e.pdmg); if(B.raid)B.dealt+=e.pdmg; e.poison--; blog('Poison burns '+e.n+' for '+e.pdmg+'.'); bpop('bf','-'+e.pdmg); bShake('bf',MF.hit,MN); battleUI(); await sleep(500); if(!B)return; if(e.hp<=0)return finishBattle(true); }
-  if(e.stun>0){ e.stun--; blog(e.n+' is stunned and cannot move!'); battleUI(); await sleep(600); }
-  else { let d=e.atk*rnd(.85,1.15); if(e.weak>0){d*=.7;e.weak--} const heavy=e.charge; if(heavy){d*=1.8;e.charge=false}
+async function enemyTurn(){ const st=stats(H);
+  for(const e of B.es){ if(!B||B.result)return; if(e.hp<=0)continue; const id=fid(e);
+    if(e.poison>0){ const was=e.hp; e.hp=Math.max(0,e.hp-e.pdmg); if(B.raid)B.dealt+=was-e.hp; e.poison--; blog('Poison burns '+e.n+' for '+e.pdmg+'.'); bpop(id,'-'+e.pdmg); bShake(id,MF.hit,MN); battleUI(); await sleep(450); if(!B)return;
+      if(e.hp<=0){ reap(); if(!alive().length)return finishBattle(true); continue; } }
+    if(e.stun>0){ e.stun--; blog(e.n+' is stunned and cannot move!'); battleUI(); await sleep(500); continue; }
+    let d=e.atk*rnd(.85,1.15); if(e.weak>0){d*=.7;e.weak--} const heavy=e.charge; if(heavy){d*=1.8;e.charge=false}
+    const crit=!heavy&&Math.random()<.08; if(crit)d*=1.6;
     d=Math.max(1,Math.round(d-st.def)); if(B.guard>0)d=Math.ceil(d/2);
     const caster=e.id.startsWith('sk_mage')||e.id.startsWith('ghost');
-    await attackAnim('f',caster,caster?(e.id.includes('lich')?'#b070ff':e.id.includes('flame')?'#ff8a3c':'#9fe8ff'):'#ff6a5a',()=>{ H.hp=Math.max(0,H.hp-d); H.pow=Math.min(100,(H.pow||0)+14);
-      bpop('bh','-'+d,heavy?'crit':''); bShake('bh',HF.hit,HN); sfx.hurt(); blog(e.n+(heavy?' unleashes a mighty blow for ':' hits you for ')+d+'.'); battleUI(); });
-    if(!B)return; B.et++; if(e.big&&B.et%3===2&&H.hp>0){e.charge=true; blog(e.n+' is gathering power…')} }
+    await attackAnim(id,['bh'],caster,caster?(e.id.includes('lich')?'#b070ff':e.id.includes('flame')?'#ff8a3c':'#9fe8ff'):'#ff6a5a',()=>{ H.hp=Math.max(0,H.hp-d); H.pow=Math.min(100,(H.pow||0)+12);
+      bpop('bh','-'+d,heavy||crit?'crit':''); bShake('bh',HF.hit,HN); sfx.hurt(); blog(e.n+(heavy?' unleashes a mighty blow for ':crit?' lands a critical hit for ':' hits you for ')+d+'.'); battleUI(); });
+    if(!B)return; e.et++; if(H.hp<=0)break;
+    if(e.big||B.raid?e.et%3===2:e.et%4===3){ e.charge=true; blog(e.n+' is gathering power…'); battleUI(); }
+    await sleep(120); }
   if(B.guard>0)B.guard--; if(B.bless>0)B.bless--;
   if(H.hp<=0)return finishBattle(false);
   if(B.raid){B.turns--; if(B.turns<=0)return finishBattle(false,true)} }
-function finishBattle(win,flew){ const st=stats(H), e=B.e; B.anim=true;
-  const hb=$b('bh'), fb=$b('bf');
-  if(win){ if(fb){fb.style.transition='opacity .6s, transform .6s'; fb.style.opacity='0'; fb.style.setProperty('--dx','40px')} bFrame(hb,HF.cheer,HN); } else if(!B.raid&&hb){ hb.style.transition='opacity .5s'; hb.style.opacity='.4'; bFrame(hb,HF.hit,HN); }
+function finishBattle(win,flew){ const st=stats(H), es=B.es; B.anim=true;
+  const hb=$b('bh');
+  if(win){ bFrame(hb,HF.cheer,HN); } else if(!B.raid&&hb){ hb.style.transition='opacity .5s'; hb.style.opacity='.4'; bFrame(hb,HF.hit,HN); }
   if(B.raid){ const dealt=B.dealt; if(H.raidDay!==today()){H.raidDay=today();H.raidTries=0} H.raidTries++; if((H.raidNo||1)!==world.no){H.raidNo=world.no;H.raidDmg=0}
     H.raidDmg=(H.raidDmg||0)+dealt; H.hp=st.hp; if(dealt>0)feat('struck Ashmaw for '+dealt); save();
     B.result={raid:true,dealt,win,flew}; win?sfx.win():sfx.hit(); battleUI(); return; }
   const res={win};
-  if(win){ const g=Math.round(e.gold*rnd(.85,1.15)*((H.relics||[]).includes(0)?1.2:1)); H.gold+=g; H.kills=(H.kills||0)+1; res.gold=g; res.xp=e.xp;
-    const r0=rank(H); res.ups=addXp(e.xp); if(rank(H)>r0)res.rank=rank(H); res.gear=addGearXp(Math.round(e.gold));
+  if(win){ const gold=es.reduce((a,e)=>a+e.gold,0), xp=es.reduce((a,e)=>a+e.xp,0);
+    const g=Math.round(gold*rnd(.85,1.15)*((H.relics||[]).includes(0)?1.2:1)); H.gold+=g; H.kills=(H.kills||0)+es.length; res.gold=g; res.xp=xp;
+    const r0=rank(H); res.ups=addXp(xp); if(rank(H)>r0)res.rank=rank(H); res.gear=addGearXp(Math.round(gold));
     if(H.relics.includes(2)&&!res.ups)H.hp=Math.min(stats(H).hp,H.hp+Math.round(stats(H).hp*.15));
     if(res.gear.some(x=>x.look)||res.ups)loadImg(heroSheet(H));
     sfx.win(); }
-  else { H.hp=st.hp; sfx.lose(); }
+  else { H.hp=st.hp; res.lost=Math.floor(H.gold*.15); H.gold-=res.lost; sfx.lose(); }
   save(); B.result=res; battleUI(); }
 function battleDone(){ if(!B||!B.result)return; const r=B.result, done=B.resolve; clearInterval(bIdle); B=null; done(r); }
 </script>
@@ -3050,6 +3096,7 @@ function render(){ if(!['who','create','lock','share'].includes(S.screen)&&!H)S.
 /* ---------- input ---------- */
 app.addEventListener('click',ev=>{ const b=ev.target.closest('[data-act]'); if(!b||b.disabled)return; const a=b.dataset.act, d=b.dataset;
   if(a==='act'){ heroAct(d.k==='atk'||d.k==='potion'||d.k==='pow'?d.k:+d.k); return; }
+  if(a==='tgt'){ pickTarget(+d.i); return; }
   sfx.tap();
   if(a==='bdone'){ battleDone(); }
   else if(a==='go'){ if(S.screen==='create'){const i=document.getElementById('heroname'); if(i)S.name=i.value} S.screen=d.to; if(d.to==='camp'||d.to==='guild'){checkRaid();processGifts()} render(); }
