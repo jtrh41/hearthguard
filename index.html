@@ -2356,8 +2356,9 @@ input[type=text]{font:inherit;color:var(--parch);background:#0c0e11;border:2px s
 /* sprites: one frame of a sheet */
 .sp{background-repeat:no-repeat;aspect-ratio:1;flex:none}
 .sp.mini{width:80px;height:80px;margin:-14px -12px -6px}
-.sp.idle{animation:idle15 1s steps(1) infinite} .sp.idle8{animation:idle8 1s steps(1) infinite}
-@keyframes idle15{50%{background-position-x:7.142857%}} @keyframes idle8{50%{background-position-x:14.285714%}}
+/* standing still: one pose that breathes smoothly (flipping between two poses looked choppy) */
+.sp.idle,.sp.idle8{animation:breathe 2.8s ease-in-out infinite;transform-origin:50% 78%}
+@keyframes breathe{50%{scale:1.012 .98}}
 .scene{position:absolute;inset:0;width:100%;height:100%}
 .aura{position:absolute;z-index:0;border-radius:50%;opacity:.6;pointer-events:none}
 .hero-stage{position:relative;height:100%;min-height:0;border:2px solid var(--line);border-radius:10px;overflow:hidden}
@@ -2383,7 +2384,8 @@ input[type=text]{font:inherit;color:var(--parch);background:#0c0e11;border:2px s
 .side{display:flex;flex-direction:column;gap:6px;min-height:0;overflow-y:auto;justify-content:flex-end}
 .stage .tag{position:absolute;top:8px;width:40%;display:flex;flex-direction:column;gap:4px;z-index:2;text-shadow:0 1px 3px #000,0 0 6px #000;font-weight:800}
 .stage .tag.l{left:8px} .stage .tag.r{right:8px}
-.bsp{position:absolute;z-index:1;transform:translateX(calc(-50% + var(--dx,0px)));transition:transform .19s ease-out}
+.bsp{position:absolute;z-index:1;transform:translateX(calc(-50% + var(--dx,0px)));transition:transform .19s ease-out;animation:breathe 2.8s ease-in-out infinite;transform-origin:50% 78%}
+#bf{animation-delay:-1.3s}
 .hitfx{animation:hitfx .3s}
 @keyframes hitfx{0%{filter:brightness(1.9)}25%{translate:-3% 0}50%{translate:3% 0;filter:brightness(1.3)}75%{translate:-2% 0}100%{translate:0 0}}
 .proj{position:absolute;z-index:3;transition:transform .23s linear;pointer-events:none}
@@ -2418,7 +2420,7 @@ input[type=text]{font:inherit;color:var(--parch);background:#0c0e11;border:2px s
 @keyframes turn{0%,20%{transform:rotate(0)}60%,100%{transform:rotate(90deg)}}
 @media (orientation:portrait){#rot{display:flex}}
 @media (max-height:430px){h1{font-size:34px} h2{font-size:24px} body{font-size:14px} .sp.mini{width:46px;height:46px}}
-@media (prefers-reduced-motion:reduce){.sp.idle,.sp.idle8,button.pow,#rot .ph{animation:none}.bar i{transition:none}}
+@media (prefers-reduced-motion:reduce){.sp.idle,.sp.idle8,.bsp,button.pow,#rot .ph{animation:none}.bar i{transition:none}}
 </style>
 
 <div id="app"><h1>Hearthguard</h1><p class="dim">Lighting the campfire…</p></div>
@@ -2774,12 +2776,12 @@ function drawExplore(cv){ const E=EX, L=E.L, T=L.T, c=cv.getContext('2d'), k=cv.
   for(const ch of L.chests)items.push({y:ch.y,d:()=>drawChest(c,ch)});
   items.push({y:L.exit.y-30,d:()=>drawGate(c,L.exit,!E.bossAlive,E.t)});
   if(L.boss&&E.bossAlive){ const W2=WORLDS[Math.floor(L.n/10)], id=(L.boss.kind==='boss'?W2.boss:W2.mini)[1], u=mobUnit(id), s=u.size*(L.boss.kind==='boss'?1.55:1.3);
-    items.push({y:L.boss.y,d:()=>{ const im=loadImg(mobSheet(id)); if(!im.naturalWidth)return; circ(c,'rgba(0,0,0,.3)',L.boss.x,L.boss.y,s*.2,s*.05); const fs=im.naturalHeight, f=Math.floor(E.t*2)%2;
-      c.shadowColor='#ff5040'; c.shadowBlur=18; c.drawImage(im,f*fs,0,fs,fs,L.boss.x-s/2,L.boss.y-s*u.foot,s,s); c.shadowBlur=0; }}); }
+    items.push({y:L.boss.y,d:()=>{ const im=loadImg(mobSheet(id)); if(!im.naturalWidth)return; circ(c,'rgba(0,0,0,.3)',L.boss.x,L.boss.y,s*.2,s*.05); const fs=im.naturalHeight, f=0, bk=1+.015*Math.sin(E.t*2.1);
+      c.shadowColor='#ff5040'; c.shadowBlur=18; c.drawImage(im,f*fs,0,fs,fs,L.boss.x-s/2,L.boss.y-s*u.foot*bk,s,s*bk); c.shadowBlur=0; }}); }
   items.push({y:E.y,d:()=>{ const im=loadImg(heroSheet(H)), s=4.4*UNIT*(1+rank(H)*.03); circ(c,'rgba(0,0,0,.3)',E.x,E.y,46,13);
       if(rank(H)){ c.globalAlpha=.5; circ(c,RANK_COL[rank(H)],E.x,E.y,62,18); c.globalAlpha=1; }
-      if(!im.naturalWidth)return; const fs=im.naturalHeight, f=E.moving?HF.walk+Math.floor(E.t*11)%6:Math.floor(E.t*2)%2;
-      c.save(); c.translate(E.x,E.y); c.scale(E.face,1); if(H.weapon){c.shadowColor=WGLOW[H.weapon]; c.shadowBlur=4+H.weapon*2}
+      if(!im.naturalWidth)return; const fs=im.naturalHeight, f=E.moving?HF.walk+Math.floor(E.t*11)%6:0, br=E.moving?1:1+.012*Math.sin(E.t*2.3);
+      c.save(); c.translate(E.x,E.y); c.scale(E.face,br); if(H.weapon){c.shadowColor=WGLOW[H.weapon]; c.shadowBlur=4+H.weapon*2}
       c.drawImage(im,f*fs,0,fs,fs,-s/2,-s*.776,s,s); c.restore(); }});
   items.sort((a,b)=>a.y-b.y); for(const it of items)it.d();
 }
@@ -2818,7 +2820,7 @@ function vBattle(){ const e=B.e, big=e.big||B.raid, rig=e.id.startsWith('sk_'), 
   </div><div class="side" id="bside"></div></div>`; }
 let bIdle=0;
 function mountBattle(){ clearInterval(bIdle); let t=0;
-  bIdle=setInterval(()=>{ if(!B||S.screen!=='battle'){clearInterval(bIdle);return} if(B.anim||B.result)return; t^=1; bFrame($b('bh'),t,HN); if(B.e.hp>0)bFrame($b('bf'),t,MN); },480);
+  bIdle=setInterval(()=>{ if(!B||S.screen!=='battle'){clearInterval(bIdle);return} },2000);
   battleUI(); }
 function bFrame(el,f,n){ if(el)el.style.backgroundPositionX=fpos(f,n); }
 function battleUI(){ if(!B)return; const e=B.e, st=stats(H), c=CLASSES[H.cls], res=B.result, pw=H.pow||0, set=(id,v)=>{const x=$b(id); if(x)x.style.width=Math.max(0,Math.min(100,v))+'%'};
