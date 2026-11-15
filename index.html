@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Hearthguard"><meta name="theme-color" content="#17100d"><meta name="robots" content="noindex"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style></head><body><script>window.HG_CLOUD="https://hearthguard-cloud.shoguns-gate-family.workers.dev"</script><script>//---------------------------------------------------------------------
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Hearthguard"><meta name="theme-color" content="#14171b"><meta name="robots" content="noindex"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style></head><body><script>window.HG_CLOUD="https://hearthguard-cloud.shoguns-gate-family.workers.dev"</script><script>//---------------------------------------------------------------------
 //
 // QR Code Generator for JavaScript
 //
@@ -2299,11 +2299,11 @@ var qrcode = function() {
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Grenze+Gotisch:wght@500;700&family=Nunito:wght@400;600;800&display=swap">
 <style>
-/* Layout: one-screen phone-first game column; a painted battle stage with rendered 3D characters on top, chunky wooden buttons below. Single dark fireside theme by choice. */
+/* Layout: one-screen phone-first game column; a painted battle stage with rendered 3D characters on top, chunky wooden buttons below. Single dark castle-stone theme by choice (slate greys, heraldic blue and gold). */
 :root{
   color-scheme:dark;
-  --night:#17100d; --wood:#2a1c16; --wood2:#3a281f; --line:#5a4032;
-  --parch:#f3e4c8; --dim:#b89f85; --ember:#ec8a3c; --gold:#f2c35b;
+  --night:#14171b; --wood:#252a30; --wood2:#333a43; --line:#5b6672;
+  --parch:#e9edf1; --dim:#9ba6b2; --ember:#ec8a3c; --gold:#e8c45e;
   --moss:#86b56a; --blood:#d6553f; --frost:#7fb7d9;
   --display:"Grenze Gotisch",Georgia,"Times New Roman",serif;
   --ui:"Nunito","Trebuchet MS",Verdana,sans-serif;
@@ -2311,10 +2311,10 @@ var qrcode = function() {
 html,body{height:100%}
 body{background:var(--night);color:var(--parch);font-family:var(--ui);font-size:16px;line-height:1.35;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
-  background-image:radial-gradient(120% 60% at 50% 110%,#4a2412 0%,transparent 60%);background-attachment:fixed}
+  background-image:radial-gradient(120% 60% at 50% 110%,#2c3542 0%,transparent 60%);background-attachment:fixed}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 #app{max-width:540px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;gap:12px;padding-block:12px 20px}
-h1{font-family:var(--display);font-weight:700;font-size:58px;line-height:.9;margin:0;color:var(--gold);text-shadow:0 3px 0 #6b3413;text-wrap:balance}
+h1{font-family:var(--display);font-weight:700;font-size:58px;line-height:.9;margin:0;color:var(--gold);text-shadow:0 3px 0 #3a3320;text-wrap:balance}
 h2{font-family:var(--display);font-weight:700;font-size:34px;line-height:1;margin:0;color:var(--gold)}
 h3{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin:0;font-weight:800}
 p{margin:0}
@@ -2323,36 +2323,37 @@ p{margin:0}
 .row{display:flex;align-items:center;gap:10px}
 .grow{flex:1;min-width:0}
 .col{display:flex;flex-direction:column;gap:10px}
-.panel{background:var(--wood);border:2px solid var(--line);border-radius:10px;padding:12px;box-shadow:0 3px 0 #0c0806}
+.panel{background:var(--wood);border:2px solid var(--line);border-radius:10px;padding:12px;box-shadow:0 3px 0 #08090b}
 button{font:inherit;color:var(--parch);background:var(--wood2);border:2px solid var(--line);border-bottom-width:5px;border-radius:10px;
   padding:10px 12px;cursor:pointer;text-align:center;min-height:48px;font-weight:800}
 button:active:not(:disabled){transform:translateY(3px);border-bottom-width:2px;margin-bottom:3px}
 button:focus-visible,input:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 button:disabled{opacity:.45;cursor:default}
-button.go{background:#8a3d17;border-color:#d0752f;color:#fff3dc}
+button.go{background:#2c5596;border-color:#6d9be0;color:#f2f6ff}
 button.ghost{background:none;border-bottom-width:2px;min-height:40px;padding:6px 10px;font-weight:600;font-size:14px}
 button .sub{display:block;font-weight:400;font-size:13px;color:var(--dim)}
-button.go .sub{color:#f6cfa6}
+button.go .sub{color:#c5d8f5}
 button.pow{grid-column:1/-1;background:linear-gradient(#f2c35b,#e08a2a);border-color:#fff0b0;color:#3a1c08;animation:glow 1s infinite alternate}
 button.pow .sub{color:#5a2c0c}
 @keyframes glow{from{box-shadow:0 0 4px #f2c35b}to{box-shadow:0 0 22px #ffd870}}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .spr{width:96px;height:96px;flex:none;object-fit:contain}
 .spr.sm{width:56px;height:56px}
-.bar{height:12px;background:#0f0a08;border:2px solid var(--line);border-radius:99px;overflow:hidden}
+.bar{height:12px;background:#0c0e11;border:2px solid var(--line);border-radius:99px;overflow:hidden}
 .bar i{display:block;height:100%;background:var(--moss);transition:width .3s;border-radius:99px}
 .bar.xp i{background:var(--frost)} .bar.foe i{background:var(--blood)} .bar.raid i{background:var(--ember)}
 .bar.pw i{background:linear-gradient(90deg,#e08a2a,#ffd870)} .bar.pw.full{border-color:var(--gold);box-shadow:0 0 10px #f2c35b}
 .stat{display:flex;justify-content:space-between;gap:8px;font-variant-numeric:tabular-nums}
 .pips{display:flex;gap:4px}
-.pips b{width:14px;height:14px;border:2px solid var(--line);background:#0f0a08;border-radius:50%}
+.pips b{width:14px;height:14px;border:2px solid var(--line);background:#0c0e11;border-radius:50%}
 .pips b.on{background:var(--gold);border-color:#8a6a1e}
 .pips b.boss{border-color:var(--blood)} .pips b.boss.on{background:var(--blood)}
 .card{display:flex;gap:12px;align-items:center;text-align:left;width:100%}
 .locked{opacity:.5}
-input[type=text]{font:inherit;color:var(--parch);background:#0f0a08;border:2px solid var(--line);border-radius:10px;padding:10px;width:100%;min-height:48px}
+input[type=text]{font:inherit;color:var(--parch);background:#0c0e11;border:2px solid var(--line);border-radius:10px;padding:10px;width:100%;min-height:48px}
 .hero-stage{position:relative;height:190px;border:2px solid var(--line);border-radius:10px;overflow:hidden}
 .hero-stage img.h{position:absolute;left:50%;bottom:2%;height:92%;transform:translateX(-50%);z-index:1;filter:drop-shadow(0 6px 4px rgba(0,0,0,.45))}
+.hero-stage img.h.bob{left:0;right:0;margin:0 auto;transform:none}
 /* battle */
 .stage{position:relative;aspect-ratio:16/10;max-width:100%;border:2px solid var(--line);border-radius:10px;overflow:hidden}
 .scene{position:absolute;inset:0;width:100%;height:100%}
@@ -2362,7 +2363,7 @@ input[type=text]{font:inherit;color:var(--parch);background:#0f0a08;border:2px s
 .stage .tag{position:absolute;left:8px;right:8px;top:8px;display:flex;flex-direction:column;gap:4px;z-index:2;text-shadow:0 1px 3px #000,0 0 6px #000;font-weight:800}
 .flash{position:absolute;inset:0;z-index:4;background:radial-gradient(circle,#fff8d0,#f2c35b 60%,transparent);animation:flash .7s ease-out forwards;pointer-events:none}
 @keyframes flash{from{opacity:.95}to{opacity:0}}
-.shout{position:absolute;left:0;right:0;top:38%;text-align:center;z-index:5;font-family:var(--display);font-size:44px;color:#fff;text-shadow:0 3px 0 #8a3d17,0 0 14px #f2c35b;animation:shout 1s ease-out forwards;pointer-events:none}
+.shout{position:absolute;left:0;right:0;top:38%;text-align:center;z-index:5;font-family:var(--display);font-size:44px;color:#fff;text-shadow:0 3px 0 #2c3542,0 0 14px #e8c45e;animation:shout 1s ease-out forwards;pointer-events:none}
 @keyframes shout{from{transform:scale(.5);opacity:0}25%{transform:scale(1.15);opacity:1}70%{opacity:1}to{transform:scale(1);opacity:0}}
 .pop{position:absolute;z-index:3;font-weight:800;font-size:26px;color:#fff;text-shadow:0 2px 0 #000,0 0 6px #000;animation:pop .8s ease-out forwards;pointer-events:none}
 .pop.heal{color:#a8e88a} .pop.crit{color:var(--gold);font-size:36px}
@@ -2376,8 +2377,8 @@ input[type=text]{font:inherit;color:var(--parch);background:#0f0a08;border:2px s
 .acts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .acts button.wide{grid-column:1/-1}
 .chips{display:flex;gap:6px;flex-wrap:wrap;min-height:22px}
-.chip{font-size:12px;padding:1px 8px;border-radius:99px;border:1px solid var(--line);background:#0f0a08;color:var(--gold)}
-#toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#0f0a08;border:2px solid var(--gold);
+.chip{font-size:12px;padding:1px 8px;border-radius:99px;border:1px solid var(--line);background:#0c0e11;color:var(--gold)}
+#toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#0c0e11;border:2px solid var(--gold);
   border-radius:10px;padding:10px 14px;max-width:min(90vw,460px);text-align:center;z-index:20;box-shadow:0 4px 0 #000}
 .aura{position:absolute;z-index:0;border-radius:50%;opacity:.6;pointer-events:none}
 .feat{font-size:14px;border-top:1px solid var(--line);padding-top:6px}
@@ -2448,7 +2449,7 @@ const SCENES=[
  {sky:['#6ea6de','#eaf5ff'],far:'#a4c0de',mid:'#d4e5f4',gnd:['#f4f9ff','#b0c8e0'],kind:'peaks'},
  {sky:['#2a0e0c','#d05a2a'],far:'#3a1c18',mid:'#241210',gnd:['#553026','#1e100e'],kind:'ash'},
  {sky:['#0e0b20','#4f2c72'],far:'#1e1838',mid:'#120f24',gnd:['#332c50','#141024'],kind:'spire'},
- {sky:['#24304a','#e0955a'],far:'#4a3a4a',mid:'#2a2430',gnd:['#5a4636','#2a1c16'],kind:'camp'}
+ {sky:['#18202e','#77879c'],far:'#465160',mid:'#262c36',gnd:['#5d6670','#2a2f36'],kind:'camp'}
 ];
 
 /* ============ HELPERS ============ */
@@ -2480,7 +2481,7 @@ function scene(i){ if(sceneCache[i])return sceneCache[i]; const shadows=i<6; con
   if(s.kind==='spire'){ m+=`<circle cx="36" cy="18" r="10" fill="#e8dcff" opacity=".9"/><circle cx="40" cy="15" r="9" fill="${s.sky[0]}" opacity=".85"/>`;
     for(let k=0;k<5;k++){const x=50+k*24+R()*8,h=22+R()*24,w=4+R()*3; m+=`<path d="M${x-w} 64 V${64-h} L${x} ${64-h-9} L${x+w} ${64-h} V64Z" fill="${s.mid}"/><rect x="${x-1}" y="${64-h+4}" width="2" height="3" fill="#b070ff"/>`}
     for(let k=0;k<20;k++)m+=`<circle cx="${R()*160}" cy="${R()*40}" r=".5" fill="#fff" opacity=".7"/>`; }
-  if(s.kind==='camp'){ for(let k=0;k<9;k++){const x=R()*160,h=20+R()*18,w=6+R()*4; m+=`<path d="M${x-w} 64 L${x} ${64-h} L${x+w} 64Z" fill="${s.mid}"/>`}
+  if(s.kind==='camp'){ m+=`<path d="M96 64 V34 h3 v-3 h3 v3 h3 v-3 h3 v3 h3 V44 h12 v-4 h3 v4 h3 v-4 h3 v4 h3 V28 h3 v-3 h3 v3 h3 v-3 h3 v3 h3 V64Z" fill="#39424e"/><rect x="103" y="40" width="2" height="4" fill="#e8c45e"/><rect x="140" y="35" width="2" height="4" fill="#e8c45e"/>`; for(let k=0;k<9;k++){const x=R()*160,h=20+R()*18,w=6+R()*4; m+=`<path d="M${x-w} 64 L${x} ${64-h} L${x+w} 64Z" fill="${s.mid}"/>`}
     for(let k=0;k<18;k++)m+=`<circle cx="${R()*160}" cy="${R()*30}" r=".5" fill="#fff" opacity=".8"/>`; m+=`<ellipse cx="80" cy="82" rx="46" ry="10" fill="#ffb040" opacity=".28"/>`; }
   return sceneCache[i]=`<svg class="scene" viewBox="0 0 160 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><linearGradient id="sk${i}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${s.sky[0]}"/><stop offset="1" stop-color="${s.sky[1]}"/></linearGradient><linearGradient id="gd${i}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${s.gnd[0]}"/><stop offset="1" stop-color="${s.gnd[1]}"/></linearGradient></defs>
     <rect width="160" height="66" fill="url(#sk${i})"/><path d="${far}" fill="${s.far}"/>${m}<rect y="63" width="160" height="37" fill="url(#gd${i})"/>${shadows?'<ellipse cx="38" cy="93" rx="22" ry="3.5" fill="#000" opacity=".28"/><ellipse cx="120" cy="92" rx="26" ry="4" fill="#000" opacity=".28"/>':''}</svg>`;
@@ -2812,15 +2813,15 @@ function keepInvite(k){
   try{document.cookie='hg-key='+k+'; path='+location.pathname+'; max-age=31536000; SameSite=Lax; Secure'}catch(e){}
   if(navigator.standalone||matchMedia('(display-mode: standalone)').matches)return;
   document.querySelectorAll('link[rel=manifest]').forEach(l=>l.remove());
-  const man={name:'Hearthguard',short_name:'Hearthguard',start_url:join,scope:base,display:'standalone',background_color:'#17100d',theme_color:'#17100d',
+  const man={name:'Hearthguard',short_name:'Hearthguard',start_url:join,scope:base,display:'standalone',background_color:'#14171b',theme_color:'#14171b',
     icons:[{src:base+'icon-180.png',sizes:'180x180',type:'image/png'},{src:base+'icon-512.png',sizes:'512x512',type:'image/png'}]};
   const l=document.createElement('link'); l.rel='manifest'; l.href='data:application/manifest+json,'+encodeURIComponent(JSON.stringify(man)); document.head.appendChild(l);
   if(lsGet('hg_tip_off'))return;
   const tip=document.createElement('div'); tip.setAttribute('role','status');
-  tip.style.cssText='position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:30;background:#2a1c16;color:#f3e4c8;border:2px solid #f2c35b;border-radius:10px;padding:12px 48px 12px 14px;box-shadow:0 6px 24px rgba(0,0,0,.5)';
+  tip.style.cssText='position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:30;background:#252a30;color:#e9edf1;border:2px solid #e8c45e;border-radius:10px;padding:12px 48px 12px 14px;box-shadow:0 6px 24px rgba(0,0,0,.5)';
   tip.textContent='Make it an app: tap Share, then Add to Home Screen, and always play from that icon.';
   const x=document.createElement('button'); x.textContent='✕'; x.setAttribute('aria-label','Close');
-  x.style.cssText='position:absolute;top:2px;right:2px;min-height:40px;width:40px;padding:0;background:none;border:0;color:#f3e4c8;font-size:18px';
+  x.style.cssText='position:absolute;top:2px;right:2px;min-height:40px;width:40px;padding:0;background:none;border:0;color:#e9edf1;font-size:18px';
   x.addEventListener('click',()=>{tip.remove();lsSet('hg_tip_off',1)}); tip.appendChild(x); document.body.appendChild(tip);
 }
 function boot(){ render(); connect(); const k=lsGet('hg_key'); if(window.HG_CLOUD&&k)keepInvite(k); }
