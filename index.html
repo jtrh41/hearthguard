@@ -2299,7 +2299,8 @@ var qrcode = function() {
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Grenze+Gotisch:wght@500;700&family=Nunito:wght@400;600;800&display=swap">
 <style>
-/* Layout: one-screen phone-first game column; a painted battle stage with rendered 3D characters on top, chunky wooden buttons below. Single dark castle-stone theme by choice (slate greys, heraldic blue and gold). */
+/* Layout: a landscape game. Menus are two panes (hero on the left, choices on the right); exploring and battles fill the screen.
+   Single dark castle-stone theme by choice (slate greys, heraldic blue and gold). */
 :root{
   color-scheme:dark;
   --night:#14171b; --wood:#252a30; --wood2:#333a43; --line:#5b6672;
@@ -2308,151 +2309,177 @@ var qrcode = function() {
   --display:"Grenze Gotisch",Georgia,"Times New Roman",serif;
   --ui:"Nunito","Trebuchet MS",Verdana,sans-serif;
 }
-html,body{height:100%}
-body{background:var(--night);color:var(--parch);font-family:var(--ui);font-size:16px;line-height:1.35;
+html,body{height:100%;overflow:hidden}
+body{background:var(--night);color:var(--parch);font-family:var(--ui);font-size:15px;line-height:1.3;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
-  background-image:radial-gradient(120% 60% at 50% 110%,#2c3542 0%,transparent 60%);background-attachment:fixed}
+  background-image:radial-gradient(120% 60% at 50% 110%,#2c3542 0%,transparent 60%);-webkit-user-select:none;user-select:none}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
-#app{max-width:540px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;gap:12px;padding-block:12px 20px}
-h1{font-family:var(--display);font-weight:700;font-size:58px;line-height:.9;margin:0;color:var(--gold);text-shadow:0 3px 0 #3a3320;text-wrap:balance}
-h2{font-family:var(--display);font-weight:700;font-size:34px;line-height:1;margin:0;color:var(--gold)}
-h3{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin:0;font-weight:800}
+#app{height:100%;max-width:1180px;margin:0 auto;padding-block:8px}
+#app[data-screen=explore],#app[data-screen=battle]{max-width:none}
+h1{font-family:var(--display);font-weight:700;font-size:44px;line-height:.9;margin:0;color:var(--gold);text-shadow:0 3px 0 #3a3320}
+h2{font-family:var(--display);font-weight:700;font-size:28px;line-height:1;margin:0;color:var(--gold)}
+h3{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin:0;font-weight:800}
 p{margin:0}
-.dim{color:var(--dim)} .gold{color:var(--gold)} .small{font-size:14px}
+.dim{color:var(--dim)} .gold{color:var(--gold)} .small{font-size:13px}
 .top{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .row{display:flex;align-items:center;gap:10px}
 .grow{flex:1;min-width:0}
-.col{display:flex;flex-direction:column;gap:10px}
-.panel{background:var(--wood);border:2px solid var(--line);border-radius:10px;padding:12px;box-shadow:0 3px 0 #08090b}
-button{font:inherit;color:var(--parch);background:var(--wood2);border:2px solid var(--line);border-bottom-width:5px;border-radius:10px;
-  padding:10px 12px;cursor:pointer;text-align:center;min-height:48px;font-weight:800}
-button:active:not(:disabled){transform:translateY(3px);border-bottom-width:2px;margin-bottom:3px}
+.col{display:flex;flex-direction:column;gap:8px}
+.pg{display:grid;grid-template-columns:minmax(0,36%) minmax(0,1fr);gap:12px;height:100%}
+.scroll{overflow-y:auto;min-height:0;-webkit-overflow-scrolling:touch;padding-bottom:6px}
+.panel{background:var(--wood);border:2px solid var(--line);border-radius:10px;padding:10px;box-shadow:0 3px 0 #08090b}
+button{font:inherit;color:var(--parch);background:var(--wood2);border:2px solid var(--line);border-bottom-width:4px;border-radius:10px;
+  padding:7px 10px;cursor:pointer;text-align:center;min-height:44px;font-weight:800}
+button:active:not(:disabled){transform:translateY(2px);border-bottom-width:2px;margin-bottom:2px}
 button:focus-visible,input:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 button:disabled{opacity:.45;cursor:default}
 button.go{background:#2c5596;border-color:#6d9be0;color:#f2f6ff}
-button.ghost{background:none;border-bottom-width:2px;min-height:40px;padding:6px 10px;font-weight:600;font-size:14px}
-button .sub{display:block;font-weight:400;font-size:13px;color:var(--dim)}
+button.ghost{background:rgba(20,23,27,.7);border-bottom-width:2px;min-height:38px;padding:5px 10px;font-weight:600;font-size:13px}
+button .sub{display:block;font-weight:400;font-size:12px;color:var(--dim)}
 button.go .sub{color:#c5d8f5}
 button.pow{grid-column:1/-1;background:linear-gradient(#f2c35b,#e08a2a);border-color:#fff0b0;color:#3a1c08;animation:glow 1s infinite alternate}
 button.pow .sub{color:#5a2c0c}
 @keyframes glow{from{box-shadow:0 0 4px #f2c35b}to{box-shadow:0 0 22px #ffd870}}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.spr{width:96px;height:96px;flex:none;object-fit:contain}
-.spr.sm{width:56px;height:56px}
-.bar{height:12px;background:#0c0e11;border:2px solid var(--line);border-radius:99px;overflow:hidden}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.card{display:flex;gap:10px;align-items:center;text-align:left;width:100%}
+.locked{opacity:.5}
+input[type=text]{font:inherit;color:var(--parch);background:#0c0e11;border:2px solid var(--line);border-radius:10px;padding:8px;width:100%;min-height:44px;-webkit-user-select:text;user-select:text}
+.bar{height:11px;background:#0c0e11;border:2px solid var(--line);border-radius:99px;overflow:hidden}
 .bar i{display:block;height:100%;background:var(--moss);transition:width .3s;border-radius:99px}
 .bar.xp i{background:var(--frost)} .bar.foe i{background:var(--blood)} .bar.raid i{background:var(--ember)}
 .bar.pw i{background:linear-gradient(90deg,#e08a2a,#ffd870)} .bar.pw.full{border-color:var(--gold);box-shadow:0 0 10px #f2c35b}
 .stat{display:flex;justify-content:space-between;gap:8px;font-variant-numeric:tabular-nums}
-.pips{display:flex;gap:4px}
-.pips b{width:14px;height:14px;border:2px solid var(--line);background:#0c0e11;border-radius:50%}
-.pips b.on{background:var(--gold);border-color:#8a6a1e}
-.pips b.boss{border-color:var(--blood)} .pips b.boss.on{background:var(--blood)}
-.card{display:flex;gap:12px;align-items:center;text-align:left;width:100%}
-.locked{opacity:.5}
-input[type=text]{font:inherit;color:var(--parch);background:#0c0e11;border:2px solid var(--line);border-radius:10px;padding:10px;width:100%;min-height:48px}
-.hero-stage{position:relative;height:190px;border:2px solid var(--line);border-radius:10px;overflow:hidden}
-.hero-stage img.h{position:absolute;left:50%;bottom:2%;height:92%;transform:translateX(-50%);z-index:1;filter:drop-shadow(0 6px 4px rgba(0,0,0,.45))}
-.hero-stage img.h.bob{left:0;right:0;margin:0 auto;transform:none}
-/* battle */
-.stage{position:relative;aspect-ratio:16/10;max-width:100%;border:2px solid var(--line);border-radius:10px;overflow:hidden}
+.chips{display:flex;gap:5px;flex-wrap:wrap;min-height:20px}
+.chip{font-size:12px;padding:1px 8px;border-radius:99px;border:1px solid var(--line);background:#0c0e11;color:var(--gold);white-space:nowrap}
+.feat{font-size:13px;border-top:1px solid var(--line);padding-top:5px}
+.feat:first-child{border-top:0;padding-top:0}
+/* sprites: one frame of a sheet */
+.sp{background-repeat:no-repeat;aspect-ratio:1;flex:none}
+.sp.mini{width:80px;height:80px;margin:-14px -12px -6px}
+.sp.idle{animation:idle15 1s steps(1) infinite} .sp.idle8{animation:idle8 1s steps(1) infinite}
+@keyframes idle15{50%{background-position-x:7.142857%}} @keyframes idle8{50%{background-position-x:14.285714%}}
 .scene{position:absolute;inset:0;width:100%;height:100%}
-.stage .you{position:absolute;left:2%;bottom:3%;width:40%;z-index:1;filter:drop-shadow(0 5px 3px rgba(0,0,0,.45))}
-.stage .foe{position:absolute;right:3%;bottom:4%;width:40%;z-index:1;filter:drop-shadow(0 5px 3px rgba(0,0,0,.45))}
-.stage .foe.big{width:56%;right:-3%;bottom:0}
-.stage .tag{position:absolute;left:8px;right:8px;top:8px;display:flex;flex-direction:column;gap:4px;z-index:2;text-shadow:0 1px 3px #000,0 0 6px #000;font-weight:800}
+.aura{position:absolute;z-index:0;border-radius:50%;opacity:.6;pointer-events:none}
+.hero-stage{position:relative;height:100%;min-height:0;border:2px solid var(--line);border-radius:10px;overflow:hidden}
+.hero-stage .sp.h{position:absolute;left:50%;bottom:-14%;transform:translateX(-50%);z-index:1}
+/* world map */
+.lvls{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:6px}
+.lv{padding:4px 2px;min-height:46px;font-size:14px} .lv.done{border-color:#8a6a1e;color:var(--gold)} .lv .sub{font-size:10px;color:var(--blood)}
+/* exploring */
+.ex{position:relative;height:100%;border:2px solid var(--line);border-radius:10px;overflow:hidden;background:#000}
+.ex canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.hud{position:absolute;z-index:3;display:flex;gap:8px;align-items:center;text-shadow:0 1px 3px #000,0 0 6px #000;font-weight:800}
+.hud.tl{left:10px;top:8px} .hud.tc{left:50%;top:8px;transform:translateX(-50%);flex-direction:column;gap:3px;font-family:var(--display);font-size:20px;color:var(--gold);white-space:nowrap} .hud.tr{right:10px;top:8px}
+#joyzone{position:absolute;inset:52px 0 0 0;z-index:2;touch-action:none}
+#joy{position:fixed;z-index:4;width:120px;height:120px;border-radius:50%;border:3px solid rgba(255,255,255,.5);background:rgba(20,23,27,.35);pointer-events:none}
+#joy i{position:absolute;left:35px;top:35px;width:50px;height:50px;border-radius:50%;background:rgba(232,196,94,.85);box-shadow:0 2px 8px #000}
+#exover{position:absolute;inset:0;z-index:6;display:flex;align-items:center;justify-content:center;background:rgba(10,12,15,.6)}
+.encflash{position:absolute;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;background:#fff;animation:enc .75s ease-in forwards;pointer-events:none}
+.encflash b{font-family:var(--display);font-size:160px;color:var(--blood);text-shadow:0 6px 0 #000}
+@keyframes enc{0%{opacity:0}12%{opacity:.9}30%{opacity:.15}48%{opacity:.9}70%{opacity:.35}100%{opacity:1;background:#14171b}}
+/* battle */
+.bt{display:grid;grid-template-columns:minmax(0,1fr) minmax(230px,34%);gap:10px;height:100%}
+.stage{position:relative;height:100%;min-height:0;border:2px solid var(--line);border-radius:10px;overflow:hidden}
+.side{display:flex;flex-direction:column;gap:6px;min-height:0;overflow-y:auto;justify-content:flex-end}
+.stage .tag{position:absolute;top:8px;width:40%;display:flex;flex-direction:column;gap:4px;z-index:2;text-shadow:0 1px 3px #000,0 0 6px #000;font-weight:800}
+.stage .tag.l{left:8px} .stage .tag.r{right:8px}
+.bsp{position:absolute;z-index:1;transform:translateX(calc(-50% + var(--dx,0px)));transition:transform .19s ease-out}
+.hitfx{animation:hitfx .3s}
+@keyframes hitfx{0%{filter:brightness(1.9)}25%{translate:-3% 0}50%{translate:3% 0;filter:brightness(1.3)}75%{translate:-2% 0}100%{translate:0 0}}
+.proj{position:absolute;z-index:3;transition:transform .23s linear;pointer-events:none}
+.proj.orb{width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:50%;background:radial-gradient(circle,#fff 0 25%,var(--c) 60%);box-shadow:0 0 22px 8px var(--c),-18px 0 16px 2px var(--c)}
+.proj.orb.flip{box-shadow:0 0 22px 8px var(--c),18px 0 16px 2px var(--c)}
+.proj.bolt{width:64px;height:6px;margin:-3px 0 0 -52px;border-radius:3px;background:linear-gradient(90deg,transparent,var(--c) 55%,#fff);filter:drop-shadow(0 0 6px var(--c))}
+.proj.bolt:after{content:"";position:absolute;right:-7px;top:-4px;border:7px solid transparent;border-left:11px solid #fff}
+.proj.bolt.flip{margin-left:-12px;transform-origin:center;background:linear-gradient(270deg,transparent,var(--c) 55%,#fff)} .proj.bolt.flip:after{right:auto;left:-7px;border-left-color:transparent;border-right:11px solid #fff}
+.slash{position:absolute;z-index:3;width:var(--sz);height:var(--sz);margin:calc(var(--sz) / -2) 0 0 calc(var(--sz) / -2);border-radius:50%;border:0 solid transparent;border-right:calc(var(--sz) / 6) solid #fff;filter:drop-shadow(0 0 8px var(--c)) drop-shadow(0 0 3px var(--c));animation:slash .36s ease-out forwards;pointer-events:none}
+.slash.flip{animation-name:slashL}
+@keyframes slash{from{transform:rotate(-70deg) scale(.6);opacity:1}60%{opacity:1}to{transform:rotate(60deg) scale(1.25);opacity:0}}
+@keyframes slashL{from{transform:scaleX(-1) rotate(-70deg) scale(.6);opacity:1}60%{opacity:1}to{transform:scaleX(-1) rotate(60deg) scale(1.25);opacity:0}}
+.burst{position:absolute;z-index:3;width:90px;height:90px;margin:-45px 0 0 -45px;border-radius:50%;background:radial-gradient(circle,#fff 0 12%,var(--c) 30%,transparent 62%);animation:burst .4s ease-out forwards;pointer-events:none}
+@keyframes burst{from{transform:scale(.2);opacity:1}to{transform:scale(1.6);opacity:0}}
 .flash{position:absolute;inset:0;z-index:4;background:radial-gradient(circle,#fff8d0,#f2c35b 60%,transparent);animation:flash .7s ease-out forwards;pointer-events:none}
 @keyframes flash{from{opacity:.95}to{opacity:0}}
-.shout{position:absolute;left:0;right:0;top:38%;text-align:center;z-index:5;font-family:var(--display);font-size:44px;color:#fff;text-shadow:0 3px 0 #2c3542,0 0 14px #e8c45e;animation:shout 1s ease-out forwards;pointer-events:none}
+.shout{position:absolute;left:0;right:0;top:34%;text-align:center;z-index:5;font-family:var(--display);font-size:52px;color:#fff;text-shadow:0 3px 0 #2c3542,0 0 14px #e8c45e;animation:shout 1s ease-out forwards;pointer-events:none}
 @keyframes shout{from{transform:scale(.5);opacity:0}25%{transform:scale(1.15);opacity:1}70%{opacity:1}to{transform:scale(1);opacity:0}}
-.pop{position:absolute;z-index:3;font-weight:800;font-size:26px;color:#fff;text-shadow:0 2px 0 #000,0 0 6px #000;animation:pop .8s ease-out forwards;pointer-events:none}
-.pop.heal{color:#a8e88a} .pop.crit{color:var(--gold);font-size:36px}
-@keyframes pop{from{transform:translateY(0);opacity:1}to{transform:translateY(-46px);opacity:0}}
-.lunge{animation:lunge .4s} .lungeL{animation:lungeL .4s} .shake{animation:shake .35s}
-@keyframes lunge{45%{transform:translateX(70%)}} @keyframes lungeL{45%{transform:translateX(-70%)}}
-@keyframes shake{20%{transform:translateX(-8%)}40%{transform:translateX(8%)}60%{transform:translateX(-5%)}80%{transform:translateX(5%)}}
-.bob{animation:bob 2.4s ease-in-out infinite} @keyframes bob{50%{transform:translateY(-2.5%)}}
-.log{min-height:62px;font-size:15px;display:flex;flex-direction:column;justify-content:flex-end;gap:2px}
+.pop{position:absolute;z-index:3;font-weight:800;font-size:28px;color:#fff;text-shadow:0 2px 0 #000,0 0 6px #000;animation:pop .9s ease-out forwards;pointer-events:none}
+.pop.heal{color:#a8e88a} .pop.crit{color:var(--gold);font-size:40px}
+@keyframes pop{from{transform:translateY(0);opacity:1}to{transform:translateY(-54px);opacity:0}}
+.log{font-size:13px;display:flex;flex-direction:column;justify-content:flex-end;gap:1px;min-height:52px}
 .log p:last-child{color:var(--parch)} .log p{color:var(--dim)}
-.acts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.acts button.wide{grid-column:1/-1}
-.chips{display:flex;gap:6px;flex-wrap:wrap;min-height:22px}
-.chip{font-size:12px;padding:1px 8px;border-radius:99px;border:1px solid var(--line);background:#0c0e11;color:var(--gold)}
-#toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#0c0e11;border:2px solid var(--gold);
-  border-radius:10px;padding:10px 14px;max-width:min(90vw,460px);text-align:center;z-index:20;box-shadow:0 4px 0 #000}
-.aura{position:absolute;z-index:0;border-radius:50%;opacity:.6;pointer-events:none}
-.feat{font-size:14px;border-top:1px solid var(--line);padding-top:6px}
-.feat:first-child{border-top:0;padding-top:0}
-@media (prefers-reduced-motion:reduce){.lunge,.lungeL,.shake,.bob,button.pow{animation:none}.bar i{transition:none}}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.acts button{min-height:42px;padding:5px 6px} .acts button.wide{grid-column:1/-1}
+#toast{position:fixed;left:50%;top:calc(58px + env(safe-area-inset-top,0px));transform:translateX(-50%);background:#0c0e11;border:2px solid var(--gold);
+  border-radius:10px;padding:8px 14px;max-width:min(90vw,460px);text-align:center;z-index:20;box-shadow:0 4px 0 #000}
+.tip{position:fixed;left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:30;background:#252a30;color:#e9edf1;border:2px solid #e8c45e;border-radius:10px;padding:10px 48px 10px 14px;box-shadow:0 6px 24px rgba(0,0,0,.5)}
+.tipx{position:absolute;top:0;right:2px;min-height:40px;width:40px;padding:0;background:none;border:0;color:#e9edf1;font-size:18px}
+#rot{display:none;position:fixed;inset:0;z-index:50;background:var(--night);align-items:center;justify-content:center;flex-direction:column;gap:14px;text-align:center;padding:24px}
+#rot .ph{width:70px;height:120px;border:4px solid var(--gold);border-radius:12px;animation:turn 2s ease-in-out infinite}
+@keyframes turn{0%,20%{transform:rotate(0)}60%,100%{transform:rotate(90deg)}}
+@media (orientation:portrait){#rot{display:flex}}
+@media (max-height:430px){h1{font-size:34px} h2{font-size:24px} body{font-size:14px} .sp.mini{width:46px;height:46px}}
+@media (prefers-reduced-motion:reduce){.sp.idle,.sp.idle8,button.pow,#rot .ph{animation:none}.bar i{transition:none}}
 </style>
 
 <div id="app"><h1>Hearthguard</h1><p class="dim">Lighting the campfire…</p></div>
 <div id="toast" hidden></div>
+<div id="rot"><div class="ph"></div><h2>Turn your device sideways</h2><p class="dim">Hearthguard is played in landscape.</p></div>
 
 <script>
 "use strict";
-/* ============ DATA ============ */
+/* Hearthguard core: data, hero maths, 50 levels, saves and family sync. Loaded first. */
 const SLOTS=[{id:'dad',label:'Dad'},{id:'lauren',label:'Lauren'},{id:'jeremiah',label:'Jeremiah'},{id:'jude',label:'Jude'}];
-const WEAPON_ATK=[0,4,9,16,25,36,50], ARMOR_HP=[0,15,35,60,95,140,200], ARMOR_DEF=[0,1,3,5,8,12,17];
-const GEAR_PRICE=[0,40,140,400,950,2000,4200], GEAR_LVL=[1,1,3,7,12,17,22];
-const WPN_TIER=['Worn','Iron','Steel','Silver','Runed','Dragonbone','Starforged'];
-const ARM_TIER=['Traveler’s','Leather','Chain','Plate','Runed','Gilded','Starforged'];
+const MAXLV=50, GEAR_MAX=8;
+const WEAPON_ATK=[0,4,9,16,25,36,50,66,85], ARMOR_HP=[0,15,35,60,95,140,200,270,350], ARMOR_DEF=[0,1,3,5,8,12,17,23,30];
+const GEAR_PRICE=[0,40,140,400,950,2000,4200,8000,14000], GEAR_LVL=[1,1,4,9,14,20,27,34,42];
+const WPN_TIER=['Worn','Iron','Steel','Silver','Runed','Dragonbone','Starforged','Mythic','Celestial'];
+const ARM_TIER=['Traveler’s','Leather','Chain','Plate','Runed','Gilded','Starforged','Mythic','Celestial'];
 const CLASSES={
-  knight:{name:'Knight',hp:1.3,atk:.9,crit:.08,weapon:['Sword','Sword and Shield','Greatsword'],blurb:'Tough as a castle wall. Stuns foes and shrugs off hits.',
+  knight:{name:'Knight',hp:1.3,atk:.9,crit:.08,weapon:['Sword','Sword and Shield','Greatsword'],ranged:[0,0,0],blurb:'Tough as a castle wall. Stuns foes and shrugs off hits.',
     skills:[{n:'Shield Bash',lv:1,cd:3,mult:1.2,stun:1,d:'Hit and stun for a turn'},
             {n:'Iron Guard',lv:3,cd:4,guard:3,heal:.1,d:'Halve damage for 3 turns'},
             {n:'Whirl Slash',lv:6,cd:5,mult:2.4,d:'A huge spinning strike'}],
     power:{n:'Lionheart',mult:4,stun:1,guard:2,d:'A mighty blow that stuns'}},
-  wizard:{name:'Wizard',hp:.8,atk:1.25,crit:.08,weapon:['Wand','Staff','Arcane Staff'],blurb:'Fragile, but hits harder than anyone.',
+  wizard:{name:'Wizard',hp:.8,atk:1.25,crit:.08,weapon:['Wand','Staff','Arcane Staff'],ranged:[1,1,1],shot:'#ff8a3c',blurb:'Fragile, but hits harder than anyone.',
     skills:[{n:'Fireball',lv:1,cd:2,mult:1.8,d:'A blast of flame'},
-            {n:'Frost Bind',lv:3,cd:4,mult:1.1,weak:3,d:'Hit and weaken the enemy'},
+            {n:'Frost Bind',lv:3,cd:4,mult:1.1,weak:3,shot:'#9fdcff',d:'Hit and weaken the enemy'},
             {n:'Meteor',lv:6,cd:6,mult:3.2,d:'Call down a falling star'}],
-    power:{n:'Starfall',mult:5.5,d:'The sky itself comes down'}},
-  ranger:{name:'Ranger',hp:1,atk:1.05,crit:.25,weapon:['Dagger','Crossbow','Heavy Crossbow'],blurb:'Quick and lucky. Lands critical hits often.',
+    power:{n:'Starfall',mult:5.5,shot:'#fff3a0',d:'The sky itself comes down'}},
+  ranger:{name:'Ranger',hp:1,atk:1.05,crit:.25,weapon:['Dagger','Crossbow','Heavy Crossbow'],ranged:[0,1,1],shot:'#e9edf1',blurb:'Quick and lucky. Lands critical hits often.',
     skills:[{n:'Twin Shot',lv:1,cd:2,mult:.95,hits:2,d:'Two shots at once'},
-            {n:'Venom Bolt',lv:3,cd:4,mult:1,poison:3,d:'Poison that keeps hurting'},
+            {n:'Venom Bolt',lv:3,cd:4,mult:1,poison:3,shot:'#8fe86a',d:'Poison that keeps hurting'},
             {n:'Eagle Eye',lv:6,cd:5,mult:1,eagle:3,d:'Next 3 hits are critical'}],
     power:{n:'Arrow Storm',mult:.75,hits:5,allcrit:true,d:'Five critical shots in a row'}},
-  barbarian:{name:'Barbarian',hp:1.15,atk:.95,crit:.1,weapon:['Hatchet','Battle Axe','Twin Axes'],blurb:'Wild and hard to put down. Heals in the thick of a fight.',
+  barbarian:{name:'Barbarian',hp:1.15,atk:.95,crit:.1,weapon:['Hatchet','Battle Axe','Twin Axes'],ranged:[0,0,0],blurb:'Wild and hard to put down. Heals in the thick of a fight.',
     skills:[{n:'Cleave',lv:1,cd:2,mult:1.6,d:'A heavy chop'},
             {n:'Second Wind',lv:3,cd:3,heal:.4,d:'Heal a big chunk of health'},
             {n:'War Cry',lv:6,cd:5,bless:4,heal:.2,d:'Heal and hit harder for 4 turns'}],
     power:{n:'Berserker Rage',mult:3.8,heal:.3,d:'A furious strike that heals you'}}
 };
-const M=(n,id)=>({n,id});
-const REGIONS=[
- {n:'Whispering Woods',lv:1,hp:20,atk:5,xp:10,gold:6,
-  mobs:[M('Green Slime','slime_green'),M('Forest Bat','bat_forest'),M('Bone Scout','sk_minion')],
-  boss:M('King Glop','slime_king'),relic:"King Glop's Jewel",rd:'+20% gold from battles'},
- {n:'Hollow Mines',lv:4,hp:55,atk:11,xp:28,gold:14,
-  mobs:[M('Cave Bat','bat_cave'),M('Rattlebones','sk_warrior'),M('Rock Golem','golem_rock')],
-  boss:M('The Bone King','sk_warrior_king'),relic:'Bone Crown',rd:'+10% attack'},
- {n:'Mistmarsh',lv:8,hp:110,atk:19,xp:65,gold:30,
-  mobs:[M('Bog Slime','slime_bog'),M('Will-o-Wisp','ghost_wisp'),M('Marsh Stalker','sk_rogue')],
-  boss:M('The Drowned Queen','ghost_queen'),relic:"Queen's Pearl",rd:'Heal 15% after every victory'},
- {n:'Frostpeak',lv:12,hp:190,atk:30,xp:130,gold:55,
-  mobs:[M('Frost Slime','slime_frost'),M('Snow Bat','bat_snow'),M('Ice Golem','golem_ice')],
-  boss:M('The Frost Giant','golem_frost'),relic:"Giant's Heart",rd:'+15% max health'},
- {n:'Ashen Wastes',lv:17,hp:300,atk:44,xp:230,gold:95,
-  mobs:[M('Ember Slime','slime_ember'),M('Cinder Bones','sk_minion_cinder'),M('Ash Wraith','ghost_ash')],
-  boss:M('The Flame Warden','sk_mage_flame'),relic:"Warden's Ember",rd:'+10% critical hit chance'},
- {n:'The Black Spire',lv:22,hp:450,atk:62,xp:380,gold:150,
-  mobs:[M('Shadow Knight','sk_warrior_shadow'),M('Obsidian Golem','golem_obsid'),M('Spire Wraith','ghost_spire')],
-  boss:M('Vorathrax the Lich','sk_mage_lich'),relic:"Lich's Phylactery",rd:'+15% attack'}
+/* 5 worlds x 10 levels. Level index n = 0..49. Stage 5 of a world has a mini-boss, stage 10 the world boss (both visible on the map). */
+const WORLDS=[
+ {n:'Whispering Woods',theme:'woods',mobs:[['Green Slime','slime_green'],['Forest Bat','bat_forest'],['Bone Scout','sk_minion']],mini:['Bandit Bones','sk_rogue'],boss:['King Glop','slime_king'],relic:"King Glop's Jewel",rd:'+20% gold from battles'},
+ {n:'Hollow Mines',theme:'mines',mobs:[['Cave Bat','bat_cave'],['Rattlebones','sk_warrior'],['Rock Golem','golem_rock']],mini:['The Deep Golem','golem_obsid'],boss:['The Bone King','sk_warrior_king'],relic:'Bone Crown',rd:'+10% attack'},
+ {n:'Mistmarsh',theme:'marsh',mobs:[['Bog Slime','slime_bog'],['Will-o-Wisp','ghost_wisp'],['Marsh Stalker','sk_rogue']],mini:['The Bog Wraith','ghost_ash'],boss:['The Drowned Queen','ghost_queen'],relic:"Queen's Pearl",rd:'Heal 15% after every victory'},
+ {n:'Frostpeak',theme:'frost',mobs:[['Frost Slime','slime_frost'],['Snow Bat','bat_snow'],['Ice Golem','golem_ice']],mini:['The Frozen Knight','sk_warrior_shadow'],boss:['The Frost Giant','golem_frost'],relic:"Giant's Heart",rd:'+15% max health'},
+ {n:'The Black Spire',theme:'spire',mobs:[['Ember Slime','slime_ember'],['Cinder Bones','sk_minion_cinder'],['Spire Wraith','ghost_spire'],['Shadow Knight','sk_warrior_shadow']],mini:['The Flame Warden','sk_mage_flame'],boss:['Vorathrax the Lich','sk_mage_lich'],relic:"Lich's Phylactery",rd:'+15% attack and +10% critical hits'}
 ];
-const RAID=M('Ashmaw the Ember Titan','golem_lava');
+const LEVELS=50;
+const RAID=['Ashmaw the Ember Titan','golem_lava'];
 const raidMax=no=>Math.round(1200*Math.pow(1.6,no-1));
-const SCENES=[
- {sky:['#7cc4e6','#dff2c4'],far:'#6fa878',mid:'#3f7a4a',gnd:['#78b556','#3f7a3a'],kind:'trees'},
- {sky:['#17131c','#3a2f38'],far:'#2a242c',mid:'#4a3e3a',gnd:['#6a574a','#2e2622'],kind:'cave'},
- {sky:['#56757f','#b9c9b4'],far:'#55706a',mid:'#34504a',gnd:['#587552','#2a3e34'],kind:'marsh'},
- {sky:['#6ea6de','#eaf5ff'],far:'#a4c0de',mid:'#d4e5f4',gnd:['#f4f9ff','#b0c8e0'],kind:'peaks'},
- {sky:['#2a0e0c','#d05a2a'],far:'#3a1c18',mid:'#241210',gnd:['#553026','#1e100e'],kind:'ash'},
- {sky:['#0e0b20','#4f2c72'],far:'#1e1838',mid:'#120f24',gnd:['#332c50','#141024'],kind:'spire'},
- {sky:['#18202e','#77879c'],far:'#465160',mid:'#262c36',gnd:['#5d6670','#2a2f36'],kind:'camp'}
-];
+const need=l=>25+l*l*8;
+/* Balance: a level expects a hero of about level .9n+1 with gear of tier n/6. A normal monster falls in about 4 hits and needs about 9 to beat you. */
+const expLv=n=>Math.round(.9*n+1), expTier=n=>Math.min(GEAR_MAX,Math.floor(n/6));
+const lvHp=n=>Math.round(3.6*(6+2.2*expLv(n)+WEAPON_ATK[expTier(n)])*(1+n*.01));
+const lvAtk=n=>(40+12*expLv(n)+ARMOR_HP[expTier(n)])/9+ARMOR_DEF[expTier(n)];
+const lvXp=n=>Math.round(need(expLv(n))/5.5), lvGold=n=>Math.round(6*Math.pow(1.09,n)*(1+n/10));
+const levelName=n=>WORLDS[Math.floor(n/10)].n+' '+(Math.floor(n/10)+1)+'-'+(n%10+1);
+const levelBoss=n=>n%10===9?'boss':n%10===4?'mini':null;
+function makeFoe(n,kind){ const W=WORLDS[Math.floor(n/10)], m=kind==='boss'?W.boss:kind==='mini'?W.mini:W.mobs[Math.floor(Math.random()*W.mobs.length)];
+  const hm=kind==='boss'?3.2:kind==='mini'?2.4:rnd(.9,1.15), am=kind==='boss'?1.45:kind==='mini'?1.3:1, hp=Math.round(lvHp(n)*hm);
+  return {n:m[0],id:m[1],hp,max:hp,atk:lvAtk(n)*am,kind,big:kind!=='mob',xp:lvXp(n)*(kind==='boss'?5:kind==='mini'?3:1),gold:lvGold(n)*(kind==='boss'?7:kind==='mini'?4:1),scene:Math.floor(n/10)}; }
 
-/* ============ HELPERS ============ */
+/* ---------- helpers ---------- */
 const app=document.getElementById('app');
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const clone=o=>JSON.parse(JSON.stringify(o));
@@ -2462,11 +2489,443 @@ const lsGet=k=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):null}
 const lsSet=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 const today=()=>{const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()};
 const look=t=>t<1?0:t<4?1:2;
-const heroImg=(h,atk,w,a)=>`img/hero_${h.cls}_${look(w==null?h.weapon:w)}${look(a==null?h.armor:a)}${atk?'_atk':''}.webp`;
-const mobImg=(id,atk)=>`img/${id}${atk&&id.startsWith('sk_')?'_atk':''}.webp`;
-const preload=src=>{const i=new Image();i.src=src};
+/* Sprite sheets (one row of square frames). Heroes: idle 0-1, walk 2-7, attack 8-12, hit 13, cheer 14. Monsters: idle 0-1, attack 2-6, hit 7. */
+const HN=15, MN=8, HF={idle:0,walk:2,atk:8,hit:13,cheer:14}, MF={idle:0,atk:2,hit:7};
+const heroSheet=(h,w,a)=>`img/h_${h.cls}_${look(w==null?h.weapon:w)}${look(a==null?h.armor:a)}.webp`;
+const mobSheet=id=>`img/m_${id}.webp`;
+const imgCache={};
+function loadImg(src){ if(!imgCache[src]){const i=new Image(); i.src=src; imgCache[src]=i} return imgCache[src]; }
+const fpos=(f,n)=>(f/(n-1)*100)+'%';
+/* a still or animated sprite as HTML: one frame of a sheet */
+const sprHtml=(src,n,f,cls,style,attr)=>`<div ${attr||''} class="sp ${cls||''}" style="background-image:url(${src});background-size:${n*100}% 100%;background-position-x:${fpos(f,n)};${style||''}"></div>`;
+const heroSpr=(h,cls,style,w,a,attr)=>sprHtml(heroSheet(h,w,a),HN,0,cls,heroFx(h)+(style||''),attr);
+const mobSpr=(id,cls,style,attr)=>sprHtml(mobSheet(id),MN,0,cls,style,attr);
+let toastT; function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,3000)}
+/* sound */
+let AC=null, muted=!!lsGet('hg_mute');
+function beep(f,d,type,vol){ if(muted)return; try{ AC=AC||new (window.AudioContext||window.webkitAudioContext)(); const o=AC.createOscillator(),g=AC.createGain();
+  o.type=type||'square'; o.frequency.value=f; g.gain.value=vol||.05; g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+d); o.connect(g); g.connect(AC.destination); o.start(); o.stop(AC.currentTime+d);}catch(e){} }
+const sfx={hit:()=>beep(180,.12,'square'),crit:()=>{beep(520,.08);setTimeout(()=>beep(780,.14),70)},hurt:()=>beep(90,.18,'sawtooth'),heal:()=>{beep(520,.1,'triangle',.08);setTimeout(()=>beep(700,.16,'triangle',.08),90)},
+  shot:()=>beep(900,.08,'triangle',.05),swing:()=>beep(300,.06,'sawtooth',.03),chest:()=>[523,659,784].forEach((f,i)=>setTimeout(()=>beep(f,.1,'triangle',.07),i*80)),
+  alarm:()=>[220,330,220,330].forEach((f,i)=>setTimeout(()=>beep(f,.09,'square',.05),i*90)),
+  power:()=>[262,392,523,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,.2,'sawtooth',.06),i*70)),
+  win:()=>[392,523,659,784].forEach((f,i)=>setTimeout(()=>beep(f,.16,'square'),i*110)),lose:()=>[330,262,196].forEach((f,i)=>setTimeout(()=>beep(f,.22,'triangle',.08),i*160)),tap:()=>beep(440,.04,'triangle',.04)};
+
+/* ---------- state ---------- */
+let db=null, loaded=false, offline=false;
+let heroes={}, world=lsGet('hg_world')||{no:1}, giftDocs=[], seenGifts=new Set();
+let me=lsGet('hg_me'), H=me?fixHero(lsGet('hg_hero_'+me)):null;
+let S={screen:'who'}, B=null;   // B = the battle in progress (null when none)
+const busy=()=>!!B||S.screen==='explore';   // don't swap the hero or pop messages mid-adventure
+
+function fixHero(h){ if(!h||!CLASSES[h.cls])return null;   // older saves: fill in new fields
+  if(h.cleared==null)h.cleared=Array.isArray(h.prog)?Math.min(LEVELS-1,h.prog.reduce((a,b)=>a+b,0)):0;
+  h.relics=(h.relics||[]).filter(r=>r<WORLDS.length); h.weapon=Math.min(GEAR_MAX,h.weapon||0); h.armor=Math.min(GEAR_MAX,h.armor||0);
+  h.wxp=h.wxp||0; h.axp=h.axp||0; h.pow=h.pow||0; h.feats=h.feats||[]; h.kills=h.kills||0; return h; }
+function stats(h){const c=CLASSES[h.cls], r=h.relics||[];
+  let hp=(40+12*h.lvl+ARMOR_HP[h.armor])*c.hp; if(r.includes(3))hp*=1.15;
+  let atk=(6+2.2*h.lvl+WEAPON_ATK[h.weapon])*c.atk; if(r.includes(1))atk*=1.1; if(r.includes(4))atk*=1.15;
+  return {hp:Math.round(hp),atk:Math.round(atk),def:ARMOR_DEF[h.armor],crit:c.crit+(r.includes(4)?.1:0)};}
+function newHero(name,cls){const h={name,cls,lvl:1,xp:0,hp:0,pow:0,gold:20,potions:2,weapon:0,armor:0,wxp:0,axp:0,cleared:0,relics:[],kills:0,raidNo:world.no,raidDmg:0,raidDay:'',raidTries:0,scales:0,feats:[],rev:0};
+  h.hp=stats(h).hp; return h;}
+function feat(x){H.feats=(H.feats||[]).concat([{t:Date.now(),x}]).slice(-6)}
+const potionPrice=()=>12+4*H.lvl;
+const raidLeft=()=>H.raidDay===today()?Math.max(0,3-(H.raidTries||0)):3;
+function raidHp(){let d=0; for(const id in heroes){const h=id===me&&H?H:heroes[id]; if(h&&h.raidNo===world.no)d+=h.raidDmg||0} return Math.max(0,raidMax(world.no)-d)}
+const wpnName=(h,t)=>WPN_TIER[t]+' '+CLASSES[h.cls].weapon[look(t)];
+const gearName=(h,k,t)=>k==='weapon'?wpnName(h,t):ARM_TIER[t]+' Armor';
+/* Looks: every 8 hero levels is a rank (aura + size); every weapon level brightens its glow; armor adds a gold sheen. */
+const RANKS=['Recruit','Adventurer','Veteran','Champion','Hero','Paragon','Legend'], RANK_COL=['','#c98a4a','#d8dde6','#f2c35b','#ff7a3c','#b070ff','#aef0ff'];
+const WGLOW=['','#d8d0c0','#9fd0ff','#ffffff','#b070ff','#ff8a3c','#fff3a0','#7ff0ff','#ff9af0'];
+const rank=h=>Math.min(6,Math.floor(h.lvl/8));
+const heroFx=h=>`filter:drop-shadow(0 5px 3px rgba(0,0,0,.45))${h.weapon?` drop-shadow(0 0 ${h.weapon*1.2}px ${WGLOW[h.weapon]})`:''}${h.armor>1?` drop-shadow(0 0 ${h.armor}px #f2c35b)`:''};`;
+const aura=(h,css)=>rank(h)?`<div class="aura" style="${css};background:radial-gradient(closest-side,${RANK_COL[rank(h)]},transparent)"></div>`:'';
+/* Gear levels 1-9 (stored 0-8). It earns gear XP from every victory; gold in the shop pays off whatever is left. */
+const gearNeed=nx=>Math.round(GEAR_PRICE[nx]*.9);
+const gxKey=k=>k==='weapon'?'wxp':'axp';
+const gearCost=k=>{const nx=H[k]+1; return Math.max(1,Math.ceil(GEAR_PRICE[nx]*(1-Math.min(1,(H[gxKey(k)]||0)/gearNeed(nx)))))};
+function gearUp(k){ const nx=H[k]+1; H[k]=nx; if(k==='armor')H.hp=Math.min(stats(H).hp,H.hp+ARMOR_HP[nx]-ARMOR_HP[nx-1]); }
+function addGearXp(x){ const ups=[]; for(const k of ['weapon','armor']){ const xk=gxKey(k); H[xk]=(H[xk]||0)+x;
+    while(H[k]<GEAR_MAX){ const nx=H[k]+1; if(H[xk]<gearNeed(nx))break; if(H.lvl<GEAR_LVL[nx]){H[xk]=gearNeed(nx);break} H[xk]-=gearNeed(nx); gearUp(k); ups.push({k,look:look(nx)!==look(nx-1)}); }
+    if(H[k]>=GEAR_MAX)H[xk]=0; } return ups; }
+function addXp(xp){ let ups=0; H.xp+=xp; while(H.lvl<MAXLV&&H.xp>=need(H.lvl)){H.xp-=need(H.lvl);H.lvl++;ups++}
+  if(ups){H.hp=stats(H).hp; if(H.lvl%5===0)feat('reached level '+H.lvl)} return ups; }
+
+/* ---------- save / sync ---------- */
+let saving=false,dirty=false;
+function save(){ if(!H||!me)return; H.rev=(H.rev||0)+1; H.t=Date.now(); lsSet('hg_hero_'+me,H); heroes[me]=clone(H); if(!db||!loaded)return; dirty=true; pump(); }
+async function pump(){ if(saving||!db)return; saving=true;
+  while(dirty&&db){ dirty=false; const slot=me, body=clone(H), d=db;
+    try{await d.doc('heroes/'+slot).set(body)}catch(e){ await sleep(1500); try{await d.doc('heroes/'+slot).set(body)}catch(e2){ if(!busy())toast('Could not reach the guild hall. Progress is saved on this device.'); } } }
+  saving=false; }
+function setWorld(no){ world={no}; lsSet('hg_world',world); if(db&&loaded) db.doc('world/raid').set({no,t:Date.now()}).catch(()=>{}); }
+function adoptMine(){ if(!me||busy())return; const d=heroes[me]; if(d&&(!H||(d.rev||0)>(H.rev||0))){H=fixHero(clone(d));lsSet('hg_hero_'+me,H)} else if(H&&(!d||(d.rev||0)<(H.rev||0))){dirty=true;pump()} }
+function softRender(){ if(busy())return; const a=document.activeElement; if(a&&a.tagName==='INPUT')return; if(['who','camp','guild'].includes(S.screen))render(); }
+function checkRaid(){ if(!H||busy())return;
+  if(world.no>(H.raidNo||1)){ const did=(H.raidDmg||0)>0, prev=world.no-1;
+    if(did){ const g=60*prev+30*H.lvl, xp=Math.round(need(H.lvl)*.5); H.gold+=g; H.scales=(H.scales||0)+1; addXp(xp); feat('helped bring down Ashmaw');
+      toast('Ashmaw is defeated! Your share: '+g+' gold, '+xp+' XP and a Titan Shard.'); sfx.win(); }
+    H.raidNo=world.no; H.raidDmg=0; save(); }
+  else if(raidHp()<=0 && Object.keys(heroes).length){ setWorld(world.no+1); checkRaid(); } }
+function processGifts(){ if(!H||busy()||!db)return; let got=false;
+  for(const g of giftDocs){ if(g.to!==me||seenGifts.has(g.id))continue; seenGifts.add(g.id); got=true;
+    if(g.kind==='potion'){H.potions++; toast(g.from+' sent you a potion!')} else {H.gold+=25; toast(g.from+' sent you 25 gold!')}
+    db.doc('gifts/'+g.id).delete().catch(()=>{}); }
+  if(got){sfx.heal();save();softRender()} }
+/* Home-screen (GitHub Pages) build: window.HG_CLOUD is the save server. This shim gives it the same shape as the claude.ai db. */
+const canonPw=v=>String(v).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+async function sha256hex(t){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t)); return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('')}
+function cloudDb(url,key){
+  const subs={heroes:[],world:[],gifts:[]}; let chain=Promise.resolve(), last='', dead=false;
+  const emit=st=>{ const sig=JSON.stringify([st.heroes,st.world,st.gifts]); if(sig===last)return; last=sig;
+    subs.heroes.forEach(f=>f({docs:Object.keys(st.heroes).map(id=>({id,data:()=>st.heroes[id]})),metadata:{fromCache:false}}));
+    subs.world.forEach(f=>f({exists:true,data:()=>st.world})); subs.gifts.forEach(f=>f({docs:st.gifts.map(g=>({id:g.id,data:()=>g}))})); };
+  const call=body=>{ const p=chain.then(async()=>{ if(dead)throw {code:'key'};
+      const r=await fetch(url+'/hg',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({key},body))});
+      if(r.status===403){ dead=true; clearInterval(tick); lsSet('hg_key',null); try{document.cookie='hg-key=; max-age=0; path='+location.pathname}catch(e){} db=null;
+        S.lockMsg='That password did not work. Try again.'; B=null; if(window.stopExplore)stopExplore(); S.screen='lock'; render(); throw {code:'key'} }
+      const j=await r.json(); if(!j.ok)throw {code:j.error}; emit(j); return j; });
+    chain=p.catch(()=>{}); return p; };
+  const poll=()=>{ if(!dead&&document.visibilityState==='visible')call({op:'get'}).catch(()=>{}) };
+  const tick=setInterval(poll,20000); document.addEventListener('visibilitychange',poll); poll();
+  return { doc(path){ const p=path.split('/'); return {
+      set:b=>p[0]==='heroes'?call({op:'hero',slot:p[1],body:b}):call({op:'world',no:b.no}),
+      delete:()=>call({op:'ungift',id:p[1]}), onSnapshot:f=>{subs.world.push(f)} } },
+    collection(c){ return { onSnapshot:f=>{subs[c].push(f)}, add:b=>call({op:'gift',to:b.to,from:b.from,kind:b.kind}) } } };
+}
+let connTimer=null;
+function connDone(){ if(loaded)return; loaded=true; adoptMine(); if(H&&S.screen==='who'&&me)S.screen='camp'; checkRaid(); if(!busy())render(); }
+function goOffline(){ clearTimeout(connTimer); offline=true; connDone(); }
+function wire(d){ db=d;
+  d.collection('heroes').onSnapshot(snap=>{ snap.docs.forEach(x=>{const v=fixHero(clone(x.data()||{})); if(v)heroes[x.id]=v});
+    if(!snap.metadata.fromCache||loaded){clearTimeout(connTimer);offline=false; if(!loaded){connDone()} else {adoptMine();checkRaid();softRender()} } }, goOffline);
+  d.doc('world/raid').onSnapshot(s=>{ if(s.exists){const v=s.data(); if(v&&v.no>world.no){world={no:v.no};lsSet('hg_world',world)} } if(loaded){checkRaid();softRender()} },()=>{});
+  d.collection('gifts').onSnapshot(s=>{ giftDocs=s.docs.map(x=>Object.assign({id:x.id},x.data())); if(loaded)processGifts(); },()=>{});
+}
+function connect(){
+  clearTimeout(connTimer); connTimer=setTimeout(()=>{ if(!loaded){offline=true;connDone()} },10000);
+  if(window.HG_CLOUD){ const k=lsGet('hg_key'); if(!k){clearTimeout(connTimer); S.screen='lock'; render(); return} wire(cloudDb(window.HG_CLOUD,k)); return; }
+  if(!window.claude||!window.claude.use){goOffline();return}
+  window.claude.use('db').then(d=>{ if(!d){goOffline();return} wire(d); }).catch(goOffline);
+}
+/* Invites (home-screen build). A QR/link carries #key=<saved key> (or #join=<password>). A home-screen app has its own storage on iPhones,
+   so the invite travels with Add to Home Screen: in the link the icon starts on, and in a cookie. */
+function keepInvite(k){
+  const base=location.origin+location.pathname, join=base+'#key='+k;
+  try{document.cookie='hg-key='+k+'; path='+location.pathname+'; max-age=31536000; SameSite=Lax; Secure'}catch(e){}
+  if(navigator.standalone||matchMedia('(display-mode: standalone)').matches)return;
+  document.querySelectorAll('link[rel=manifest]').forEach(l=>l.remove());
+  const man={name:'Hearthguard',short_name:'Hearthguard',start_url:join,scope:base,display:'standalone',orientation:'landscape',background_color:'#14171b',theme_color:'#14171b',
+    icons:[{src:base+'icon-180.png',sizes:'180x180',type:'image/png'},{src:base+'icon-512.png',sizes:'512x512',type:'image/png'}]};
+  const l=document.createElement('link'); l.rel='manifest'; l.href='data:application/manifest+json,'+encodeURIComponent(JSON.stringify(man)); document.head.appendChild(l);
+  if(lsGet('hg_tip_off'))return;
+  const tip=document.createElement('div'); tip.setAttribute('role','status'); tip.className='tip';
+  tip.textContent='Make it an app: tap Share, then Add to Home Screen, and always play from that icon.';
+  const x=document.createElement('button'); x.textContent='✕'; x.setAttribute('aria-label','Close'); x.className='tipx';
+  x.addEventListener('click',()=>{tip.remove();lsSet('hg_tip_off',1)}); tip.appendChild(x); document.body.appendChild(tip);
+}
+function boot(){ render(); connect(); const k=lsGet('hg_key'); if(window.HG_CLOUD&&k)keepInvite(k); }
+function start(){
+  if(window.HG_CLOUD){
+    let m=/[#&]key=([0-9a-f]{64})/.exec(location.hash), j=/[#&]join=([^&]+)/.exec(location.hash), c=null;
+    try{c=/(?:^|; )hg-key=([0-9a-f]{64})/.exec(document.cookie)}catch(e){}
+    if(m){lsSet('hg_key',m[1]);boot()}
+    else if(j){render(); sha256hex(canonPw(decodeURIComponent(j[1]))).then(k=>{lsSet('hg_key',k);boot()})}
+    else { if(!lsGet('hg_key')&&c)lsSet('hg_key',c[1]); boot(); }
+  } else boot();
+}
+</script>
+<script>
+"use strict";
+/* Hearthguard exploring: a wide side-view level you roam with a joystick (left/right and up/down), with branching trails,
+   chests, surprise encounters, a visible boss on boss levels and an exit gate at the far end. */
+const CELL=160, ROWS=5, TOP=250, UNIT=77;   // world units: one trail cell, sky band height, units per Blender unit of a sprite
+const THEMES={
+ woods:{sky:['#7cc4e6','#dff2c4'],far:'#6fa878',ground:'#3f7a3a',dot:'#356b33',path:'#cdb67e',edge:'#a8905c',props:['tree','pine','bush','tree']},
+ mines:{sky:['#17131c','#3a2f38'],far:'#2a242c',ground:'#353030',dot:'#2a2625',path:'#8f7f6f',edge:'#6e6055',props:['rock','stal','crystal','rock']},
+ marsh:{sky:['#56757f','#b9c9b4'],far:'#55706a',ground:'#33544a',dot:'#29463d',path:'#96955f',edge:'#74734a',props:['dead','reeds','pool','reeds']},
+ frost:{sky:['#6ea6de','#eaf5ff'],far:'#a4c0de',ground:'#e3edf7',dot:'#c9d9ea',path:'#a3b7ca',edge:'#8499ae',props:['spine','icerock','mound','spine']},
+ spire:{sky:['#0e0b20','#4f2c72'],far:'#1e1838',ground:'#231d3a',dot:'#1a152c',path:'#62587f',edge:'#463d62',props:['pillar','pcrystal','wall','pillar']}
+};
+function seeded(seed){ let s=seed%2147483647; if(s<=0)s+=2147483646; return ()=>(s=s*16807%2147483647)/2147483647; }
+function genLevel(n){ const R=seeded(n*7919+17), C=30+(n%10)*2, g=[]; for(let r=0;r<ROWS;r++)g.push(new Uint8Array(C));
+  let r=2; const main=[];
+  for(let c=0;c<C;c++){ g[r][c]=1; main.push([c,r]);
+    if(c>2&&c<C-5&&R()<.5){ const d=R()<.5?-1:1, len=1+Math.floor(R()*2); for(let k=0;k<len;k++){ const nr=r+d; if(nr<0||nr>=ROWS)break; r=nr; g[r][c]=1; main.push([c,r]); } } }
+  const chests=[], nb=3+Math.floor(C/9);
+  for(let b=0;b<nb;b++){ let [c,rr]=main[3+Math.floor(R()*(main.length-14))]; if(c>C-7)continue; let len=3+Math.floor(R()*4), last=null;
+    for(let k=0;k<len;k++){ const d=R(); let nc=c,nr=rr; if(d<.45)nr+=(R()<.5?-1:1); else if(d<.85)nc+=1; else nc-=1;
+      if(nr<0||nr>=ROWS||nc<1||nc>C-6)continue; c=nc; rr=nr; if(!g[rr][c]){g[rr][c]=1; last=[c,rr]} }
+    if(last&&!chests.some(x=>x.c===last[0]&&x.r===last[1]))chests.push({c:last[0],r:last[1],x:(last[0]+.5)*CELL,y:(last[1]+.5)*CELL,open:false}); }
+  const T=THEMES[WORLDS[Math.floor(n/10)].theme], props=[];
+  for(let rr=0;rr<ROWS;rr++)for(let c=0;c<C;c++){ if(g[rr][c])continue; const k=1+Math.floor(R()*2);
+    for(let i=0;i<k;i++)props.push({x:(c+.2+R()*.6)*CELL,y:(rr+.45+R()*.5)*CELL,kind:T.props[Math.floor(R()*T.props.length)],s:.5+R()*.22}); }
+  for(let c=-3;c<C+3;c++){ props.push({x:(c+R())*CELL,y:-6-R()*20,kind:T.props[0],s:.6+R()*.3}); props.push({x:(c+R())*CELL,y:ROWS*CELL+150+R()*50,kind:T.props[0],s:.7+R()*.3}); }
+  props.sort((a,b)=>a.y-b.y);
+  const er=main[main.length-1][1];
+  return {n,C,g,T,props,chests,start:{x:CELL*.5,y:2.5*CELL},exit:{x:(C-.5)*CELL,y:(er+.5)*CELL},boss:levelBoss(n)?{x:(C-3.5)*CELL,y:(er+.5)*CELL,kind:levelBoss(n)}:null};
+}
+/* ----- scenery, drawn once per kind into a small canvas (200 x 320, base of the object at 100,300) ----- */
+const propCache={};
+function poly(c,col,pts){ c.fillStyle=col; c.beginPath(); c.moveTo(pts[0],pts[1]); for(let i=2;i<pts.length;i+=2)c.lineTo(pts[i],pts[i+1]); c.closePath(); c.fill(); }
+function circ(c,col,x,y,r,ry){ c.fillStyle=col; c.beginPath(); c.ellipse(x,y,r,ry||r,0,0,7); c.fill(); }
+function propCanvas(kind){ if(propCache[kind])return propCache[kind]; const cv=document.createElement('canvas'); cv.width=200; cv.height=320; const c=cv.getContext('2d');
+  circ(c,'rgba(0,0,0,.22)',100,300,kind==='pool'?0:62,14);
+  const pine=(d,m,l,snow)=>{ poly(c,'#5a3d28',[92,300,108,300,106,230,94,230]); [[40,250,150],[50,200,105],[62,150,60]].forEach(([w,y,t],i)=>{ poly(c,d,[100-w,y,100+w,y,100,t]); poly(c,m,[100-w,y,100,y,100,t]); if(snow)poly(c,'#fff',[100-w*.5,(y+t)/2+8,100,t,100+w*.5,(y+t)/2+8,100+w*.2,(y+t)/2-4,100,(y+t)/2+6,100-w*.25,(y+t)/2-4]); }); };
+  const rock=(d,m,l)=>{ poly(c,d,[40,300,52,240,90,210,140,228,165,300]); poly(c,m,[52,240,90,210,110,255,70,300,40,300]); poly(c,l,[90,210,140,228,110,255]); };
+  const crystal=(d,l,glow)=>{ c.shadowColor=glow; c.shadowBlur=22; poly(c,d,[70,300,84,200,100,300]); poly(c,l,[95,300,112,160,132,300]); poly(c,d,[125,300,142,225,156,300]); c.shadowBlur=0; poly(c,'rgba(255,255,255,.55)',[103,290,112,175,117,290]); };
+  if(kind==='tree'){ poly(c,'#5a3d28',[90,300,110,300,107,205,93,205]); circ(c,'#2f6a3e',100,150,72); circ(c,'#3f8a4a',78,132,50); circ(c,'#3f8a4a',128,142,46); circ(c,'#62b060',92,108,36); circ(c,'#8fd07a',84,96,14); }
+  else if(kind==='pine')pine('#2a5c3c','#3c7e50');
+  else if(kind==='spine')pine('#3a6a70','#4f8a8f',0,true);
+  else if(kind==='bush'){ circ(c,'#2f6a3e',76,278,34); circ(c,'#3f8a4a',118,272,40); circ(c,'#62b060',100,258,26); circ(c,'#e86a6a',88,262,5); circ(c,'#e86a6a',120,270,5); }
+  else if(kind==='rock')rock('#5a524c','#7d736a','#a39990');
+  else if(kind==='icerock')rock('#7fa8cc','#a9cdea','#e4f3ff');
+  else if(kind==='stal'){ poly(c,'#5a524c',[70,300,100,130,130,300]); poly(c,'#7d736a',[70,300,100,130,100,300]); poly(c,'#5a524c',[120,300,140,220,158,300]); }
+  else if(kind==='crystal')crystal('#3fb8d8','#8fe6f5','#7fe0ff');
+  else if(kind==='pcrystal')crystal('#7a3fd8','#c08ff5','#b070ff');
+  else if(kind==='dead'){ c.strokeStyle='#4a4038'; c.lineCap='round'; c.lineWidth=14; c.beginPath(); c.moveTo(100,300); c.lineTo(98,170); c.stroke(); c.lineWidth=8; c.beginPath(); c.moveTo(99,220); c.lineTo(60,170); c.moveTo(98,190); c.lineTo(140,140); c.moveTo(98,172); c.lineTo(80,120); c.moveTo(125,158); c.lineTo(150,160); c.stroke(); }
+  else if(kind==='reeds'){ c.lineCap='round'; for(let i=0;i<7;i++){ const x=62+i*13, h=70+((i*37)%50); c.strokeStyle=i%2?'#6f8a4a':'#56703a'; c.lineWidth=5; c.beginPath(); c.moveTo(x,300); c.quadraticCurveTo(x+6,300-h/2,x+(i%3-1)*8,300-h); c.stroke(); circ(c,'#5a3d28',x+(i%3-1)*8,300-h,5,13); } }
+  else if(kind==='pool'){ circ(c,'#2a4a52',100,288,88,24); circ(c,'#3f7a86',100,286,80,19); circ(c,'rgba(255,255,255,.35)',78,281,22,4); }
+  else if(kind==='mound'){ circ(c,'#c9d9ea',100,300,80,40); circ(c,'#ffffff',96,292,70,34); c.clearRect(0,301,200,20); circ(c,'rgba(0,0,0,.12)',100,302,80,8); }
+  else if(kind==='pillar'){ poly(c,'#2a2440',[72,300,128,300,124,120,76,120]); poly(c,'#3d355c',[72,300,100,300,100,120,76,120]); poly(c,'#4a4270',[64,120,136,120,130,100,70,100]); c.shadowColor='#b070ff'; c.shadowBlur=14; poly(c,'#b070ff',[96,180,104,180,102,240,98,240]); c.shadowBlur=0; }
+  else if(kind==='wall'){ poly(c,'#2a2440',[30,300,170,300,170,235,140,235,140,205,100,205,100,225,60,225,60,250,30,250]); c.strokeStyle='#4a4270'; c.lineWidth=3; for(let y=250;y<300;y+=22){ c.beginPath(); c.moveTo(32,y+10); c.lineTo(168,y+10); c.stroke(); } }
+  return propCache[kind]=cv;
+}
+/* ----- the level in play ----- */
+let EX=null, exRaf=0;
+const mobUnit=id=>id.startsWith('sk_')?{size:4.4*UNIT,foot:.776}:{size:5*UNIT,foot:.743};
+function startLevel(n){ const L=genLevel(n); B=null;
+  EX={n,L,x:L.start.x,y:L.start.y,face:1,moving:false,walk:0,next:rnd(1000,1700),enc:0,t:0,joy:{x:0,y:0},keys:{},bossAlive:!!L.boss,busy:false,done:false,relic:null};
+  loadImg(heroSheet(H)); if(L.boss)loadImg(mobSheet((L.boss.kind==='boss'?WORLDS[Math.floor(n/10)].boss:WORLDS[Math.floor(n/10)].mini)[1]));
+  S.screen='explore'; render(); }
+function stopExplore(){ EX=null; cancelAnimationFrame(exRaf); }
+window.stopExplore=stopExplore;
+function vExplore(){ const st=stats(H);
+  return `<div class="ex"><canvas id="ex"></canvas>
+    <div class="hud tl"><b>${esc(H.name)}</b> <span class="dim">Lv ${H.lvl}</span><div class="bar" style="width:150px"><i id="exhp" style="width:${100*H.hp/st.hp}%"></i></div></div>
+    <div class="hud tc">${esc(levelName(EX.n))}<div class="bar xp" style="width:160px;height:8px"><i id="exprog" style="width:0%"></i></div></div>
+    <div class="hud tr"><button class="ghost" data-act="expotion" ${H.potions<1||H.hp>=st.hp?'disabled':''}>Potion (${H.potions})</button><button class="ghost" data-act="exleave">Camp</button></div>
+    <div id="joyzone"></div><div id="joy" hidden><i></i></div>
+    <div id="exover" ${EX.over?'':'hidden'}>${EX.over||''}</div></div>`; }
+function mountExplore(){ const cv=document.getElementById('ex'); if(!cv||!EX)return;
+  const fit=()=>{ const d=Math.min(2,window.devicePixelRatio||1); cv.width=Math.round(cv.clientWidth*d); cv.height=Math.round(cv.clientHeight*d); };
+  fit(); window.onresize=fit;
+  const zone=document.getElementById('joyzone'), joy=document.getElementById('joy'), knob=joy.firstElementChild; let pid=null, ox=0, oy=0;
+  zone.onpointerdown=e=>{ if(pid!==null||!EX||EX.busy)return; pid=e.pointerId; try{zone.setPointerCapture(pid)}catch(_){} ox=e.clientX; oy=e.clientY; joy.hidden=false; joy.style.left=(ox-60)+'px'; joy.style.top=(oy-60)+'px'; knob.style.transform=''; };
+  zone.onpointermove=e=>{ if(e.pointerId!==pid||!EX)return; let dx=e.clientX-ox, dy=e.clientY-oy; const m=Math.hypot(dx,dy), R=55; if(m>R){dx*=R/m;dy*=R/m} knob.style.transform=`translate(${dx}px,${dy}px)`; EX.joy={x:m<8?0:dx/R,y:m<8?0:dy/R}; };
+  zone.onpointerup=zone.onpointercancel=e=>{ if(e.pointerId!==pid)return; pid=null; joy.hidden=true; if(EX)EX.joy={x:0,y:0}; };
+  cancelAnimationFrame(exRaf); let last=performance.now();
+  const loop=now=>{ if(!EX||S.screen!=='explore'||!cv.isConnected)return; const dt=Math.min(.05,(now-last)/1000); last=now; stepExplore(dt); drawExplore(cv); exRaf=requestAnimationFrame(loop); };
+  exRaf=requestAnimationFrame(loop); }
+const KEYMAP={ArrowLeft:'l',ArrowRight:'r',ArrowUp:'u',ArrowDown:'d',a:'l',d:'r',w:'u',s:'d'};
+addEventListener('keydown',e=>{ if(EX&&KEYMAP[e.key]){EX.keys[KEYMAP[e.key]]=1; e.preventDefault()} });
+addEventListener('keyup',e=>{ if(EX&&KEYMAP[e.key])EX.keys[KEYMAP[e.key]]=0; });
+function walkable(x,y){ const L=EX.L; for(const ox of [-36,36])for(const oy of [-22,12]){ const c=Math.floor((x+ox)/CELL), r=Math.floor((y+oy)/CELL); if(r<0||r>=ROWS||c<0||c>=L.C||!L.g[r][c])return false; } return true; }
+function stepExplore(dt){ const E=EX; E.t+=dt; if(E.busy||E.done)return;
+  let vx=E.joy.x+(E.keys.r?1:0)-(E.keys.l?1:0), vy=E.joy.y+(E.keys.d?1:0)-(E.keys.u?1:0); const m=Math.hypot(vx,vy); if(m>1){vx/=m;vy/=m}
+  E.moving=m>.05; if(!E.moving)return;
+  const sp=390*dt, ox=E.x, oy=E.y; if(Math.abs(vx)>.05)E.face=vx>0?1:-1;
+  if(walkable(E.x+vx*sp,E.y))E.x+=vx*sp; if(walkable(E.x,E.y+vy*sp*.8))E.y+=vy*sp*.8;
+  E.walk+=Math.hypot(E.x-ox,E.y-oy); const L=E.L;
+  for(const c of L.chests)if(!c.open&&Math.hypot(c.x-E.x,c.y-E.y)<95)openChest(c);
+  if(L.boss&&E.bossAlive&&Math.hypot(L.boss.x-E.x,(L.boss.y-E.y)*1.4)<150){ encounter(L.boss.kind); return; }
+  if(Math.hypot(L.exit.x-E.x,L.exit.y-E.y)<80&&!E.bossAlive){ levelDone(); return; }
+  const nearEnd=E.x>(L.C-5)*CELL;
+  if(E.walk>=E.next&&E.enc<7&&!nearEnd){ E.walk=0; E.next=rnd(1200,2200); E.enc++; encounter('mob'); }
+}
+function openChest(c){ c.open=true; sfx.chest(); const n=EX.n, r=Math.random(); let msg;
+  if(r<.55){ const g=lvGold(n)*4; H.gold+=g; msg='Treasure! +'+g+' gold'; } else if(r<.8){ H.potions=Math.min(9,H.potions+1); msg='You found a healing potion'; }
+  else { const ups=addGearXp(lvGold(n)*5); msg='Ancient forge dust! Your gear grows stronger'+(ups.length?' and levels up!':''); }
+  save(); toast(msg); hudExplore(); }
+function hudExplore(){ const st=stats(H), hp=document.getElementById('exhp'); if(hp)hp.style.width=(100*H.hp/st.hp)+'%'; }
+async function encounter(kind){ const E=EX; E.busy=true; E.joy={x:0,y:0}; E.keys={}; E.moving=false; sfx.alarm();
+  const ex=document.querySelector('.ex'); if(ex){ const f=document.createElement('div'); f.className='encflash'; f.innerHTML='<b>!</b>'; ex.appendChild(f); }
+  await sleep(750); if(EX!==E)return;
+  const res=await battle(makeFoe(E.n,kind)); if(EX!==E)return;
+  if(!res.win){ stopExplore(); S.screen='camp'; render(); return; }
+  if(kind!=='mob'){ E.bossAlive=false; const w=Math.floor(E.n/10);
+    if(kind==='boss'&&!H.relics.includes(w)){ H.relics.push(w); E.relic=w; feat('defeated '+WORLDS[w].boss[0]+' and won '+WORLDS[w].relic); save(); toast('Relic won: '+WORLDS[w].relic+' ('+WORLDS[w].rd+')'); } }
+  E.busy=false; E.walk=0; S.screen='explore'; render(); }
+function levelDone(){ const E=EX, n=E.n; E.done=true; const first=n>=H.cleared, bonus=lvGold(n)*(first?6:2); H.gold+=bonus; H.hp=stats(H).hp;
+  if(first){ H.cleared=Math.min(LEVELS,n+1); if(n%10===9)feat('cleared '+WORLDS[Math.floor(n/10)].n); if(n===LEVELS-1)feat('saved the realm'); }
+  save(); sfx.win();
+  E.over=`<div class="panel col" style="text-align:center;min-width:280px"><h2>${n===LEVELS-1?'The realm is saved!':'Level complete!'}</h2><p>${esc(levelName(n))}</p><p class="gold">+${bonus} gold${first?' · first clear':''}</p>
+    <div class="grid2">${n<LEVELS-1?`<button class="go" data-act="level" data-n="${n+1}">Next level</button>`:''}<button data-act="excamp" ${n<LEVELS-1?'':'style="grid-column:1/-1"'}>Camp</button></div></div>`;
+  render(); }
+/* ----- drawing ----- */
+function drawExplore(cv){ const E=EX, L=E.L, T=L.T, c=cv.getContext('2d'), k=cv.height/(TOP+ROWS*CELL), vw=cv.width/k, W=L.C*CELL;
+  const cam=Math.max(0,Math.min(W-vw,E.x-vw*.42)); E.cam=cam;
+  const pr=document.getElementById('exprog'); if(pr)pr.style.width=Math.round(100*E.x/W)+'%';
+  c.setTransform(k,0,0,k,0,0);
+  const sky=c.createLinearGradient(0,0,0,TOP); sky.addColorStop(0,T.sky[0]); sky.addColorStop(1,T.sky[1]); c.fillStyle=sky; c.fillRect(0,0,vw,TOP+2);
+  c.fillStyle=T.far; c.beginPath(); c.moveTo(0,TOP); const R=seeded(L.n+5), off=cam*.25; for(let i=0;i<80;i++){ const x=i*150-off, h=60+R()*110; if(x>-200&&x<vw+200){c.lineTo(x,TOP-h); c.lineTo(x+75,TOP-h*.55);} } c.lineTo(vw,TOP); c.closePath(); c.fill();
+  c.translate(-cam,TOP);
+  c.fillStyle=T.ground; c.fillRect(cam-10,-4,vw+20,ROWS*CELL+10);
+  const c0=Math.max(0,Math.floor(cam/CELL)-1), c1=Math.min(L.C-1,Math.ceil((cam+vw)/CELL)+1);
+  for(let r=0;r<ROWS;r++)for(let col=c0;col<=c1;col++){ const x=col*CELL, y=r*CELL; const h=(col*31+r*17)%7;
+    if(L.g[r][col]){ c.fillStyle=T.path; c.fillRect(x-1,y-1,CELL+2,CELL+2); c.fillStyle=T.edge;
+      if(r===0||!L.g[r-1][col])c.fillRect(x,y,CELL,12); if(r===ROWS-1||!L.g[r+1][col])c.fillRect(x,y+CELL-8,CELL,8);
+      if(col===0||!L.g[r][col-1])c.fillRect(x,y,8,CELL); if(col===L.C-1||!L.g[r][col+1])c.fillRect(x+CELL-8,y,8,CELL);
+      c.globalAlpha=.35; circ(c,T.edge,x+30+h*14,y+40+h*9,7,4); circ(c,T.edge,x+110-h*8,y+115-h*6,5,3); c.globalAlpha=1; }
+    else { circ(c,T.dot,x+35+h*12,y+50+h*8,16,7); circ(c,T.dot,x+120-h*9,y+120-h*5,12,5); } }
+  // everything standing on the ground, back to front
+  const items=[];
+  for(const p of L.props)if(p.x>cam-200&&p.x<cam+vw+200)items.push({y:p.kind==='pool'?p.y-200:p.y,d:()=>{ const w=200*p.s, h=320*p.s; c.drawImage(propCanvas(p.kind),p.x-w/2,p.y-h*300/320,w,h); }});
+  for(const ch of L.chests)items.push({y:ch.y,d:()=>drawChest(c,ch)});
+  items.push({y:L.exit.y-30,d:()=>drawGate(c,L.exit,!E.bossAlive,E.t)});
+  if(L.boss&&E.bossAlive){ const W2=WORLDS[Math.floor(L.n/10)], id=(L.boss.kind==='boss'?W2.boss:W2.mini)[1], u=mobUnit(id), s=u.size*(L.boss.kind==='boss'?1.55:1.3);
+    items.push({y:L.boss.y,d:()=>{ const im=loadImg(mobSheet(id)); if(!im.naturalWidth)return; circ(c,'rgba(0,0,0,.3)',L.boss.x,L.boss.y,s*.2,s*.05); const fs=im.naturalHeight, f=Math.floor(E.t*2)%2;
+      c.shadowColor='#ff5040'; c.shadowBlur=18; c.drawImage(im,f*fs,0,fs,fs,L.boss.x-s/2,L.boss.y-s*u.foot,s,s); c.shadowBlur=0; }}); }
+  items.push({y:E.y,d:()=>{ const im=loadImg(heroSheet(H)), s=4.4*UNIT*(1+rank(H)*.03); circ(c,'rgba(0,0,0,.3)',E.x,E.y,46,13);
+      if(rank(H)){ c.globalAlpha=.5; circ(c,RANK_COL[rank(H)],E.x,E.y,62,18); c.globalAlpha=1; }
+      if(!im.naturalWidth)return; const fs=im.naturalHeight, f=E.moving?HF.walk+Math.floor(E.t*11)%6:Math.floor(E.t*2)%2;
+      c.save(); c.translate(E.x,E.y); c.scale(E.face,1); if(H.weapon){c.shadowColor=WGLOW[H.weapon]; c.shadowBlur=4+H.weapon*2}
+      c.drawImage(im,f*fs,0,fs,fs,-s/2,-s*.776,s,s); c.restore(); }});
+  items.sort((a,b)=>a.y-b.y); for(const it of items)it.d();
+}
+function drawChest(c,ch){ const x=ch.x, y=ch.y; circ(c,'rgba(0,0,0,.25)',x,y+4,48,12);
+  poly(c,'#6a4424',[x-38,y,x+38,y,x+38,y-40,x-38,y-40]); poly(c,'#8a5a30',[x-38,y-40,x+38,y-40,x+38,y-30,x-38,y-30]);
+  if(ch.open){ poly(c,'#4a2e16',[x-38,y-40,x+38,y-40,x+30,y-78,x-30,y-78]); poly(c,'#1a1210',[x-32,y-40,x+32,y-40,x+32,y-34,x-32,y-34]); }
+  else { poly(c,'#8a5a30',[x-40,y-40,x+40,y-40,x+34,y-66,x-34,y-66]); c.shadowColor='#f2c35b'; c.shadowBlur=14; poly(c,'#f2c35b',[x-6,y-46,x+6,y-46,x+6,y-28,x-6,y-28]); c.shadowBlur=0; }
+  poly(c,'#e8c45e',[x-40,y-22,x+40,y-22,x+40,y-16,x-40,y-16]); }
+function drawGate(c,g,open,t){ const x=g.x, y=g.y+40; circ(c,'rgba(0,0,0,.25)',x,y,90,18);
+  c.shadowColor=open?'#7fe0ff':'#ff5040'; c.shadowBlur=30; c.fillStyle=open?`rgba(140,230,255,${.55+.25*Math.sin(t*4)})`:'rgba(120,30,30,.55)';
+  c.beginPath(); c.moveTo(x-50,y); c.lineTo(x-50,y-120); c.arc(x,y-120,50,Math.PI,0); c.lineTo(x+50,y); c.closePath(); c.fill(); c.shadowBlur=0;
+  poly(c,'#6b7480',[x-74,y,x-46,y,x-46,y-150,x-74,y-150]); poly(c,'#8a94a2',[x-74,y,x-62,y,x-62,y-150,x-74,y-150]);
+  poly(c,'#6b7480',[x+46,y,x+74,y,x+74,y-150,x+46,y-150]); poly(c,'#8a94a2',[x+46,y,x+58,y,x+58,y-150,x+46,y-150]);
+  c.strokeStyle='#6b7480'; c.lineWidth=26; c.beginPath(); c.arc(x,y-140,60,Math.PI,0); c.stroke();
+  if(!open){ c.strokeStyle='#2a2f36'; c.lineWidth=6; for(let i=-30;i<=30;i+=20){ c.beginPath(); c.moveTo(x+i,y); c.lineTo(x+i,y-150); c.stroke(); } } }
+</script>
+<script>
+"use strict";
+/* Hearthguard battle screen: turn-based. You pick a move, your hero plays its attack animation, then the enemy takes its turn.
+   battle(foe, {raid}) switches to the battle screen and resolves with {win, ...} when the player taps Continue. */
+const BU=17.5;   // % of stage height per Blender unit of a sprite
+const $b=id=>document.getElementById(id);
+function battle(foe,opt){ opt=opt||{};
+  return new Promise(resolve=>{
+    B=Object.assign({e:Object.assign({stun:0,weak:0,poison:0,pdmg:0,charge:false},foe),cd:[0,0,0],guard:0,bless:0,eagle:0,et:0,busy:false,anim:false,
+      log:[opt.raid?'Ashmaw towers over you. You have 8 turns to strike!':foe.kind==='mob'?'Ambush! '+foe.n+' attacks!':foe.n+' stands in your way!'],resolve},opt.raid?{raid:true,turns:8,dealt:0}:{});
+    loadImg(heroSheet(H)); loadImg(mobSheet(foe.id)); S.screen='battle'; render(); });
+}
+function vBattle(){ const e=B.e, big=e.big||B.raid, rig=e.id.startsWith('sk_'), fs=(rig?4.4:5)*BU*(big?1.35:1), hs=4.4*BU*(1+rank(H)*.03), foot=rig?.776:.743;
+  return `<div class="bt"><div class="stage" id="bstage">${scene(B.raid?6:e.scene)}
+    <div class="tag l"><div class="stat"><span>${esc(H.name)} · Lv ${H.lvl}</span><span id="bhpT"></span></div><div class="bar"><i id="bhp"></i></div><div class="bar pw" id="bpwb"><i id="bpw"></i></div></div>
+    <div class="tag r"><div class="stat"><span>${esc(e.n)}</span><span id="bfT"></span></div><div class="bar ${B.raid?'raid':'foe'}"><i id="bfhp"></i></div></div>
+    ${aura(H,'left:14%;width:20%;top:80%;height:12%')}
+    ${heroSpr(H,'bsp',`height:${hs}%;top:${86-.776*hs}%;left:24%;`,null,null,'id="bh"')}
+    ${mobSpr(e.id,'bsp',`height:${fs}%;top:${87-foot*fs}%;left:${big?72:76}%;`,'id="bf"')}
+  </div><div class="side" id="bside"></div></div>`; }
+let bIdle=0;
+function mountBattle(){ clearInterval(bIdle); let t=0;
+  bIdle=setInterval(()=>{ if(!B||S.screen!=='battle'){clearInterval(bIdle);return} if(B.anim||B.result)return; t^=1; bFrame($b('bh'),t,HN); if(B.e.hp>0)bFrame($b('bf'),t,MN); },480);
+  battleUI(); }
+function bFrame(el,f,n){ if(el)el.style.backgroundPositionX=fpos(f,n); }
+function battleUI(){ if(!B)return; const e=B.e, st=stats(H), c=CLASSES[H.cls], res=B.result, pw=H.pow||0, set=(id,v)=>{const x=$b(id); if(x)x.style.width=Math.max(0,Math.min(100,v))+'%'};
+  set('bhp',100*H.hp/st.hp); set('bpw',pw); set('bfhp',100*e.hp/e.max); const pb=$b('bpwb'); if(pb)pb.classList.toggle('full',pw>=100);
+  if($b('bhpT'))$b('bhpT').textContent=H.hp+' / '+st.hp; if($b('bfT'))$b('bfT').textContent=e.hp+' / '+e.max;
+  const chips=[]; if(B.guard>0)chips.push('Guard '+B.guard); if(B.bless>0)chips.push('War Cry '+B.bless); if(B.eagle>0)chips.push('Eagle Eye '+B.eagle);
+  if(e.stun>0)chips.push('Enemy stunned'); if(e.weak>0)chips.push('Enemy weakened '+e.weak); if(e.poison>0)chips.push('Enemy poisoned '+e.poison); if(e.charge)chips.push('Mighty blow coming!'); if(B.raid&&!res)chips.push(B.turns+' turns left');
+  let h;
+  if(res){ let t;
+    if(res.raid)t=`<h2>${res.win?'Ashmaw falls!':res.flew?'Time is up':'Knocked back'}</h2><p>You dealt <b class="gold">${res.dealt}</b> damage for the family.</p>`;
+    else if(res.win)t=`<h2>Victory!</h2><p>+${res.gold} gold · +${res.xp} XP</p>${res.ups?`<p class="gold">Level up! You are now level ${H.lvl}.</p>`:''}${res.rank?`<p class="gold">New rank: ${RANKS[res.rank]}! Your hero looks stronger.</p>`:''}${(res.gear||[]).map(g=>`<p class="gold">Your ${g.k} grew to level ${H[g.k]+1}: ${esc(gearName(H,g.k,H[g.k]))}.${g.look?' New look!':''}</p>`).join('')}`;
+    else t=`<h2>Knocked out</h2><p class="dim">Your friends carry you back to the fire. Rest, gear up, and try again.</p>`;
+    h=`<div class="panel col" style="text-align:center">${t}</div><button class="go" data-act="bdone">Continue</button>`;
+  } else {
+    const off=B.busy?'disabled':'';
+    h=`<div class="log">${B.log.map(l=>`<p>${esc(l)}</p>`).join('')}</div><div class="chips">${chips.map(x=>`<span class="chip">${x}</span>`).join('')}</div><div class="acts">
+      ${pw>=100?`<button class="pow" data-act="act" data-k="pow" ${off}>${c.power.n}!<span class="sub">${c.power.d}</span></button>`:''}
+      <button class="go wide" data-act="act" data-k="atk" ${off}>Attack</button>
+      ${c.skills.map((s,i)=>`<button data-act="act" data-k="${i}" ${B.busy||B.cd[i]>0||H.lvl<s.lv?'disabled':''}>${s.n}<span class="sub">${H.lvl<s.lv?'Level '+s.lv:B.cd[i]>0?'Ready in '+B.cd[i]:s.d}</span></button>`).join('')}
+      <button data-act="act" data-k="potion" ${B.busy||H.potions<1?'disabled':''}>Potion<span class="sub">${H.potions} left</span></button></div>`;
+  }
+  const side=$b('bside'); if(side)side.innerHTML=h; }
+function blog(t){B.log.push(t); if(B.log.length>3)B.log.shift()}
+function bpop(id,text,cls){ const st=$b('bstage'), el=$b(id); if(!st||!el)return; const a=el.getBoundingClientRect(), s=st.getBoundingClientRect();
+  const d=document.createElement('div'); d.className='pop '+(cls||''); d.textContent=text; d.style.left=(a.left-s.left+a.width/2-20)+'px'; d.style.top=(a.top-s.top+a.height*.3)+'px'; st.appendChild(d); setTimeout(()=>d.remove(),900); }
+function bShake(id,frame,n){ const el=$b(id); if(!el)return; bFrame(el,frame,n); el.classList.remove('hitfx'); void el.offsetWidth; el.classList.add('hitfx'); setTimeout(()=>{ if(el.isConnected&&B&&!B.anim)bFrame(el,0,n) },300); }
+const centerX=el=>{const r=el.getBoundingClientRect(); return r.left+r.width/2};
+/* weapon effects: a slash arc for blades and claws, a burst where anything lands */
+function slashFx(id,col,flip){ const st=$b('bstage'), el=$b(id); if(!st||!el)return; const a=el.getBoundingClientRect(), s=st.getBoundingClientRect(), d=document.createElement('div');
+  d.className='slash'+(flip?' flip':''); d.style.left=(a.left-s.left+a.width/2)+'px'; d.style.top=(a.top-s.top+a.height*.52)+'px'; d.style.setProperty('--c',col); d.style.setProperty('--sz',Math.round(a.height*.42)+'px'); st.appendChild(d); setTimeout(()=>d.remove(),380); }
+function burstFx(id,col){ const st=$b('bstage'), el=$b(id); if(!st||!el)return; const a=el.getBoundingClientRect(), s=st.getBoundingClientRect(), d=document.createElement('div');
+  d.className='burst'; d.style.left=(a.left-s.left+a.width/2)+'px'; d.style.top=(a.top-s.top+a.height*.52)+'px'; d.style.setProperty('--c',col); st.appendChild(d); setTimeout(()=>d.remove(),420); }
+async function projectile(fromId,toId,col,kind){ const st=$b('bstage'), a=$b(fromId), b=$b(toId); if(!st||!a||!b)return; const s=st.getBoundingClientRect(), ra=a.getBoundingClientRect(), rb=b.getBoundingClientRect();
+  const p=document.createElement('div'); p.className='proj '+(kind||'orb'); p.style.setProperty('--c',col); if(centerX(b)<centerX(a))p.classList.add('flip'); p.style.left=(centerX(a)-s.left)+'px'; p.style.top=(ra.top-s.top+ra.height*.5)+'px'; st.appendChild(p);
+  void p.offsetWidth; p.style.transform=`translate(${centerX(b)-centerX(a)}px,${(rb.top+rb.height*.55)-(ra.top+ra.height*.5)}px)`; await sleep(230); p.remove(); }
+/* plays 5 attack frames; melee attackers run up to the target first. onHit fires on the impact frame. */
+async function attackAnim(who,ranged,col,onHit,kind){ const hero=who==='h', el=$b(hero?'bh':'bf'), tgt=$b(hero?'bf':'bh'), base=hero?HF.atk:MF.atk, n=hero?HN:MN; if(!el||!tgt){onHit();return}
+  B.anim=true;
+  if(!ranged){ const d=centerX(tgt)-centerX(el); el.style.setProperty('--dx',(d-Math.sign(d)*el.offsetWidth*.36)+'px'); await sleep(190); }
+  for(let k=0;k<5;k++){ bFrame(el,base+k,n); if(k===1)sfx.swing(); if(k===2){ if(ranged){sfx.shot(); await projectile(hero?'bh':'bf',hero?'bf':'bh',col||'#fff',kind)} else slashFx(hero?'bf':'bh',col||'#fff',!hero); burstFx(hero?'bf':'bh',col||'#fff'); onHit(); } await sleep(85); }
+  el.style.setProperty('--dx','0px'); bFrame(el,0,n); await sleep(ranged?90:200); B.anim=false; }
+function strike(mult,forceCrit){ const st=stats(H); let d=st.atk*mult*rnd(.88,1.12); if(B.bless>0)d*=1.4;
+  let crit=forceCrit||Math.random()<st.crit; if(!forceCrit&&B.eagle>0){crit=true;B.eagle--} if(crit)d*=1.8;
+  d=Math.max(1,Math.round(d)); B.e.hp=Math.max(0,B.e.hp-d); if(B.raid)B.dealt+=d; return {d,crit}; }
+async function heroAct(kind){ if(!B||B.busy||B.result)return; const st=stats(H), e=B.e, c=CLASSES[H.cls];
+  if(kind==='potion'){ if(H.potions<1)return toast('No potions left.'); if(H.hp>=st.hp)return toast('You are already at full health.'); }
+  const sk=kind==='potion'?null:kind==='atk'?{n:'Attack',mult:1}:kind==='pow'?c.power:c.skills[kind], power=kind==='pow';
+  if(power&&(H.pow||0)<100)return; if(typeof kind==='number'&&(B.cd[kind]>0||H.lvl<sk.lv))return;
+  B.busy=true; for(let i=0;i<3;i++)if(B.cd[i]>0)B.cd[i]--; if(typeof kind==='number')B.cd[kind]=sk.cd; if(power)H.pow=0;
+  battleUI();
+  if(kind==='potion'){ H.potions--; const h=Math.round(st.hp*.4); H.hp=Math.min(st.hp,H.hp+h); blog('You drink a potion and heal '+h+'.'); bFrame($b('bh'),HF.cheer,HN); B.anim=true; bpop('bh','+'+h,'heal'); sfx.heal(); battleUI(); await sleep(550); B.anim=false; }
+  else {
+    if(power){ sfx.power(); const stg=$b('bstage'); if(stg){ const f=document.createElement('div'); f.className='flash'; stg.appendChild(f); const t=document.createElement('div'); t.className='shout'; t.textContent=c.power.n+'!'; stg.appendChild(t); setTimeout(()=>{f.remove();t.remove()},1000); } bFrame($b('bh'),HF.cheer,HN); B.anim=true; await sleep(450); B.anim=false; }
+    let line=kind==='atk'?'You attack':'You use '+sk.n;
+    if(sk.mult){ let total=0, anyCrit=false;
+      const rg=!!c.ranged[look(H.weapon)]; await attackAnim('h',rg,rg?(sk.shot||c.shot):(sk.shot||WGLOW[H.weapon]||'#ffffff'),()=>{ for(let i=0;i<(sk.hits||1);i++){const s=strike(sk.mult,sk.allcrit); total+=s.d; anyCrit=anyCrit||s.crit}
+        bpop('bf','-'+total,anyCrit||power?'crit':''); bShake('bf',MF.hit,MN); anyCrit||power?sfx.crit():sfx.hit(); battleUI(); },H.cls==='ranger'?'bolt':'orb');
+      line+=' for '+total+(anyCrit?', a critical hit!':'.'); if(!power)H.pow=Math.min(100,(H.pow||0)+22);
+    } else { line+='.'; bFrame($b('bh'),HF.cheer,HN); B.anim=true; await sleep(300); B.anim=false; }
+    if(sk.heal){ const h=Math.round(st.hp*sk.heal); H.hp=Math.min(st.hp,H.hp+h); bpop('bh','+'+h,'heal'); sfx.heal(); }
+    if(sk.stun&&!B.raid)e.stun=sk.stun; if(sk.weak)e.weak=sk.weak; if(sk.poison){e.poison=sk.poison;e.pdmg=Math.max(1,Math.round(st.atk*.45))}
+    if(sk.guard)B.guard=sk.guard; if(sk.bless)B.bless=sk.bless; if(sk.eagle)B.eagle=sk.eagle;
+    blog(line); }
+  battleUI(); await sleep(250); if(!B)return; if(e.hp<=0)return finishBattle(true);
+  await enemyTurn(); if(!B||B.result)return; B.busy=false; battleUI(); }
+async function enemyTurn(){ const e=B.e, st=stats(H);
+  if(e.poison>0){ e.hp=Math.max(0,e.hp-e.pdmg); if(B.raid)B.dealt+=e.pdmg; e.poison--; blog('Poison burns '+e.n+' for '+e.pdmg+'.'); bpop('bf','-'+e.pdmg); bShake('bf',MF.hit,MN); battleUI(); await sleep(500); if(!B)return; if(e.hp<=0)return finishBattle(true); }
+  if(e.stun>0){ e.stun--; blog(e.n+' is stunned and cannot move!'); battleUI(); await sleep(600); }
+  else { let d=e.atk*rnd(.85,1.15); if(e.weak>0){d*=.7;e.weak--} const heavy=e.charge; if(heavy){d*=1.8;e.charge=false}
+    d=Math.max(1,Math.round(d-st.def)); if(B.guard>0)d=Math.ceil(d/2);
+    const caster=e.id.startsWith('sk_mage')||e.id.startsWith('ghost');
+    await attackAnim('f',caster,caster?(e.id.includes('lich')?'#b070ff':e.id.includes('flame')?'#ff8a3c':'#9fe8ff'):'#ff6a5a',()=>{ H.hp=Math.max(0,H.hp-d); H.pow=Math.min(100,(H.pow||0)+14);
+      bpop('bh','-'+d,heavy?'crit':''); bShake('bh',HF.hit,HN); sfx.hurt(); blog(e.n+(heavy?' unleashes a mighty blow for ':' hits you for ')+d+'.'); battleUI(); });
+    if(!B)return; B.et++; if(e.big&&B.et%3===2&&H.hp>0){e.charge=true; blog(e.n+' is gathering power…')} }
+  if(B.guard>0)B.guard--; if(B.bless>0)B.bless--;
+  if(H.hp<=0)return finishBattle(false);
+  if(B.raid){B.turns--; if(B.turns<=0)return finishBattle(false,true)} }
+function finishBattle(win,flew){ const st=stats(H), e=B.e; B.anim=true;
+  const hb=$b('bh'), fb=$b('bf');
+  if(win){ if(fb){fb.style.transition='opacity .6s, transform .6s'; fb.style.opacity='0'; fb.style.setProperty('--dx','40px')} bFrame(hb,HF.cheer,HN); } else if(!B.raid&&hb){ hb.style.transition='opacity .5s'; hb.style.opacity='.4'; bFrame(hb,HF.hit,HN); }
+  if(B.raid){ const dealt=B.dealt; if(H.raidDay!==today()){H.raidDay=today();H.raidTries=0} H.raidTries++; if((H.raidNo||1)!==world.no){H.raidNo=world.no;H.raidDmg=0}
+    H.raidDmg=(H.raidDmg||0)+dealt; H.hp=st.hp; if(dealt>0)feat('struck Ashmaw for '+dealt); save();
+    B.result={raid:true,dealt,win,flew}; win?sfx.win():sfx.hit(); battleUI(); return; }
+  const res={win};
+  if(win){ const g=Math.round(e.gold*rnd(.85,1.15)*((H.relics||[]).includes(0)?1.2:1)); H.gold+=g; H.kills=(H.kills||0)+1; res.gold=g; res.xp=e.xp;
+    const r0=rank(H); res.ups=addXp(e.xp); if(rank(H)>r0)res.rank=rank(H); res.gear=addGearXp(Math.round(e.gold));
+    if(H.relics.includes(2)&&!res.ups)H.hp=Math.min(stats(H).hp,H.hp+Math.round(stats(H).hp*.15));
+    if(res.gear.some(x=>x.look)||res.ups)loadImg(heroSheet(H));
+    sfx.win(); }
+  else { H.hp=st.hp; sfx.lose(); }
+  save(); B.result=res; battleUI(); }
+function battleDone(){ if(!B||!B.result)return; const r=B.result, done=B.resolve; clearInterval(bIdle); B=null; done(r); }
+</script>
+<script>
+"use strict";
+/* Hearthguard menus (landscape): who is playing, new hero, camp, world map, shop, hero, guild hall, share. Loaded last; starts the game. */
+const SCENES=[
+ {sky:['#7cc4e6','#dff2c4'],far:'#6fa878',mid:'#3f7a4a',gnd:['#78b556','#3f7a3a'],kind:'trees'},
+ {sky:['#17131c','#3a2f38'],far:'#2a242c',mid:'#4a3e3a',gnd:['#6a574a','#2e2622'],kind:'cave'},
+ {sky:['#56757f','#b9c9b4'],far:'#55706a',mid:'#34504a',gnd:['#587552','#2a3e34'],kind:'marsh'},
+ {sky:['#6ea6de','#eaf5ff'],far:'#a4c0de',mid:'#d4e5f4',gnd:['#f4f9ff','#b0c8e0'],kind:'peaks'},
+ {sky:['#0e0b20','#4f2c72'],far:'#1e1838',mid:'#120f24',gnd:['#332c50','#141024'],kind:'spire'},
+ {sky:['#18202e','#77879c'],far:'#465160',mid:'#262c36',gnd:['#5d6670','#2a2f36'],kind:'camp'},
+ {sky:['#2a0e0c','#d05a2a'],far:'#3a1c18',mid:'#241210',gnd:['#553026','#1e100e'],kind:'ash'}
+];
 const sceneCache={};
-function scene(i){ if(sceneCache[i])return sceneCache[i]; const shadows=i<6; const s=SCENES[i]; let seed=i*97+13; const R=()=>(seed=(seed*16807)%2147483647)/2147483647;
+function scene(i){ if(sceneCache[i])return sceneCache[i]; const s=SCENES[i]; let seed=i*97+13; const R=()=>(seed=(seed*16807)%2147483647)/2147483647;
   let far='M0 64'; for(let x=0;x<=160;x+=10)far+=` L${x} ${(s.kind==='peaks'?26:40)+R()*18}`; far+=' L160 64Z'; let m='';
   if(s.kind==='trees'){ for(let k=0;k<13;k++){const x=R()*160,h=16+R()*20,w=5+R()*4; m+=`<path d="M${x} 64 v-${h*.3}" stroke="#4a3220" stroke-width="1.6"/><path d="M${x-w} ${64-h*.25} L${x} ${64-h} L${x+w} ${64-h*.25}Z" fill="${k%3?s.mid:'#2f6a3e'}"/>`}
     m+=`<circle cx="128" cy="16" r="9" fill="#fff6c8" opacity=".9"/>`; }
@@ -2481,316 +2940,133 @@ function scene(i){ if(sceneCache[i])return sceneCache[i]; const shadows=i<6; con
   if(s.kind==='spire'){ m+=`<circle cx="36" cy="18" r="10" fill="#e8dcff" opacity=".9"/><circle cx="40" cy="15" r="9" fill="${s.sky[0]}" opacity=".85"/>`;
     for(let k=0;k<5;k++){const x=50+k*24+R()*8,h=22+R()*24,w=4+R()*3; m+=`<path d="M${x-w} 64 V${64-h} L${x} ${64-h-9} L${x+w} ${64-h} V64Z" fill="${s.mid}"/><rect x="${x-1}" y="${64-h+4}" width="2" height="3" fill="#b070ff"/>`}
     for(let k=0;k<20;k++)m+=`<circle cx="${R()*160}" cy="${R()*40}" r=".5" fill="#fff" opacity=".7"/>`; }
-  if(s.kind==='camp'){ m+=`<path d="M96 64 V34 h3 v-3 h3 v3 h3 v-3 h3 v3 h3 V44 h12 v-4 h3 v4 h3 v-4 h3 v4 h3 V28 h3 v-3 h3 v3 h3 v-3 h3 v3 h3 V64Z" fill="#39424e"/><rect x="103" y="40" width="2" height="4" fill="#e8c45e"/><rect x="140" y="35" width="2" height="4" fill="#e8c45e"/>`; for(let k=0;k<9;k++){const x=R()*160,h=20+R()*18,w=6+R()*4; m+=`<path d="M${x-w} 64 L${x} ${64-h} L${x+w} 64Z" fill="${s.mid}"/>`}
-    for(let k=0;k<18;k++)m+=`<circle cx="${R()*160}" cy="${R()*30}" r=".5" fill="#fff" opacity=".8"/>`; m+=`<ellipse cx="80" cy="82" rx="46" ry="10" fill="#ffb040" opacity=".28"/>`; }
+  if(s.kind==='camp'){ m+=`<path d="M96 64 V34 h3 v-3 h3 v3 h3 v-3 h3 v3 h3 V44 h12 v-4 h3 v4 h3 v-4 h3 v4 h3 V28 h3 v-3 h3 v3 h3 v-3 h3 v3 h3 V64Z" fill="#39424e"/><rect x="103" y="40" width="2" height="4" fill="#e8c45e"/><rect x="140" y="35" width="2" height="4" fill="#e8c45e"/>`;
+    for(let k=0;k<9;k++){const x=R()*90,h=20+R()*18,w=6+R()*4; m+=`<path d="M${x-w} 64 L${x} ${64-h} L${x+w} 64Z" fill="${s.mid}"/>`}
+    for(let k=0;k<18;k++)m+=`<circle cx="${R()*160}" cy="${R()*30}" r=".5" fill="#fff" opacity=".8"/>`; m+=`<ellipse cx="80" cy="84" rx="46" ry="9" fill="#ffb040" opacity=".22"/>`; }
   return sceneCache[i]=`<svg class="scene" viewBox="0 0 160 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><linearGradient id="sk${i}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${s.sky[0]}"/><stop offset="1" stop-color="${s.sky[1]}"/></linearGradient><linearGradient id="gd${i}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${s.gnd[0]}"/><stop offset="1" stop-color="${s.gnd[1]}"/></linearGradient></defs>
-    <rect width="160" height="66" fill="url(#sk${i})"/><path d="${far}" fill="${s.far}"/>${m}<rect y="63" width="160" height="37" fill="url(#gd${i})"/>${shadows?'<ellipse cx="38" cy="93" rx="22" ry="3.5" fill="#000" opacity=".28"/><ellipse cx="120" cy="92" rx="26" ry="4" fill="#000" opacity=".28"/>':''}</svg>`;
+    <rect width="160" height="66" fill="url(#sk${i})"/><path d="${far}" fill="${s.far}"/>${m}<rect y="63" width="160" height="37" fill="url(#gd${i})"/></svg>`;
 }
-let toastT; function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,3000)}
-/* sound */
-let AC=null, muted=!!lsGet('hg_mute');
-function beep(f,d,type,vol){ if(muted)return; try{ AC=AC||new (window.AudioContext||window.webkitAudioContext)(); const o=AC.createOscillator(),g=AC.createGain();
-  o.type=type||'square'; o.frequency.value=f; g.gain.value=vol||.05; g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+d); o.connect(g); g.connect(AC.destination); o.start(); o.stop(AC.currentTime+d);}catch(e){} }
-const sfx={hit:()=>beep(180,.12,'square'),crit:()=>{beep(520,.08);setTimeout(()=>beep(780,.14),70)},hurt:()=>beep(90,.18,'sawtooth'),heal:()=>{beep(520,.1,'triangle',.08);setTimeout(()=>beep(700,.16,'triangle',.08),90)},
-  power:()=>[262,392,523,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,.2,'sawtooth',.06),i*70)),
-  win:()=>[392,523,659,784].forEach((f,i)=>setTimeout(()=>beep(f,.16,'square'),i*110)),lose:()=>[330,262,196].forEach((f,i)=>setTimeout(()=>beep(f,.22,'triangle',.08),i*160)),tap:()=>beep(440,.04,'triangle',.04)};
-
-/* ============ STATE ============ */
-let db=null, loaded=false, offline=false;
-let heroes={}, world=lsGet('hg_world')||{no:1}, giftDocs=[], seenGifts=new Set();
-let me=lsGet('hg_me'), H=me?lsGet('hg_hero_'+me):null;
-let S={screen:'who'}, B=null;
-
-const need=l=>25+l*l*8;
-function stats(h){const c=CLASSES[h.cls], r=h.relics||[];
-  let hp=(40+12*h.lvl+ARMOR_HP[h.armor])*c.hp; if(r.includes(3))hp*=1.15;
-  let atk=(6+2.2*h.lvl+WEAPON_ATK[h.weapon])*c.atk; if(r.includes(1))atk*=1.1; if(r.includes(5))atk*=1.15;
-  return {hp:Math.round(hp),atk:Math.round(atk),def:ARMOR_DEF[h.armor],crit:c.crit+(r.includes(4)?.1:0)};}
-function newHero(name,cls){const h={name,cls,lvl:1,xp:0,hp:0,pow:0,gold:20,potions:2,weapon:0,armor:0,prog:[0,0,0,0,0,0],relics:[],kills:0,raidNo:world.no,raidDmg:0,raidDay:'',raidTries:0,scales:0,feats:[],rev:0};
-  h.hp=stats(h).hp; return h;}
-function feat(x){H.feats=(H.feats||[]).concat([{t:Date.now(),x}]).slice(-6)}
-const potionPrice=()=>12+4*H.lvl;
-const raidLeft=()=>H.raidDay===today()?Math.max(0,3-(H.raidTries||0)):3;
-function raidHp(){let d=0; for(const id in heroes){const h=id===me&&H?H:heroes[id]; if(h&&h.raidNo===world.no)d+=h.raidDmg||0} return Math.max(0,raidMax(world.no)-d)}
-const wpnName=(h,t)=>WPN_TIER[t]+' '+CLASSES[h.cls].weapon[look(t)];
-const gearName=(h,k,t)=>k==='weapon'?wpnName(h,t):ARM_TIER[t]+' Armor';
-/* Looks: every 5 hero levels is a rank (aura + size); every weapon level brightens its glow; armor adds a gold sheen. */
-const RANKS=['Recruit','Adventurer','Veteran','Champion','Hero','Paragon','Legend'], RANK_COL=['','#c98a4a','#d8dde6','#f2c35b','#ff7a3c','#b070ff','#aef0ff'];
-const WGLOW=['','#d8d0c0','#9fd0ff','#ffffff','#b070ff','#ff8a3c','#fff3a0'];
-const rank=h=>Math.min(6,Math.floor(h.lvl/5));
-const heroFx=h=>`filter:drop-shadow(0 5px 3px rgba(0,0,0,.45))${h.weapon?` drop-shadow(0 0 ${2+h.weapon*1.5}px ${WGLOW[h.weapon]})`:''}${h.armor>1?` drop-shadow(0 0 ${h.armor}px #f2c35b)`:''};`;
-const aura=(h,css)=>rank(h)?`<div class="aura" style="${css};background:radial-gradient(closest-side,${RANK_COL[rank(h)]},transparent)"></div>`:'';
-/* Gear levels 1-7 (stored 0-6). It earns gear XP from every victory; gold in the shop pays off whatever is left. */
-const gearNeed=nx=>Math.round(GEAR_PRICE[nx]*.9);
-const gxKey=k=>k==='weapon'?'wxp':'axp';
-const gearCost=k=>{const nx=H[k]+1; return Math.max(1,Math.ceil(GEAR_PRICE[nx]*(1-Math.min(1,(H[gxKey(k)]||0)/gearNeed(nx)))))};
-function gearUp(k){ const nx=H[k]+1; H[k]=nx; if(k==='armor')H.hp=Math.min(stats(H).hp,H.hp+ARMOR_HP[nx]-ARMOR_HP[nx-1]); }
-function addGearXp(x){ const ups=[]; for(const k of ['weapon','armor']){ const xk=gxKey(k); H[xk]=(H[xk]||0)+x;
-    while(H[k]<6){ const nx=H[k]+1; if(H[xk]<gearNeed(nx))break; if(H.lvl<GEAR_LVL[nx]){H[xk]=gearNeed(nx);break} H[xk]-=gearNeed(nx); gearUp(k); ups.push({k,look:look(nx)!==look(nx-1)}); }
-    if(H[k]>=6)H[xk]=0; } return ups; }
-
-/* ============ SAVE / SYNC ============ */
-let saving=false,dirty=false;
-function save(){ if(!H||!me)return; H.rev=(H.rev||0)+1; H.t=Date.now(); lsSet('hg_hero_'+me,H); heroes[me]=clone(H); if(!db||!loaded)return; dirty=true; pump(); }
-async function pump(){ if(saving||!db)return; saving=true;
-  while(dirty){ dirty=false; const slot=me, body=clone(H);
-    try{await db.doc('heroes/'+slot).set(body)}catch(e){ await sleep(1500); try{await db.doc('heroes/'+slot).set(body)}catch(e2){ toast('Could not reach the guild hall. Progress is saved on this device.'); } } }
-  saving=false; }
-function setWorld(no){ world={no}; lsSet('hg_world',world); if(db&&loaded) db.doc('world/raid').set({no,t:Date.now()}).catch(()=>{}); }
-function adoptMine(){ if(!me||B)return; const d=heroes[me]; if(d&&(!H||(d.rev||0)>(H.rev||0))){H=clone(d);lsSet('hg_hero_'+me,H)} else if(H&&(!d||(d.rev||0)<(H.rev||0))){dirty=true;pump()} }
-function softRender(){ if(B)return; const a=document.activeElement; if(a&&a.tagName==='INPUT')return; if(['who','camp','guild'].includes(S.screen))render(); }
-function checkRaid(){ if(!H||B)return;
-  if(world.no>(H.raidNo||1)){ const did=(H.raidDmg||0)>0, prev=world.no-1;
-    if(did){ const g=60*prev+30*H.lvl, xp=Math.round(need(H.lvl)*.5); H.gold+=g; H.scales=(H.scales||0)+1; addXp(xp); feat('helped bring down Ashmaw');
-      toast('Ashmaw is defeated! Your share: '+g+' gold, '+xp+' XP and a Titan Shard.'); sfx.win(); }
-    H.raidNo=world.no; H.raidDmg=0; save(); }
-  else if(raidHp()<=0 && Object.keys(heroes).length){ setWorld(world.no+1); checkRaid(); } }
-function processGifts(){ if(!H||B||!db)return; let got=false;
-  for(const g of giftDocs){ if(g.to!==me||seenGifts.has(g.id))continue; seenGifts.add(g.id); got=true;
-    if(g.kind==='potion'){H.potions++; toast(g.from+' sent you a potion!')} else {H.gold+=25; toast(g.from+' sent you 25 gold!')}
-    db.doc('gifts/'+g.id).delete().catch(()=>{}); }
-  if(got){sfx.heal();save();softRender()} }
-/* Home-screen (GitHub Pages) build: window.HG_CLOUD is the save server. This shim gives it the same shape as the claude.ai db. */
-const canonPw=v=>String(v).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
-async function sha256hex(t){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t)); return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('')}
-function cloudDb(url,key){
-  const subs={heroes:[],world:[],gifts:[]}; let busy=Promise.resolve(), last='', dead=false;
-  const emit=st=>{ const sig=JSON.stringify([st.heroes,st.world,st.gifts]); if(sig===last)return; last=sig;
-    subs.heroes.forEach(f=>f({docs:Object.keys(st.heroes).map(id=>({id,data:()=>st.heroes[id]})),metadata:{fromCache:false}}));
-    subs.world.forEach(f=>f({exists:true,data:()=>st.world})); subs.gifts.forEach(f=>f({docs:st.gifts.map(g=>({id:g.id,data:()=>g}))})); };
-  const call=body=>{ const p=busy.then(async()=>{ if(dead)throw {code:'key'};
-      const r=await fetch(url+'/hg',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({key},body))});
-      if(r.status===403){ dead=true; clearInterval(tick); lsSet('hg_key',null); try{document.cookie='hg-key=; max-age=0; path='+location.pathname}catch(e){} db=null; S.lockMsg='That password did not work. Try again.'; B=null; S.screen='lock'; render(); throw {code:'key'} }
-      const j=await r.json(); if(!j.ok)throw {code:j.error}; emit(j); return j; });
-    busy=p.catch(()=>{}); return p; };
-  const poll=()=>{ if(!dead&&document.visibilityState==='visible')call({op:'get'}).catch(()=>{}) };
-  const tick=setInterval(poll,20000); document.addEventListener('visibilitychange',poll); poll();
-  return { doc(path){ const p=path.split('/'); return {
-      set:b=>p[0]==='heroes'?call({op:'hero',slot:p[1],body:b}):call({op:'world',no:b.no}),
-      delete:()=>call({op:'ungift',id:p[1]}), onSnapshot:f=>{subs.world.push(f)} } },
-    collection(c){ return { onSnapshot:f=>{subs[c].push(f)}, add:b=>call({op:'gift',to:b.to,from:b.from,kind:b.kind}) } } };
-}
-let connTimer=null;
-function connDone(){ if(loaded)return; loaded=true; adoptMine(); if(H&&S.screen==='who'&&me)S.screen='camp'; checkRaid(); render(); }
-function goOffline(){ clearTimeout(connTimer); offline=true; connDone(); }
-function wire(d){ db=d;
-  d.collection('heroes').onSnapshot(snap=>{ snap.docs.forEach(x=>{const v=x.data(); if(v&&CLASSES[v.cls])heroes[x.id]=clone(v)});
-    if(!snap.metadata.fromCache||loaded){clearTimeout(connTimer);offline=false; if(!loaded){connDone()} else {adoptMine();checkRaid();softRender()} } }, goOffline);
-  d.doc('world/raid').onSnapshot(s=>{ if(s.exists){const v=s.data(); if(v&&v.no>world.no){world={no:v.no};lsSet('hg_world',world)} } if(loaded){checkRaid();softRender()} },()=>{});
-  d.collection('gifts').onSnapshot(s=>{ giftDocs=s.docs.map(x=>Object.assign({id:x.id},x.data())); if(loaded)processGifts(); },()=>{});
-}
-function connect(){
-  clearTimeout(connTimer); connTimer=setTimeout(()=>{ if(!loaded){offline=true;connDone()} },10000);
-  if(window.HG_CLOUD){ const k=lsGet('hg_key'); if(!k){clearTimeout(connTimer); S.screen='lock'; render(); return} wire(cloudDb(window.HG_CLOUD,k)); return; }
-  if(!window.claude||!window.claude.use){goOffline();return}
-  window.claude.use('db').then(d=>{ if(!d){goOffline();return} wire(d); }).catch(goOffline);
-}
-
-/* ============ PROGRESSION ============ */
-function addXp(xp){ let ups=0; H.xp+=xp; while(H.lvl<30&&H.xp>=need(H.lvl)){H.xp-=need(H.lvl);H.lvl++;ups++}
-  if(ups){H.hp=stats(H).hp; if(H.lvl%5===0)feat('reached level '+H.lvl)} return ups; }
-
-/* ============ BATTLE ============ */
-function baseB(e,sc,log){ return {e:Object.assign({stun:0,weak:0,poison:0,pdmg:0,charge:false},e),cd:[0,0,0],guard:0,bless:0,eagle:0,et:0,busy:false,log:[log],sc}; }
-function startBattle(r,stage){ // stage 0-4, -1 hunt
-  const R=REGIONS[r], boss=stage===4, m=boss?R.boss:R.mobs[stage<0?Math.floor(Math.random()*3):stage%3];
-  const sc=stage<0?1.2:1+.1*stage;
-  const hp=Math.round(R.hp*sc*(boss?2.6:1)), atk=R.atk*(stage<0?1.1:1+.06*stage)*(boss?1.35:1);
-  B=Object.assign(baseB({n:m.n,id:m.id,hp,max:hp,atk},r,boss?m.n+' rises before you!':m.n+' blocks the path!'),{r,stage,boss});
-  preload(heroImg(H,true)); preload(mobImg(m.id,true));
-  S.screen='battle'; render();
-}
-function startRaid(){ if(raidLeft()<1)return toast('You have struck three times today. Ashmaw will still be here tomorrow.');
-  const st=stats(H); H.hp=st.hp; const hp=raidHp(); if(hp<=0)return;
-  B=Object.assign(baseB({n:RAID.n,id:RAID.id,hp,max:raidMax(world.no),atk:7+2*H.lvl+st.def},4,'Ashmaw towers over you. You have 8 turns to strike!'),{raid:true,boss:true,turns:8,dealt:0});
-  preload(heroImg(H,true)); S.screen='battle'; render();
-}
-function blog(t){B.log.push(t); if(B.log.length>3)B.log.shift()}
-function pop(sel,text,cls){const st=app.querySelector('.stage'),el=app.querySelector(sel); if(!st||!el)return;
-  const d=document.createElement('div'); d.className='pop '+(cls||''); d.textContent=text; d.style.left=(el.offsetLeft+el.offsetWidth/2-18)+'px'; d.style.top=(el.offsetTop+el.offsetHeight*.15)+'px'; st.appendChild(d); setTimeout(()=>d.remove(),800);}
-function anim(sel,cls,frame){const el=app.querySelector(sel); if(!el)return; el.classList.remove('bob',cls); void el.offsetWidth; el.classList.add(cls);
-  if(frame){const old=el.getAttribute('src'); el.src=frame; setTimeout(()=>{if(el.isConnected)el.src=old},430)} }
-function strike(mult,forceCrit){ const st=stats(H); let d=st.atk*mult*rnd(.88,1.12); if(B.bless>0)d*=1.4;
-  let crit=forceCrit||Math.random()<st.crit; if(!forceCrit&&B.eagle>0){crit=true;B.eagle--} if(crit)d*=1.8;
-  d=Math.max(1,Math.round(d)); B.e.hp=Math.max(0,B.e.hp-d); if(B.raid)B.dealt+=d; return {d,crit}; }
-async function heroAct(kind){ if(!B||B.busy||B.result)return; const st=stats(H), e=B.e, c=CLASSES[H.cls]; let pops=[], power=false;
-  if(kind==='potion'){ if(H.potions<1)return toast('No potions left.'); if(H.hp>=st.hp)return toast('You are already at full health.');
-    H.potions--; const h=Math.round(st.hp*.4); H.hp=Math.min(st.hp,H.hp+h); blog('You drink a potion and heal '+h+'.'); pops.push(['.you','+'+h,'heal']); sfx.heal(); }
-  else { const sk=kind==='atk'?{n:'Attack',mult:1}:kind==='pow'?c.power:c.skills[kind];
-    if(kind==='pow'){ if((H.pow||0)<100)return; power=true; H.pow=0; }
-    else if(kind!=='atk'&&(B.cd[kind]>0||H.lvl<sk.lv))return;
-    let line=kind==='atk'?'You attack':'You use '+sk.n;
-    if(sk.mult){ let total=0,anyCrit=false; for(let i=0;i<(sk.hits||1);i++){const s=strike(sk.mult,sk.allcrit); total+=s.d; anyCrit=anyCrit||s.crit}
-      line+=' for '+total+(anyCrit?', a critical hit!':'.'); pops.push(['.foe','-'+total,anyCrit||power?'crit':'']); if(!power)(anyCrit?sfx.crit():sfx.hit());
-      if(!power)H.pow=Math.min(100,(H.pow||0)+22); } else line+='.';
-    if(sk.heal){const h=Math.round(st.hp*sk.heal); H.hp=Math.min(st.hp,H.hp+h); pops.push(['.you','+'+h,'heal']); if(!power)sfx.heal()}
-    if(sk.stun&&!B.raid)e.stun=sk.stun; if(sk.weak)e.weak=sk.weak; if(sk.poison){e.poison=sk.poison;e.pdmg=Math.max(1,Math.round(st.atk*.45))}
-    if(sk.guard)B.guard=sk.guard; if(sk.bless)B.bless=sk.bless; if(sk.eagle)B.eagle=sk.eagle;
-    blog(line); }
-  B.busy=true; for(let i=0;i<3;i++)if(B.cd[i]>0)B.cd[i]--; if(typeof kind==='number')B.cd[kind]=c.skills[kind].cd;
-  render();
-  if(power){ sfx.power(); const stg=app.querySelector('.stage'); if(stg){const f=document.createElement('div');f.className='flash';stg.appendChild(f); const t=document.createElement('div');t.className='shout';t.textContent=c.power.n+'!';stg.appendChild(t); setTimeout(()=>{f.remove();t.remove()},1000)} await sleep(350); }
-  if(pops.some(p=>p[0]==='.foe')){anim('.you','lunge',heroImg(H,true));anim('.foe','shake')} pops.forEach(p=>pop(p[0],p[1],p[2]));
-  await sleep(power?900:600); if(e.hp<=0)return finish(true);
-  await enemyTurn(); if(!B||B.result)return; B.busy=false; render(); }
-async function enemyTurn(){ const e=B.e, st=stats(H);
-  if(e.poison>0){ e.hp=Math.max(0,e.hp-e.pdmg); if(B.raid)B.dealt+=e.pdmg; e.poison--; blog('Poison burns '+e.n+' for '+e.pdmg+'.'); render(); pop('.foe','-'+e.pdmg); await sleep(450); if(e.hp<=0)return finish(true); }
-  if(e.stun>0){ e.stun--; blog(e.n+' is stunned and cannot move!'); render(); await sleep(500); }
-  else { let d=e.atk*rnd(.85,1.15); if(e.weak>0){d*=.7;e.weak--} const heavy=e.charge; if(heavy){d*=1.8;e.charge=false}
-    d=Math.max(1,Math.round(d-st.def)); if(B.guard>0)d=Math.ceil(d/2);
-    H.hp=Math.max(0,H.hp-d); H.pow=Math.min(100,(H.pow||0)+14); blog(e.n+(heavy?' unleashes a mighty blow for ':' hits you for ')+d+'.'); render(); anim('.foe','lungeL',mobImg(e.id,true)); anim('.you','shake'); pop('.you','-'+d); sfx.hurt(); await sleep(600);
-    B.et++; if(B.boss&&B.et%3===2&&H.hp>0){e.charge=true; blog(e.n+' is gathering power…')} }
-  if(B.guard>0)B.guard--; if(B.bless>0)B.bless--;
-  if(H.hp<=0)return finish(false);
-  if(B.raid){B.turns--; if(B.turns<=0)return finish(false,true)} }
-function finish(win,flew){ const st=stats(H);
-  if(B.raid){ const dealt=B.dealt; if(H.raidDay!==today()){H.raidDay=today();H.raidTries=0} H.raidTries++; if((H.raidNo||1)!==world.no){H.raidNo=world.no;H.raidDmg=0}
-    H.raidDmg=(H.raidDmg||0)+dealt; H.hp=st.hp; if(dealt>0)feat('struck Ashmaw for '+dealt); save();
-    B.result={raid:true,dealt,win,flew}; win?sfx.win():sfx.hit(); render(); return; }
-  const R=REGIONS[B.r]; let res={win};
-  if(win){ let g=Math.round(R.gold*rnd(.85,1.15)*(B.boss?5:1)*((H.relics||[]).includes(0)?1.2:1)), xp=R.xp*(B.boss?4:1);
-    H.gold+=g; H.kills=(H.kills||0)+1; res.gold=g; res.xp=xp;
-    if(B.stage>=0&&B.stage===H.prog[B.r]){ H.prog[B.r]++; if(B.boss){ if(!H.relics.includes(B.r)){H.relics.push(B.r);res.relic=B.r} feat('defeated '+R.boss.n+' in '+R.n) } }
-    const r0=rank(H); res.ups=addXp(xp); if(rank(H)>r0)res.rank=rank(H); res.gear=addGearXp(Math.round(R.gold*(B.boss?5:1))); if(H.relics.includes(2)&&!res.ups)H.hp=Math.min(stats(H).hp,H.hp+Math.round(stats(H).hp*.15));
-    sfx.win(); }
-  else { H.hp=st.hp; sfx.lose(); }
-  save(); B.result=res; render(); }
-
-/* ============ SCREENS ============ */
 const bar=(v,m,cls)=>`<div class="bar ${cls||''}"><i style="width:${Math.max(0,Math.min(100,100*v/m))}%"></i></div>`;
-const lineup=()=>`<div class="hero-stage">${scene(6)}<img class="h" style="left:22%" alt="" src="img/hero_knight_11.webp"><img class="h" style="left:41%" alt="" src="img/hero_wizard_11.webp"><img class="h" style="left:60%" alt="" src="img/hero_ranger_11.webp"><img class="h" style="left:79%" alt="" src="img/hero_barbarian_11.webp"></div>`;
-function vLock(){ return `<div class="col" style="text-align:center;padding-top:8px"><h1>Hearthguard</h1><p class="dim">One family. One guild. A realm that needs saving.</p></div>${lineup()}
+const KIT={cls:'knight',weapon:1,armor:1,lvl:1};
+const kit=cls=>Object.assign({},KIT,{cls});
+/* left pane: a hero (or the four classes) standing in the camp */
+const heroPane=(h,w,a)=>`<div class="hero-stage">${scene(5)}${aura(h,'left:28%;right:28%;bottom:2%;height:16%')}${heroSpr(h,'h idle',`height:${94+rank(h)*2.5}%;`,w,a)}</div>`;
+const lineup=()=>`<div class="hero-stage">${scene(5)}${['knight','wizard','ranger','barbarian'].map((k,i)=>heroSpr(kit(k),'h idle',`height:74%;left:${20+i*20}%;animation-delay:-${i*.3}s;`)).join('')}</div>`;
+const page=(left,right)=>`<div class="pg">${left}<div class="scroll col">${right}</div></div>`;
+const topBar=(title,btns)=>`<div class="top"><h2>${title}</h2><span class="row">${btns||'<button class="ghost" data-act="go" data-to="camp">Camp</button>'}</span></div>`;
+
+function vLock(){ return page(lineup(),`<div><h1>Hearthguard</h1><p class="dim">One family. One guild. A realm that needs saving.</p></div>
   <div class="panel col"><h3><label for="fampw">Family password</label></h3><p class="dim small">${esc(S.lockMsg||'The same one as Shogun’s Gate. Enter it once and this device will remember it.')}</p>
-  <input type="text" id="fampw" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false"><button class="go" data-act="unlock">Enter the realm</button></div>`; }
+  <input type="text" id="fampw" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false"><button class="go" data-act="unlock">Enter the realm</button></div>`); }
 function vWho(){
   const rows=SLOTS.map(s=>{const h=heroes[s.id]||(s.id===me?H:null);
-    return `<button class="card" data-act="pick" data-id="${s.id}" ${loaded?'':'disabled'}>${h?`<img class="spr sm" alt="" src="${heroImg(h)}" style="${heroFx(h)}">`:`<span class="spr sm"></span>`}
+    return `<button class="card" data-act="pick" data-id="${s.id}" ${loaded?'':'disabled'}>${h?heroSpr(h,'mini'):`<span class="sp mini"></span>`}
       <span class="grow"><b>${esc(s.label)}</b><span class="sub">${h?esc(h.name)+' · Level '+h.lvl+' '+CLASSES[h.cls].name:'No hero yet. Tap to create one.'}</span></span></button>`}).join('');
-  return `<div class="col" style="text-align:center;padding-top:8px"><h1>Hearthguard</h1><p class="dim">One family. One guild. A realm that needs saving.</p></div>
-    ${lineup()}
-    <div class="panel col"><h3>Who is playing?</h3>${loaded?'':'<p class="dim small">Reaching the guild hall…</p>'}${rows}
-    ${offline&&loaded?'<p class="dim small">Playing offline. Progress saves on this device until the guild hall can be reached.</p>':''}</div>${window.HG_CLOUD&&loaded?'<button class="ghost" data-act="go" data-to="share">Share the game</button>':''}`;
+  return page(lineup(),`<div class="top"><div><h1>Hearthguard</h1><p class="dim">One family. One guild. A realm that needs saving.</p></div>${window.HG_CLOUD&&loaded?'<button class="ghost" data-act="go" data-to="share">Share the game</button>':''}</div>
+    <div class="panel col"><h3>Who is playing?</h3>${loaded?'':'<p class="dim small">Reaching the guild hall…</p>'}<div class="grid2">${rows}</div>
+    ${offline&&loaded?'<p class="dim small">Playing offline. Progress saves on this device until the guild hall can be reached.</p>':''}</div>`);
 }
 function vCreate(){ const cur=S.cls||'knight';
-  return `<div class="top"><h2>New hero</h2><button class="ghost" data-act="go" data-to="who">Back</button></div>
-  <div class="hero-stage">${scene(6)}<img class="h bob" alt="" src="img/hero_${cur}_11.webp"></div>
-  <div class="panel col"><h3><label for="heroname">Hero name</label></h3><input type="text" id="heroname" maxlength="12" value="${esc(S.name||'')}" autocomplete="off"></div>
-  <div class="panel col"><h3>Choose a class</h3>${Object.keys(CLASSES).map(k=>{const c=CLASSES[k];
-    return `<button class="card ${k===cur?'go':''}" data-act="cls" data-id="${k}"><img class="spr sm" alt="" src="img/hero_${k}_11.webp"><span class="grow"><b>${c.name}</b><span class="sub">${c.blurb}</span></span></button>`}).join('')}</div>
-  <button class="go" data-act="create">Begin the adventure</button>`;
+  return page(heroPane(kit(cur)),`${topBar('New hero','<button class="ghost" data-act="go" data-to="who">Back</button>')}
+  <div class="panel col"><h3><label for="heroname">Name your hero</label></h3><input type="text" id="heroname" maxlength="12" value="${esc(S.name||'')}" autocomplete="off"></div>
+  <div class="panel col"><h3>Choose a starting class</h3><div class="grid2">${Object.keys(CLASSES).map(k=>{const c=CLASSES[k];
+    return `<button class="card ${k===cur?'go':''}" data-act="cls" data-id="${k}">${heroSpr(kit(k),'mini')}<span class="grow"><b>${c.name}</b><span class="sub">${c.blurb}</span></span></button>`}).join('')}</div></div>
+  <button class="go" data-act="create">Begin the adventure</button>`);
 }
 function heroCard(){ const st=stats(H);
   return `<div class="panel col" style="gap:5px">
     <div class="stat"><b>${esc(H.name)}</b><span class="gold">${H.gold} gold</span></div>
     <div class="stat small dim"><span>Level ${H.lvl} ${CLASSES[H.cls].name} · ${RANKS[rank(H)]}</span><span>${H.potions} potion${H.potions===1?'':'s'}</span></div>
     ${bar(H.hp,st.hp)}<div class="stat small dim"><span>Health</span><span>${H.hp} / ${st.hp}</span></div>
-    ${bar(H.xp,need(H.lvl),'xp')}<div class="stat small dim"><span>Experience</span><span>${H.lvl>=30?'Max level':H.xp+' / '+need(H.lvl)}</span></div></div>`;
+    ${bar(H.xp,need(H.lvl),'xp')}<div class="stat small dim"><span>Experience</span><span>${H.lvl>=MAXLV?'Max level':H.xp+' / '+need(H.lvl)}</span></div></div>`;
 }
-function vCamp(){ const st=stats(H), left=raidLeft();
-  return `<div class="top"><h2>The Camp</h2><span class="row"><button class="ghost" data-act="mute">${muted?'Sound off':'Sound on'}</button><button class="ghost" data-act="go" data-to="who">Switch hero</button></span></div>
-  <div class="hero-stage">${scene(6)}${aura(H,'left:24%;right:24%;bottom:0;height:24%')}<img class="h bob" alt="" src="${heroImg(H)}" style="height:${80+rank(H)*2}%;${heroFx(H)}"></div>${heroCard()}
-  <button class="go" data-act="go" data-to="map">Adventure<span class="sub">Explore the realm and fight monsters</span></button>
+function vCamp(){ const st=stats(H), left=raidLeft(), nx=Math.min(LEVELS-1,H.cleared);
+  return page(heroPane(H),`${topBar('The Camp',`<button class="ghost" data-act="mute">${muted?'Sound off':'Sound on'}</button><button class="ghost" data-act="go" data-to="who">Switch hero</button>`)}
+  ${heroCard()}
   <div class="grid2">
+    <button class="go" data-act="level" data-n="${nx}">${H.cleared>=LEVELS?'Adventure again':'Adventure'}<span class="sub">${esc(levelName(nx))}</span></button>
+    <button data-act="go" data-to="world">World map<span class="sub">${H.cleared} of ${LEVELS} levels cleared</span></button>
     <button data-act="rest" ${H.hp>=st.hp?'disabled':''}>Rest by the fire<span class="sub">${H.hp>=st.hp?'Fully rested':'Heal to full, free'}</span></button>
-    <button data-act="go" data-to="shop">Shop<span class="sub">New gear and potions</span></button>
+    <button data-act="go" data-to="shop">Shop<span class="sub">Gear and potions</span></button>
     <button data-act="go" data-to="guild">Guild Hall<span class="sub">${left} strike${left===1?'':'s'} left on Ashmaw</span></button>
     <button data-act="go" data-to="hero">My Hero<span class="sub">Skills and relics</span></button>
-  </div>${window.HG_CLOUD?'<button data-act="go" data-to="share">Share the game<span class="sub">QR code to add it on another phone or iPad</span></button>':''}${offline?'<p class="dim small">Offline: saved on this device only for now.</p>':''}`;
+    ${window.HG_CLOUD?'<button style="grid-column:1/-1" data-act="go" data-to="share">Share the game<span class="sub">QR code to add it on another phone or iPad</span></button>':''}
+  </div>${offline?'<p class="dim small">Offline: saved on this device only for now.</p>':''}`);
 }
-function vMap(){
-  return `<div class="top"><h2>The Realm</h2><button class="ghost" data-act="go" data-to="camp">Camp</button></div>
-  ${REGIONS.map((R,r)=>{ const open=r===0||H.prog[r-1]>=5, p=H.prog[r], done=p>=5;
-    const pips='<span class="pips">'+[0,1,2,3,4].map(i=>`<b class="${i===4?'boss ':''}${i<p?'on':''}"></b>`).join('')+'</span>';
-    return `<div class="panel col ${open?'':'locked'}"><div class="row"><img class="spr sm" alt="" src="${mobImg(R.boss.id)}" ${open?'':'style="filter:brightness(0)"'}><div class="grow"><b>${R.n}</b><div class="small dim">${open?'Best at level '+R.lv+' and up':'Defeat '+REGIONS[r-1].boss.n+' to enter'}</div></div>${pips}</div>
-      ${open?`<div class="grid2">${done?`<button data-act="fight" data-r="${r}" data-s="-1">Hunt<span class="sub">Fight for gold and XP</span></button><button data-act="fight" data-r="${r}" data-s="4">Rematch<span class="sub">${R.boss.n}</span></button>`
-        :`<button class="go" style="grid-column:1/-1" data-act="fight" data-r="${r}" data-s="${p}">${p===4?'Face '+R.boss.n:'Stage '+(p+1)+' of 5'}</button>`}</div>`:''}</div>`}).join('')}`;
+function vWorld(){
+  return `<div class="scroll col" style="height:100%">${topBar('The Realm')}
+  ${WORLDS.map((W,w)=>{ const open=H.cleared>=w*10;
+    return `<div class="panel col ${open?'':'locked'}" style="gap:8px"><div class="row">${mobSpr(W.boss[1],'mini',open?'':'filter:brightness(0);')}<div class="grow"><b>${W.n}</b><div class="small dim">${open?'Hero level '+expLv(w*10)+' to '+expLv(w*10+9)+' · boss: '+W.boss[0]:'Clear '+WORLDS[w-1].n+' to enter'}</div></div>${H.relics.includes(w)?'<span class="chip">relic won</span>':''}</div>
+      <div class="lvls">${[0,1,2,3,4,5,6,7,8,9].map(s=>{ const n=w*10+s, can=n<=H.cleared, done=n<H.cleared, b=levelBoss(n);
+        return `<button class="lv ${n===H.cleared?'go':''} ${done?'done':''}" data-act="level" data-n="${n}" ${can?'':'disabled'} aria-label="Level ${w+1}-${s+1}${b?' boss':''}">${w+1}-${s+1}${b?`<span class="sub">${b==='boss'?'Boss':'Guardian'}</span>`:''}</button>`}).join('')}</div></div>`}).join('')}</div>`;
 }
 function vShop(){
   const gear=(kind)=>{ const t=H[kind], nx=t+1, xp=H[gxKey(kind)]||0;
-    if(nx>6)return `<div class="panel"><b>${gearName(H,kind,t)} · Level 7</b><div class="small dim">The finest there is.</div></div>`;
+    if(nx>GEAR_MAX)return `<div class="panel"><b>${esc(gearName(H,kind,t))} · Level ${GEAR_MAX+1}</b><div class="small dim">The finest there is.</div></div>`;
     const gain=kind==='weapon'?'+'+(WEAPON_ATK[nx]-WEAPON_ATK[t])+' attack':'+'+(ARMOR_HP[nx]-ARMOR_HP[t])+' health, +'+(ARMOR_DEF[nx]-ARMOR_DEF[t])+' defense';
     const lock=H.lvl<GEAR_LVL[nx], cost=gearCost(kind), poor=H.gold<cost, newLook=look(nx)!==look(t);
-    return `<div class="panel col" style="gap:6px"><div class="row"><img class="spr sm" alt="" src="${kind==='weapon'?heroImg(H,false,nx,null):heroImg(H,false,null,nx)}"><div class="grow"><b>${gearName(H,kind,t)} · Level ${t+1}</b><div class="small dim">Next: ${gearName(H,kind,nx)}, ${gain}${newLook?' · <span class="gold">new look!</span>':''}</div></div></div>
+    return `<div class="panel col" style="gap:6px"><div class="row">${kind==='weapon'?heroSpr(H,'mini','',nx,null):heroSpr(H,'mini','',null,nx)}<div class="grow"><b>${esc(gearName(H,kind,t))} · Level ${t+1}</b><div class="small dim">Next: ${esc(gearName(H,kind,nx))}, ${gain}${newLook?' · <span class="gold">new look!</span>':''}</div></div></div>
       ${bar(xp,gearNeed(nx),'xp')}<div class="row"><span class="grow small dim">${lock?'Levels up once your hero is level '+GEAR_LVL[nx]:'Levels up as you win battles'}</span><button class="${lock||poor?'':'go'}" data-act="buy" data-id="${kind}" ${lock||poor?'disabled':''}>Upgrade now<span class="sub">${cost} gold</span></button></div></div>`; };
-  return `<div class="top"><h2>The Shop</h2><button class="ghost" data-act="go" data-to="camp">Camp</button></div>
-  <div class="hero-stage">${scene(6)}${aura(H,'left:24%;right:24%;bottom:0;height:24%')}<img class="h bob" alt="" src="${heroImg(H)}" style="height:${80+rank(H)*2}%;${heroFx(H)}"></div>
+  return page(heroPane(H),`${topBar('The Shop')}
   <p><span class="gold">You have ${H.gold} gold.</span> <span class="dim small">Gear levels up as you fight. Gold gets it there sooner.</span></p>${gear('weapon')}${gear('armor')}
-  <div class="panel row"><div class="grow"><b>Healing Potion</b><div class="small dim">Heals 40% in battle · you carry ${H.potions} of 9</div></div><button class="${H.gold<potionPrice()||H.potions>=9?'':'go'}" data-act="buy" data-id="potion" ${H.gold<potionPrice()||H.potions>=9?'disabled':''}>${potionPrice()} gold</button></div>`;
+  <div class="panel row"><div class="grow"><b>Healing Potion</b><div class="small dim">Heals 40% · you carry ${H.potions} of 9</div></div><button class="${H.gold<potionPrice()||H.potions>=9?'':'go'}" data-act="buy" data-id="potion" ${H.gold<potionPrice()||H.potions>=9?'disabled':''}>${potionPrice()} gold</button></div>`);
 }
 function vHero(){ const st=stats(H), c=CLASSES[H.cls];
-  return `<div class="top"><h2>${esc(H.name)}</h2><button class="ghost" data-act="go" data-to="camp">Camp</button></div>
-  <div class="hero-stage">${scene(6)}${aura(H,'left:24%;right:24%;bottom:0;height:24%')}<img class="h bob" alt="" src="${heroImg(H)}" style="height:${80+rank(H)*2}%;${heroFx(H)}"></div>${heroCard()}
+  return page(heroPane(H),`${topBar(esc(H.name))}${heroCard()}
   <div class="panel col" style="gap:4px"><h3>Strength</h3><div class="stat"><span>Attack</span><b>${st.atk}</b></div><div class="stat"><span>Defense</span><b>${st.def}</b></div><div class="stat"><span>Critical chance</span><b>${Math.round(st.crit*100)}%</b></div>
-    <div class="stat"><span>Weapon</span><b>${wpnName(H,H.weapon)} · level ${H.weapon+1}</b></div><div class="stat"><span>Armor</span><b>${ARM_TIER[H.armor]} Armor · level ${H.armor+1}</b></div><div class="stat"><span>Monsters defeated</span><b>${H.kills||0}</b></div><div class="stat"><span>Titan Shards</span><b>${H.scales||0}</b></div></div>
+    <div class="stat"><span>Weapon</span><b>${esc(wpnName(H,H.weapon))} · level ${H.weapon+1}</b></div><div class="stat"><span>Armor</span><b>${ARM_TIER[H.armor]} Armor · level ${H.armor+1}</b></div><div class="stat"><span>Monsters defeated</span><b>${H.kills||0}</b></div><div class="stat"><span>Titan Shards</span><b>${H.scales||0}</b></div></div>
   <div class="panel col"><h3>Power move</h3><div><b class="gold">${c.power.n}</b><div class="small dim">${c.power.d}. Your power bar fills as you give and take hits; when it is full, unleash it.</div></div>${bar(H.pow||0,100,'pw')}</div>
   <div class="panel col"><h3>Skills</h3>${c.skills.map(s=>`<div class="${H.lvl<s.lv?'locked':''}"><b>${s.n}</b> <span class="small dim">${H.lvl<s.lv?'unlocks at level '+s.lv:'ready every '+s.cd+' turns'}</span><div class="small dim">${s.d}</div></div>`).join('')}</div>
-  <div class="panel col"><h3>Relics</h3>${H.relics.length?H.relics.map(r=>`<div><b class="gold">${REGIONS[r].relic}</b><div class="small dim">${REGIONS[r].rd}</div></div>`).join(''):'<p class="dim small">Defeat a region’s boss to win its relic.</p>'}</div>`;
+  <div class="panel col"><h3>Relics</h3>${H.relics.length?H.relics.map(r=>`<div><b class="gold">${WORLDS[r].relic}</b><div class="small dim">${WORLDS[r].rd}</div></div>`).join(''):'<p class="dim small">Defeat a world’s boss to win its relic.</p>'}</div>`);
 }
 function vGuild(){ const all=SLOTS.map(s=>({s,h:s.id===me?H:heroes[s.id]})).filter(x=>x.h).sort((a,b)=>b.h.lvl-a.h.lvl||b.h.xp-a.h.xp);
   const hp=raidHp(), max=raidMax(world.no), left=raidLeft();
   const feats=[]; all.forEach(x=>(x.h.feats||[]).forEach(f=>feats.push({t:f.t,x:x.h.name+' '+f.x}))); feats.sort((a,b)=>b.t-a.t);
   const mineDmg=H.raidNo===world.no?(H.raidDmg||0):0;
-  return `<div class="top"><h2>Guild Hall</h2><button class="ghost" data-act="go" data-to="camp">Camp</button></div>
-  <div class="panel col"><div class="row"><img class="spr" alt="" src="${mobImg(RAID.id)}"><div class="grow col" style="gap:5px"><b>${RAID.n}</b><div class="small dim">Family raid ${world.no}. Everyone’s damage adds up.</div>${bar(hp,max,'raid')}<div class="stat small dim"><span>${hp} / ${max}</span><span>You: ${mineDmg}</span></div></div></div>
+  return page(`<div class="hero-stage">${scene(6)}${mobSpr(RAID[1],'h idle8','height:120%;bottom:-22%;')}</div>`,`${topBar('Guild Hall')}
+  <div class="panel col"><b>${RAID[0]}</b><div class="small dim">Family raid ${world.no}. Everyone’s damage adds up.</div>${bar(hp,max,'raid')}<div class="stat small dim"><span>${hp} / ${max}</span><span>You: ${mineDmg}</span></div>
     <button class="go" data-act="raid" ${left<1?'disabled':''}>Strike Ashmaw<span class="sub">${left<1?'Come back tomorrow':left+' of 3 strikes left today'}</span></button></div>
-  <div class="panel col"><h3>The Hearthguard</h3>${all.map(x=>`<div class="row" style="flex-wrap:wrap"><img class="spr sm" alt="" src="${heroImg(x.h)}" style="${heroFx(x.h)}"><div class="grow"><b>${esc(x.h.name)}</b>${x.s.id===me?' <span class="chip">you</span>':''}<div class="small dim">Level ${x.h.lvl} ${CLASSES[x.h.cls].name} · ${(x.h.relics||[]).length} relic${(x.h.relics||[]).length===1?'':'s'}</div></div>
+  <div class="panel col"><h3>The Hearthguard</h3>${all.map(x=>`<div class="row" style="flex-wrap:wrap">${heroSpr(x.h,'mini')}<div class="grow"><b>${esc(x.h.name)}</b>${x.s.id===me?' <span class="chip">you</span>':''}<div class="small dim">Level ${x.h.lvl} ${CLASSES[x.h.cls].name} · ${x.h.cleared||0} levels · ${(x.h.relics||[]).length} relic${(x.h.relics||[]).length===1?'':'s'}</div></div>
       ${x.s.id!==me&&db?`<button class="ghost" data-act="gift" data-id="${x.s.id}" data-k="potion">Give potion</button><button class="ghost" data-act="gift" data-id="${x.s.id}" data-k="gold">Give 25 gold</button>`:''}</div>`).join('')}
     ${all.length<2?'<p class="dim small">When the rest of the family makes heroes, they will appear here.</p>':''}</div>
-  <div class="panel col"><h3>Chronicle</h3>${feats.length?feats.slice(0,10).map(f=>`<div class="feat">${esc(f.x)}</div>`).join(''):'<p class="dim small">Great deeds will be written here.</p>'}</div>`;
-}
-function vBattle(){ const e=B.e, st=stats(H), c=CLASSES[H.cls], res=B.result, pw=H.pow||0;
-  const chips=[]; if(B.guard>0)chips.push('Guard '+B.guard); if(B.bless>0)chips.push('War Cry '+B.bless); if(B.eagle>0)chips.push('Eagle Eye '+B.eagle);
-  if(e.stun>0)chips.push('Enemy stunned'); if(e.weak>0)chips.push('Enemy weakened '+e.weak); if(e.poison>0)chips.push('Enemy poisoned '+e.poison); if(e.charge)chips.push('Mighty blow coming!'); if(B.raid&&!res)chips.push(B.turns+' turns left');
-  let bottom;
-  if(res){ let t='',btn='';
-    if(res.raid){ t=`<h2>${res.win?'Ashmaw falls!':res.flew?'Time is up':'Knocked back'}</h2><p>You dealt <b class="gold">${res.dealt}</b> damage for the family.</p>`; btn=`<button class="go" data-act="go" data-to="guild">Back to the Guild Hall</button>`; }
-    else if(res.win){ const more=B.stage>=0&&H.prog[B.r]<5;
-      t=`<h2>Victory!</h2><p>+${res.gold} gold · +${res.xp} XP</p>${res.ups?`<p class="gold">Level up! You are now level ${H.lvl}.</p>`:''}${res.rank?`<p class="gold">New rank: ${RANKS[res.rank]}! Your hero looks stronger.</p>`:''}${(res.gear||[]).map(g=>`<p class="gold">Your ${g.k} grew to level ${H[g.k]+1}: ${gearName(H,g.k,H[g.k])}.${g.look?' New look!':''}</p>`).join('')}${res.relic!=null?`<p class="gold">Relic found: ${REGIONS[res.relic].relic} (${REGIONS[res.relic].rd})</p>`:''}`;
-      btn=`<div class="grid2"><button class="go" data-act="fight" data-r="${B.r}" data-s="${more?H.prog[B.r]:-1}">${more?(H.prog[B.r]===4?'Face the boss':'Next stage'):'Hunt again'}</button><button data-act="go" data-to="camp">Camp</button></div>`; }
-    else { t=`<h2>Knocked out</h2><p class="dim">Your friends carry you back to the fire. Rest, gear up, and try again.</p>`; btn=`<button class="go" data-act="go" data-to="camp">Back to camp</button>`; }
-    bottom=`<div class="panel col" style="text-align:center">${t}</div>${btn}`;
-  } else {
-    bottom=`<div class="log">${B.log.map(l=>`<p>${esc(l)}</p>`).join('')}</div><div class="acts">
-      ${pw>=100?`<button class="pow" data-act="act" data-k="pow" ${B.busy?'disabled':''}>${c.power.n}!<span class="sub">${c.power.d}</span></button>`:''}
-      <button class="go wide" data-act="act" data-k="atk" ${B.busy?'disabled':''}>Attack</button>
-      ${c.skills.map((s,i)=>`<button data-act="act" data-k="${i}" ${B.busy||B.cd[i]>0||H.lvl<s.lv?'disabled':''}>${s.n}<span class="sub">${H.lvl<s.lv?'Level '+s.lv:B.cd[i]>0?'Ready in '+B.cd[i]:s.d}</span></button>`).join('')}
-      <button data-act="act" data-k="potion" ${B.busy||H.potions<1?'disabled':''}>Potion<span class="sub">${H.potions} left</span></button></div>`;
-  }
-  return `<div class="stage">${scene(B.sc)}<div class="tag"><div class="stat"><span>${esc(e.n)}</span><span>${e.hp} / ${e.max}</span></div>${bar(e.hp,e.max,B.raid?'raid':'foe')}</div>
-    ${aura(H,'left:2%;width:40%;bottom:0;height:18%')}<img class="you ${res&&!res.win&&!res.raid?'':'bob'}" alt="Your hero" src="${heroImg(H)}" style="width:${37+rank(H)*1.5}%;${heroFx(H)}${res&&!res.win&&!res.raid?'opacity:.5':''}"><img class="foe ${B.boss?'big':''} ${e.hp>0?'bob':''}" alt="${esc(e.n)}" src="${mobImg(e.id)}" style="animation-delay:-1.1s;${e.hp<=0?'opacity:.2':''}"></div>
-  <div class="col" style="gap:5px"><div class="stat"><b>${esc(H.name)} · Level ${H.lvl}</b><span>${H.hp} / ${st.hp}</span></div>${bar(H.hp,st.hp)}
-    <div class="row"><span class="small ${pw>=100?'gold':'dim'}" style="width:52px">Power</span><div class="grow">${bar(pw,100,'pw'+(pw>=100?' full':''))}</div></div><div class="chips">${chips.map(x=>`<span class="chip">${x}</span>`).join('')}</div></div>${bottom}`;
+  <div class="panel col"><h3>Chronicle</h3>${feats.length?feats.slice(0,10).map(f=>`<div class="feat">${esc(f.x)}</div>`).join(''):'<p class="dim small">Great deeds will be written here.</p>'}</div>`);
 }
 function shareLink(){ const k=lsGet('hg_key'); return window.HG_CLOUD&&k?location.origin+location.pathname+'#key='+k:null; }
 function qrSvg(text){ const q=qrcode(0,'M'); q.addData(text); q.make(); const n=q.getModuleCount(), m=3; let d='';
   for(let r=0;r<n;r++)for(let c=0;c<n;c++)if(q.isDark(r,c))d+=`M${c+m} ${r+m}h1v1h-1z`;
-  return `<svg viewBox="0 0 ${n+m*2} ${n+m*2}" role="img" aria-label="QR code to play Hearthguard" shape-rendering="crispEdges" style="width:min(100%,300px);align-self:center;border-radius:8px"><rect width="100%" height="100%" fill="#fff"/><path d="${d}" fill="#000"/></svg>`; }
-function vShare(){ const url=shareLink(), back=H?'camp':'who';
-  if(!url||typeof qrcode!=='function')return `<div class="top"><h2>Share the game</h2><button class="ghost" data-act="go" data-to="${back}">Back</button></div><div class="panel"><p>Sharing works from the home-screen game.</p></div>`;
-  return `<div class="top"><h2>Share the game</h2><button class="ghost" data-act="go" data-to="${back}">Back</button></div>
-  <div class="panel col"><p>Scan this with a phone or iPad camera. Then tap Share, Add to Home Screen, and play from that icon.</p>${qrSvg(url)}
+  return `<svg viewBox="0 0 ${n+m*2} ${n+m*2}" role="img" aria-label="QR code to play Hearthguard" shape-rendering="crispEdges" style="height:100%;max-width:100%;border-radius:8px"><rect width="100%" height="100%" fill="#fff"/><path d="${d}" fill="#000"/></svg>`; }
+function vShare(){ const url=shareLink(), back=H?'camp':'who', t=topBar('Share the game',`<button class="ghost" data-act="go" data-to="${back}">Back</button>`);
+  if(!url||typeof qrcode!=='function')return page(lineup(),`${t}<div class="panel"><p>Sharing works from the home-screen game.</p></div>`);
+  return page(`<div class="hero-stage" style="display:flex;align-items:center;justify-content:center;padding:10px;background:var(--wood)">${qrSvg(url)}</div>`,`${t}
+  <div class="panel col"><p>Scan this with a phone or iPad camera. Then tap Share, Add to Home Screen, and play from that icon.</p>
   <p class="dim small">Only share this with family. Anyone who scans it joins our guild.</p>
-  <button class="go" data-act="sendlink">Send the link</button></div>`; }
-const VIEWS={share:vShare,lock:vLock,who:vWho,create:vCreate,camp:vCamp,map:vMap,shop:vShop,hero:vHero,guild:vGuild,battle:vBattle};
-function render(){ if(S.screen!=='who'&&S.screen!=='create'&&S.screen!=='lock'&&S.screen!=='share'&&!H)S.screen='who'; if(S.screen==='battle'&&!B)S.screen='camp';
-  const keep=S.screen==='battle'; const y=window.scrollY; app.innerHTML=VIEWS[S.screen](); if(keep)window.scrollTo(0,y); }
+  <button class="go" data-act="sendlink">Send the link</button></div>`); }
+const VIEWS={share:vShare,lock:vLock,who:vWho,create:vCreate,camp:vCamp,world:vWorld,shop:vShop,hero:vHero,guild:vGuild,explore:vExplore,battle:vBattle};
+function render(){ if(!['who','create','lock','share'].includes(S.screen)&&!H)S.screen='who'; if(S.screen==='battle'&&!B)S.screen='camp'; if(S.screen==='explore'&&!EX)S.screen='camp';
+  app.dataset.screen=S.screen; app.innerHTML=VIEWS[S.screen](); if(S.screen==='explore')mountExplore(); if(S.screen==='battle')mountBattle(); }
 
-/* ============ INPUT ============ */
+/* ---------- input ---------- */
 app.addEventListener('click',ev=>{ const b=ev.target.closest('[data-act]'); if(!b||b.disabled)return; const a=b.dataset.act, d=b.dataset;
   if(a==='act'){ heroAct(d.k==='atk'||d.k==='potion'||d.k==='pow'?d.k:+d.k); return; }
   sfx.tap();
-  if(a==='go'){ if(S.screen==='create'){const i=document.getElementById('heroname'); if(i)S.name=i.value} B=null; S.screen=d.to; if(d.to==='camp'||d.to==='guild'){checkRaid();processGifts()} render(); window.scrollTo(0,0); }
-  else if(a==='pick'){ me=d.id; lsSet('hg_me',me); const loc=lsGet('hg_hero_'+me), rem=heroes[me]; H=rem&&(!loc||(rem.rev||0)>=(loc.rev||0))?clone(rem):loc; if(H&&!CLASSES[H.cls])H=null;
+  if(a==='bdone'){ battleDone(); }
+  else if(a==='go'){ if(S.screen==='create'){const i=document.getElementById('heroname'); if(i)S.name=i.value} S.screen=d.to; if(d.to==='camp'||d.to==='guild'){checkRaid();processGifts()} render(); }
+  else if(a==='pick'){ me=d.id; lsSet('hg_me',me); const loc=fixHero(lsGet('hg_hero_'+me)), rem=heroes[me]; H=rem&&(!loc||(rem.rev||0)>=(loc.rev||0))?fixHero(clone(rem)):loc;
     if(H){ if(!rem||(rem.rev||0)<(H.rev||0)){dirty=true;pump()} S.screen='camp'; checkRaid(); processGifts(); } else { S.name=SLOTS.find(s=>s.id===me).label; S.cls='knight'; S.screen='create'; } render(); }
   else if(a==='cls'){ const i=document.getElementById('heroname'); if(i)S.name=i.value; S.cls=d.id; render(); }
   else if(a==='create'){ const i=document.getElementById('heroname'); const name=(i?i.value:'').trim().slice(0,12)||SLOTS.find(s=>s.id===me).label;
     H=newHero(name,S.cls||'knight'); feat('joined the Hearthguard'); save(); S.screen='camp'; render(); toast('Welcome, '+name+'. The realm is counting on you.'); }
   else if(a==='rest'){ H.hp=stats(H).hp; sfx.heal(); save(); render(); }
   else if(a==='mute'){ muted=!muted; lsSet('hg_mute',muted); render(); }
-  else if(a==='fight'){ startBattle(+d.r,+d.s); window.scrollTo(0,0); }
-  else if(a==='raid'){ startRaid(); window.scrollTo(0,0); }
+  else if(a==='level'){ const n=+d.n; if(n>H.cleared)return; startLevel(Math.min(LEVELS-1,n)); }
+  else if(a==='expotion'){ const st=stats(H); if(H.potions<1||H.hp>=st.hp)return; H.potions--; H.hp=Math.min(st.hp,H.hp+Math.round(st.hp*.4)); sfx.heal(); save(); render(); }
+  else if(a==='exleave'){ EX.busy=true; EX.over=`<div class="panel col" style="text-align:center;min-width:260px"><h2>Back to camp?</h2><p class="dim">You will start this level over next time.</p><div class="grid2"><button data-act="exstay">Keep exploring</button><button class="go" data-act="excamp">Go to camp</button></div></div>`; render(); }
+  else if(a==='exstay'){ EX.over=null; EX.busy=false; render(); }
+  else if(a==='excamp'){ stopExplore(); S.screen='camp'; checkRaid(); processGifts(); render(); }
+  else if(a==='raid'){ if(raidLeft()<1)return toast('You have struck three times today. Ashmaw will still be here tomorrow.'); const st=stats(H), hp=raidHp(); if(hp<=0)return; H.hp=st.hp;
+    battle({n:RAID[0],id:RAID[1],hp,max:raidMax(world.no),atk:7+2*H.lvl+st.def,kind:'raid',big:true,xp:0,gold:0,scene:6},{raid:true}).then(()=>{ S.screen='guild'; checkRaid(); render(); }); }
   else if(a==='buy'){ if(d.id==='potion'){ if(H.gold<potionPrice()||H.potions>=9)return; H.gold-=potionPrice(); H.potions++; }
-    else { const nx=H[d.id]+1; if(nx>6||H.lvl<GEAR_LVL[nx])return; const cost=gearCost(d.id); if(H.gold<cost)return; const changed=look(nx)!==look(nx-1); H.gold-=cost; H[gxKey(d.id)]=0; gearUp(d.id);
+    else { const nx=H[d.id]+1; if(nx>GEAR_MAX||H.lvl<GEAR_LVL[nx])return; const cost=gearCost(d.id); if(H.gold<cost)return; const changed=look(nx)!==look(nx-1); H.gold-=cost; H[gxKey(d.id)]=0; gearUp(d.id);
       if(changed){toast('Your hero has a new look!');sfx.win()} }
     sfx.heal(); save(); render(); }
   else if(a==='gift'){ sendGift(d.id,d.k); }
@@ -2805,33 +3081,6 @@ async function sendGift(to,kind){ if(!db)return; const who=(heroes[to]||{}).name
   save(); render();
   try{ await db.collection('gifts').add({to,from:H.name,kind,t:Date.now()}); toast('Sent to '+who+'.'); }
   catch(e){ if(kind==='potion')H.potions++; else H.gold+=25; save(); render(); toast('The gift could not be sent. Nothing was lost.'); } }
-
-if(H&&!CLASSES[H.cls])H=null;
-/* Invites (home-screen build). A QR/link carries #key=<saved key> (or #join=<password>). A home-screen app has its own storage on iPhones,
-   so the invite travels with Add to Home Screen: in the link the icon starts on, and in a cookie. */
-function keepInvite(k){
-  const base=location.origin+location.pathname, join=base+'#key='+k;
-  try{document.cookie='hg-key='+k+'; path='+location.pathname+'; max-age=31536000; SameSite=Lax; Secure'}catch(e){}
-  if(navigator.standalone||matchMedia('(display-mode: standalone)').matches)return;
-  document.querySelectorAll('link[rel=manifest]').forEach(l=>l.remove());
-  const man={name:'Hearthguard',short_name:'Hearthguard',start_url:join,scope:base,display:'standalone',background_color:'#14171b',theme_color:'#14171b',
-    icons:[{src:base+'icon-180.png',sizes:'180x180',type:'image/png'},{src:base+'icon-512.png',sizes:'512x512',type:'image/png'}]};
-  const l=document.createElement('link'); l.rel='manifest'; l.href='data:application/manifest+json,'+encodeURIComponent(JSON.stringify(man)); document.head.appendChild(l);
-  if(lsGet('hg_tip_off'))return;
-  const tip=document.createElement('div'); tip.setAttribute('role','status');
-  tip.style.cssText='position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:30;background:#252a30;color:#e9edf1;border:2px solid #e8c45e;border-radius:10px;padding:12px 48px 12px 14px;box-shadow:0 6px 24px rgba(0,0,0,.5)';
-  tip.textContent='Make it an app: tap Share, then Add to Home Screen, and always play from that icon.';
-  const x=document.createElement('button'); x.textContent='✕'; x.setAttribute('aria-label','Close');
-  x.style.cssText='position:absolute;top:2px;right:2px;min-height:40px;width:40px;padding:0;background:none;border:0;color:#e9edf1;font-size:18px';
-  x.addEventListener('click',()=>{tip.remove();lsSet('hg_tip_off',1)}); tip.appendChild(x); document.body.appendChild(tip);
-}
-function boot(){ render(); connect(); const k=lsGet('hg_key'); if(window.HG_CLOUD&&k)keepInvite(k); }
-if(window.HG_CLOUD){
-  let m=/[#&]key=([0-9a-f]{64})/.exec(location.hash), j=/[#&]join=([^&]+)/.exec(location.hash), c=null;
-  try{c=/(?:^|; )hg-key=([0-9a-f]{64})/.exec(document.cookie)}catch(e){}
-  if(m){lsSet('hg_key',m[1]);boot()}
-  else if(j){render(); sha256hex(canonPw(decodeURIComponent(j[1]))).then(k=>{lsSet('hg_key',k);boot()})}
-  else { if(!lsGet('hg_key')&&c)lsSet('hg_key',c[1]); boot(); }
-} else boot();
+start();
 </script>
 <script>if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js")</script></body></html>
