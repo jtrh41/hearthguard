@@ -2406,6 +2406,7 @@ button.wsk{border-color:#c07bff;box-shadow:inset 0 0 10px rgba(192,123,255,.35)}
 @keyframes itemleg{0%,100%{box-shadow:0 3px 0 #08090b,0 0 10px rgba(255,176,64,.35)}50%{box-shadow:0 3px 0 #08090b,0 0 22px rgba(255,216,112,.7)}}
 .spark{position:fixed;z-index:50;font-size:22px;pointer-events:none;animation:spark 1.1s ease-out forwards;text-shadow:0 0 8px currentColor}
 @keyframes spark{0%{transform:scale(.2) translateY(0);opacity:0}25%{opacity:1;transform:scale(1.2) translateY(-10px)}100%{transform:scale(.6) translateY(-50px) rotate(90deg);opacity:0}}
+.scene.bgimg{background-size:cover;background-position:50% 62%}
 .pop.stun{color:#ffd84a;font-size:24px}
 .proj.big{width:46px;height:46px;margin:-23px 0 0 -23px}
 .proj.meteor{transition:transform .32s ease-in}
@@ -3267,6 +3268,8 @@ function drawGate(c,g,open,t){ const x=g.x, y=g.y+40; circ(c,'rgba(0,0,0,.25)',x
 /* Hearthguard battle screen: turn-based. You pick a move (tap a monster to choose who you hit), your hero plays its attack animation,
    then every monster still standing takes its turn. battle(foes, {raid}) switches to the battle screen and resolves with {win, ...}
    when the player taps Continue. foes is one monster or a list of up to 3. */
+/* rendered 3D backdrops (tools/scenes.py), drawn over the old drawn scene */
+const BG_NAMES=['woods','mines','marsh','frost','spire','camp','ash'];
 const BU=10;   // zoomed out a little more so the two sides have a wide gap of open ground (owner)   // % of stage height per Blender unit of a sprite
 const $b=id=>document.getElementById(id);
 /* where monsters stand: by group size. x = % of stage width, y = feet (% of height), s = size. The first (the leader / boss) stands at the back. */
@@ -3286,7 +3289,8 @@ function battle(foes,opt){ opt=opt||{}; if(!Array.isArray(foes))foes=[foes];
 function foeGeom(e,i){ const P=SLOTPOS[B.es.length-1][i], big=e.big||B.raid, rig=isRig(e.id), fs=(rig?4.4:5)*BU*(big?1.3:1)*P.s, foot=rig?.776:.743;
   return {x:P.x,y:P.y,fs,top:P.y-foot*fs,head:P.y-fs*(rig?.5:.6)}; }
 function vBattle(){ const hs=4.4*BU*(1+rank(H)*.02), multi=B.es.length>1;
-  return `<div class="bt"><div class="stage" id="bstage">${scene(B.raid?6:B.es[0].scene)}
+  const bgi=B.raid?6:B.es[0].scene;
+  return `<div class="bt"><div class="stage" id="bstage">${scene(bgi)}<div class="scene bgimg" style="background-image:url(img/bg_${BG_NAMES[bgi]}.webp)"></div>
     <div class="tag l"><div class="stat"><span>${esc(H.name)} · Lv ${H.lvl}</span><span id="bhpT"></span></div><div class="bar"><i id="bhp"></i></div><div class="bar pw" id="bpwb"><i id="bpw"></i></div></div>
     <div class="tag r"><div class="stat"><span id="bfN"></span><span id="bfT"></span></div><div class="bar ${B.raid?'raid':'foe'}"><i id="bfhp"></i></div></div>
     ${aura(H,`left:${HERO_X-7}%;width:14%;top:${HERO_Y-5}%;height:9%`)}
