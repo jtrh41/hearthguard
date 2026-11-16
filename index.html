@@ -2425,16 +2425,16 @@ button.wsk{border-color:#c07bff;box-shadow:inset 0 0 10px rgba(192,123,255,.35)}
 .hsp>i.blink,.port>i.blink{opacity:0;animation:blinkk 4.3s linear infinite} @keyframes blinkk{0%,96.5%{opacity:0}97%,99.6%{opacity:1}100%{opacity:0}}
 .lvbeam{position:absolute;top:0;bottom:6%;width:18%;translate:-50% 0;z-index:103;pointer-events:none;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--c) 70%,transparent) 30%,#fff 50%,color-mix(in srgb,var(--c) 70%,transparent) 70%,transparent);filter:blur(2px);mix-blend-mode:screen;animation:lvbeam 1.8s ease-out forwards;transform-origin:50% 0}
 @keyframes lvbeam{0%{transform:scaleY(0);opacity:0}15%{transform:scaleY(1);opacity:1}60%{opacity:.85}100%{opacity:0;transform:scaleY(1) scaleX(.3)}}
-.bsp.foe.elite{filter:drop-shadow(0 0 1.2px rgba(0,0,0,.85)) drop-shadow(0 0 10px #ff5a30);animation:breathe 2.8s ease-in-out infinite,elitep 1.6s ease-in-out infinite alternate}
+.bsp.foe.elite{filter:drop-shadow(0 0 1.2px rgba(0,0,0,.85)) drop-shadow(0 0 14px #ff7a30)}
 @keyframes elitep{to{filter:drop-shadow(0 0 1.2px rgba(0,0,0,.85)) drop-shadow(0 0 18px #ffb040)}}
 .eliteaura{position:absolute;z-index:0;height:5%;translate:-50% -50%;border-radius:50%;background:radial-gradient(closest-side,rgba(255,120,40,.7),rgba(255,60,20,0));animation:glowp 1.2s ease-in-out infinite alternate;pointer-events:none}
 .crown{position:absolute;z-index:98;width:34px;height:22px;translate:-50% 0;background:linear-gradient(#ffe080,#d89a20);clip-path:polygon(0 100%,0 25%,22% 60%,35% 0,50% 50%,65% 0,78% 60%,100% 25%,100% 100%);filter:drop-shadow(0 0 6px #ffb040);animation:crownb 1.4s ease-in-out infinite alternate;pointer-events:none}
 @keyframes crownb{to{translate:-50% -4px}}
 .eliteaura.gone,.crown.gone{opacity:0}
-.bsp.foe.enraged{scale:1.12;filter:drop-shadow(0 0 1.2px rgba(0,0,0,.85)) drop-shadow(0 0 12px var(--ec)) saturate(1.35) contrast(1.08);animation:breathe 1.6s ease-in-out infinite,enragep .9s ease-in-out infinite alternate}
+.bsp.foe.enraged{scale:1.12;filter:drop-shadow(0 0 1.2px rgba(0,0,0,.85)) drop-shadow(0 0 12px var(--ec)) saturate(1.35) contrast(1.08);animation:breathe 1.6s ease-in-out infinite}
 @keyframes enragep{to{filter:drop-shadow(0 0 1.2px rgba(0,0,0,.85)) drop-shadow(0 0 26px var(--ec)) saturate(1.5) contrast(1.12) brightness(1.08)}}
-.hsp>i.blaze{animation:blazep 1.1s ease-in-out infinite alternate} @keyframes blazep{from{filter:drop-shadow(0 0 4px #ffb040) brightness(1.05)}to{filter:drop-shadow(0 0 14px #ff6a20) drop-shadow(0 0 4px #fff2b0) brightness(1.25)}}
-.hsp>i.clglow{animation:clglowp 2.2s ease-in-out infinite alternate} @keyframes clglowp{from{filter:drop-shadow(0 0 2px #ffe8a0)}to{filter:drop-shadow(0 0 9px #ffe8a0) brightness(1.15)}}
+.hsp>i.blaze:not(.pulse){filter:drop-shadow(0 0 4px #ffb040) brightness(1.05)}
+.hsp>i.clglow:not(.pulse){filter:drop-shadow(0 0 2px #ffe8a0)}
 .icon{position:relative;flex:none;border-radius:10px;overflow:hidden;display:inline-block} .icon>i{position:absolute;inset:0;background-repeat:no-repeat;filter:drop-shadow(0 2px 2px rgba(0,0,0,.6))}
 .campsc{position:absolute;inset:0;overflow:hidden;container-type:size;background:#0b0d12}
 .campbg{position:absolute;left:42%;top:50%;width:max(122cqw,175cqh);aspect-ratio:1.6;translate:-50% -52%;background:url(img/bg_camp.webp) 0 0/100% 100%}
@@ -2467,8 +2467,10 @@ button.wsk{border-color:#c07bff;box-shadow:inset 0 0 10px rgba(192,123,255,.35)}
 .bi-sub{font-size:18px;letter-spacing:.2em;text-transform:uppercase;color:#f0c8b8;margin-top:6px;animation:fadeup .8s .3s both}
 @keyframes bi{from{opacity:0}to{opacity:1}} @keyframes bio{to{opacity:0}}
 @keyframes slam{from{transform:scale(3);opacity:0}to{transform:scale(1);opacity:1}} @keyframes fadeup{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
-.hsp>i.epic{animation:epicp 2.4s ease-in-out infinite} .hsp>i.legend{animation:legp 1.8s ease-in-out infinite}
-@keyframes epicp{50%{filter:drop-shadow(0 0 9px #c07bff)}} @keyframes legp{0%,100%{filter:drop-shadow(0 0 6px #ffb040)}50%{filter:drop-shadow(0 0 16px #ffd870) brightness(1.15)}}
+/* SPEED (session 6): glows pulse by opacity only (a still glow copy of the layer); animating filter itself lagged on the iPad */
+.hsp>i.pulse{opacity:0;will-change:opacity;animation:pulsep 2.4s ease-in-out infinite alternate} .hsp>i.pulse.legend{animation-duration:1.8s} .hsp>i.pulse.blaze{animation-duration:1.1s} .hsp>i.pulse.clglow{animation-duration:2.2s} @keyframes pulsep{to{opacity:1}}
+.hsp>canvas.hcv{position:absolute;inset:0;width:100%;height:100%} .port>i.pl1{inset:auto;left:-33.171%;top:-2.770%;width:166.504%;height:105.409%;background-size:100% 100%}
+
 .item.r3{box-shadow:0 3px 0 #08090b,0 0 14px rgba(192,123,255,.35)} .item.r4{animation:itemleg 2.2s ease-in-out infinite}
 @keyframes itemleg{0%,100%{box-shadow:0 3px 0 #08090b,0 0 10px rgba(255,176,64,.35)}50%{box-shadow:0 3px 0 #08090b,0 0 22px rgba(255,216,112,.7)}}
 .spark{position:fixed;z-index:50;font-size:22px;pointer-events:none;animation:spark 1.1s ease-out forwards;text-shadow:0 0 8px currentColor}
@@ -2503,7 +2505,7 @@ button.wsk{border-color:#c07bff;box-shadow:inset 0 0 10px rgba(192,123,255,.35)}
 .side .chips{grid-column:2}
 .stage .tag{position:absolute;top:8px;width:40%;display:flex;flex-direction:column;gap:4px;z-index:100;text-shadow:0 1px 3px #000,0 0 6px #000;font-weight:800}
 .stage .tag.l{left:8px} .stage .tag.r{right:8px}
-.bsp{position:absolute;z-index:1;transform:translateX(calc(-50% + var(--dx,0px)));transition:transform .25s ease-out;animation:breathe 2.8s ease-in-out infinite;transform-origin:50% 78%}
+.bsp{position:absolute;z-index:1;will-change:transform;transform:translateX(calc(-50% + var(--dx,0px)));transition:transform .25s ease-out;animation:breathe 2.8s ease-in-out infinite;transform-origin:50% 78%}
 .bsp.foe{cursor:pointer;transition:transform .25s ease-out,opacity .6s}
 .bsp.gone,.fbar.gone{opacity:0;pointer-events:none}
 .fbar{position:absolute;z-index:99;width:9%;min-width:46px;height:8px;transform:translateX(-50%);background:#0c0e11;border:2px solid var(--line);border-radius:99px;overflow:visible;pointer-events:none;transition:opacity .5s}
@@ -2720,64 +2722,84 @@ function tinted(src,col){ if(!col)return src; const key=src+'|'+col; let t=tintC
     }catch(e){} };
   if(im.complete&&im.naturalWidth)go(); else im.addEventListener('load',go,{once:true}); return src; }
 const PW=1024, PH=799;   // one view of a p_ strip (8 views side by side)
-function layerSrc(l,portrait){ return 'img/'+(portrait?'p_':'')+l.f+'.webp'; }
+function layerSrc(l,portrait){ return 'img/'+(portrait===1?'p1_':portrait?'p_':'')+l.f+'.webp'; }   // portrait: true = 8-view strip, 1 = view 0 only
 const tintCol=t=>(TINTS[t]||TINTS[0]).c;
 function layerDiv(l,portrait){ const src=layerSrc(l,portrait), col=tintCol(l.t), u=tinted(src,col);
   const glow=l.w>=2?`filter:drop-shadow(0 0 ${l.w*2}px ${RARITY[l.w].c});`:'';
-  const kl=(l.blink?'blink':l.blaze?'blaze':l.cl?'clglow':l.w>=4?'legend':l.w>=3?'epic':'')+(portrait?' pl':'');
+  const kl=(l.blink?'blink':l.blaze?'blaze':l.cl?'clglow':l.w>=4?'legend':l.w>=3?'epic':'')+(portrait===1?' pl1':portrait?' pl':'');
   /* portraits (session 5): each p_ picture is a strip of 8 views, 45 degrees apart (frame 0 = the old menu picture); --ra on the .port picks the view */
-  return `<i ${kl.trim()?`class="${kl.trim()}" `:''}${col?`data-tk="${esc(src+'|'+col)}"`:''} style="background-image:url(${u});${portrait?'':'background-size:'+heroBgSize};${glow}"></i>`; }
+  const one=`<i ${kl.trim()?`class="${kl.trim()}" `:''}${col?`data-tk="${esc(src+'|'+col)}"`:''} style="background-image:url(${u});${portrait?'':'background-size:'+heroBgSize};${glow}"></i>`;
+  /* SPEED (session 6): a pulsing glow used to animate the CSS filter itself (redrawn every frame = lag on the iPad). Now the glow is
+     a still copy of the layer and only its opacity pulses, which the graphics chip does for free. */
+  const pk=portrait||l.blink?'':l.blaze?'blaze':l.cl?'clglow':l.w>=4?'legend':l.w>=3?'epic':'';
+  return pk?one+`<i class="${pk} pulse" style="background-image:url(${u});background-size:${heroBgSize};filter:${PULSE[pk]}"></i>`:one; }
+const PULSE={epic:'drop-shadow(0 0 9px #c07bff)',legend:'drop-shadow(0 0 16px #ffd870) brightness(1.15)',blaze:'drop-shadow(0 0 14px #ff6a20) drop-shadow(0 0 4px #fff2b0) brightness(1.25)',clglow:'drop-shadow(0 0 9px #ffe8a0) brightness(1.15)'};
 /* an item's picture for the bag and the Forge: the piece cut out of its front-facing picture, in its tint, on a rarity-coloured tile */
 function itemIcon(it,size){ size=size||58;
   if(isPetItem(it)){ const pk=(H&&H.pet?H.pet.k:'wolf')+(H&&H.pet?petForm(H):''), f='pt_'+pk+'_'+it.s.slice(1), b=ICONBOX['s_'+f], rc=RARITY[it.r].c, tile=`width:${size}px;height:${size}px;background:radial-gradient(circle at 50% 45%,${rc}55,#0c0e11 72%);border:2px solid ${rc}aa`;
-    if(!b)return `<span class="icon" style="${tile}"></span>`; const src='img/'+f+'.webp', col=it.s==='pcharm'?null:tintCol(it.t), u=tinted(src,col), k=size*.84/Math.max((b[2]-b[0])*512,(b[3]-b[1])*512), ox=size/2-(b[0]+b[2])/2*512*k, oy=size/2-(b[1]+b[3])/2*512*k;
-    return `<span class="icon" style="${tile}"><i ${col?`data-tk="${esc(src+'|'+col)}"`:''} style="background-image:url(${u});background-size:${(512*12*k).toFixed(1)}px ${(512*k).toFixed(1)}px;background-position:${ox.toFixed(1)}px ${oy.toFixed(1)}px"></i></span>`; }
+    if(!b)return `<span class="icon" style="${tile}"></span>`; const src='img/f0_'+f+'.webp', col=it.s==='pcharm'?null:tintCol(it.t), u=tinted(src,col), k=size*.84/Math.max((b[2]-b[0])*512,(b[3]-b[1])*512), ox=size/2-(b[0]+b[2])/2*512*k, oy=size/2-(b[1]+b[3])/2*512*k;
+    return `<span class="icon" style="${tile}"><i ${col?`data-tk="${esc(src+'|'+col)}"`:''} style="background-image:url(${u});background-size:${(512*k).toFixed(1)}px ${(512*k).toFixed(1)}px;background-position:${ox.toFixed(1)}px ${oy.toFixed(1)}px"></i></span>`; }
   const f=it.s==='weapon'?'hw_'+it.k+weaponTier(it):'hl_'+H.cls+'_'+heroGrip(H)+'_'+armourLayer(H,it,it.s); let b=ICONBOX[f];
   const rc=RARITY[it.r].c, tile=`width:${size}px;height:${size}px;background:radial-gradient(circle at 50% 45%,${rc}55,#0c0e11 72%);border:2px solid ${rc}aa`;
   if(!b)return `<span class="icon" style="${tile}"></span>`;
   const side=it.s==='cloak'&&ICONBOX['s_'+f]; if(side)b=side;   // a cloak hides behind the hero from the front: show it from the side (sheet frame 0)
-  const src=side?'img/'+f+'.webp':'img/p_'+f+'.webp', col=it.s==='weapon'?null:tintCol(it.t), u=tinted(src,col), W=side?512:PW, Hh=side?512:PH, bw=(b[2]-b[0])*W, bh=(b[3]-b[1])*Hh, k=size*.84/Math.max(bw,bh);
+  const src=side?'img/f0_'+f+'.webp':'img/p1_'+f+'.webp', col=it.s==='weapon'?null:tintCol(it.t), u=tinted(src,col), W=side?512:PW, Hh=side?512:PH, bw=(b[2]-b[0])*W, bh=(b[3]-b[1])*Hh, k=size*.84/Math.max(bw,bh);
   const ox=size/2-(b[0]+b[2])/2*W*k, oy=size/2-(b[1]+b[3])/2*Hh*k;
-  return `<span class="icon" style="${tile}"><i ${col?`data-tk="${esc(src+'|'+col)}"`:''} style="background-image:url(${u});background-size:${((side?512*HC:W*8)*k).toFixed(1)}px ${((side?512*HR:Hh)*k).toFixed(1)}px;background-position:${ox.toFixed(1)}px ${oy.toFixed(1)}px"></i></span>`; }
+  return `<span class="icon" style="${tile}"><i ${col?`data-tk="${esc(src+'|'+col)}"`:''} style="background-image:url(${u});background-size:${(W*k).toFixed(1)}px ${(Hh*k).toFixed(1)}px;background-position:${ox.toFixed(1)}px ${oy.toFixed(1)}px"></i></span>`; }
 /* battle / side view: one frame of the layered sheets. bFrame moves every layer via --fx. */
 /* SPEED: all of a hero's layers (tinted, weapon glow and outline/shadow baked in) are merged ONCE into one sheet per look.
    Stacking 5-7 huge see-through sheets with live CSS shadow filters made attacks lag on the iPad once gear (a helmet) was added.
-   Epic/legendary weapons stay their own layer so their glow can still pulse. */
+   Epic/legendary weapons stay their own layer so their glow can still pulse.
+   SPEED 2 (session 6): the merged sheet stays a canvas (no picture encode: that took 1-2 s per hero on a PC, far more on the iPad);
+   battle sprites show it through a small <canvas class="hcv"> that bFrame redraws. Merging yields between layers so the screen never freezes. */
 const compCache={};
 function heroComp(h){ const L=heroLayers(h), base=L.filter(l=>!(l.w>=3)&&!l.blink&&!l.blaze&&!l.cl), key=base.map(l=>l.f+':'+l.t+':'+(l.w||0)).join('|');
   let c=compCache[key]; if(c)return c; c=compCache[key]={key};
-  const ims=base.map(l=>loadImg(layerSrc(l)));
-  const go=()=>{ if(c.busy||c.cv||!ims.every(i=>i.complete&&i.naturalWidth))return; c.busy=1;
+  const ims=base.map(l=>loadImg(layerSrc(l))), nap=()=>new Promise(r=>setTimeout(r,0));
+  const go=async()=>{ if(c.busy||c.cv||!ims.every(i=>i.complete&&i.naturalWidth))return; c.busy=1;
     try{ const W=ims[0].naturalWidth, Hh=ims[0].naturalHeight, mk=()=>{const v=document.createElement('canvas'); v.width=W; v.height=Hh; return v;};
-      const comp=mk(), cc=comp.getContext('2d'), tmp=mk(), tc=tmp.getContext('2d');
-      base.forEach((l,i)=>{ const im=ims[i], col=tintCol(l.t); let src=im;
-        if(col){ tc.globalCompositeOperation='source-over'; tc.clearRect(0,0,W,Hh); tc.drawImage(im,0,0); tc.globalCompositeOperation='multiply'; tc.fillStyle=col; tc.fillRect(0,0,W,Hh);
+      const comp=mk(), cc=comp.getContext('2d'); let tmp=null, tc=null;
+      for(let i=0;i<base.length;i++){ const l=base[i], im=ims[i], col=tintCol(l.t); let src=im;
+        if(col){ if(!tmp){ tmp=mk(); tc=tmp.getContext('2d'); } tc.globalCompositeOperation='source-over'; tc.clearRect(0,0,W,Hh); tc.drawImage(im,0,0); tc.globalCompositeOperation='multiply'; tc.fillStyle=col; tc.fillRect(0,0,W,Hh);
           tc.globalCompositeOperation='destination-in'; tc.drawImage(im,0,0); src=tmp; }
-        if(l.w>=2){ cc.shadowColor=RARITY[l.w].c; cc.shadowBlur=l.w*5; } cc.drawImage(src,0,0); cc.shadowBlur=0; });
-      tmp.width=tmp.height=0;
+        if(l.w>=2){ cc.shadowColor=RARITY[l.w].c; cc.shadowBlur=l.w*5; } cc.drawImage(src,0,0); cc.shadowBlur=0; await nap(); }
+      if(tmp)tmp.width=tmp.height=0;
       const out=mk(), oc=out.getContext('2d');
-      oc.shadowColor='rgba(0,0,0,.35)'; oc.shadowOffsetY=12; oc.shadowBlur=8; oc.drawImage(comp,0,0);
+      oc.shadowColor='rgba(0,0,0,.35)'; oc.shadowOffsetY=12; oc.shadowBlur=8; oc.drawImage(comp,0,0); await nap();
       oc.shadowOffsetY=0; oc.shadowColor='rgba(0,0,0,.85)'; oc.shadowBlur=3; oc.drawImage(comp,0,0); oc.shadowBlur=0;
       comp.width=comp.height=0; c.cv=out;
-      out.toBlob(b=>{ if(!b)return; c.url=URL.createObjectURL(b); document.querySelectorAll('[data-hc]').forEach(el=>{ if(el.dataset.hc===key)swapComp(el,c); }); },'image/webp',.92);
+      base.forEach(l=>{ delete imgCache[layerSrc(l)]; });   // the merged canvas has them all now: let the iPad free the big layer pictures
+      document.querySelectorAll('[data-hc]').forEach(el=>{ if(el.dataset.hc===key)swapComp(el,c); });
     }catch(e){ c.fail=1; } };
   ims.forEach(i=>{ if(!(i.complete&&i.naturalWidth))i.addEventListener('load',go,{once:true}); }); go(); return c; }
-const compDiv=c=>`<i style="background-image:url(${c.url});background-size:${heroBgSize}"></i>`;
-function swapComp(el,c){ const top=[...el.querySelectorAll('i.epic,i.legend,i.blink,i.blaze,i.clglow')].map(i=>i.outerHTML).join(''); el.innerHTML=compDiv(c)+top; el.style.filter='none'; el.removeAttribute('data-hc'); }
-/* battle / side view: one frame of the layered sheets. bFrame moves every layer via --fx. */
+const compDiv=()=>`<canvas class="hcv" width="512" height="512"></canvas>`;
+/* draw sheet frame f of a hero sprite's merged canvas into its little canvas */
+function paintHcv(el,f){ const cv=el&&el.querySelector('canvas.hcv'), c=el&&compCache[el.dataset.hk]; if(!cv||!c||!c.cv)return; if(f==null)f=+(el.dataset.f||0); el.dataset.f=f;
+  const fs=c.cv.height/HR, g=cv.getContext('2d'); if(cv.width!==fs){ cv.width=cv.height=fs; } g.clearRect(0,0,fs,fs); g.drawImage(c.cv,(f%HC)*fs,Math.floor(f/HC)*fs,fs,fs,0,0,fs,fs); }
+function swapComp(el,c){ const top=[...el.querySelectorAll('i.epic,i.legend,i.blink,i.blaze,i.clglow')].map(i=>i.outerHTML).join(''); el.innerHTML=compDiv()+top; el.style.filter='none'; el.removeAttribute('data-hc'); el.dataset.hk=c.key; paintHcv(el); }
+/* sprites put on screen with innerHTML start blank: paint them as soon as they appear */
+new MutationObserver(ms=>{ for(const m of ms)for(const n of m.addedNodes){ if(n.nodeType!==1)continue; if(n.matches&&n.matches('[data-hk]'))paintHcv(n); n.querySelectorAll&&n.querySelectorAll('[data-hk]').forEach(e=>paintHcv(e)); } }).observe(document.documentElement,{childList:true,subtree:true});
 function heroSpr(h,cls,style,attr){ const c=heroComp(h), L=heroLayers(h), top=L.filter(l=>l.w>=3||l.blink||l.blaze||l.cl).map(l=>layerDiv(l)).join('');
-  if(c.url)return `<div ${attr||''} class="sp hsp ${cls||''}" style="--fx:0%;--fy:0%;${style||''}">${compDiv(c)}${top}</div>`;
-  return `<div ${attr||''} ${c.fail?'':`data-hc="${esc(c.key)}"`} class="sp hsp ${cls||''}" style="--fx:0%;filter:drop-shadow(0 0 1.2px rgba(0,0,0,.85)) drop-shadow(0 5px 3px rgba(0,0,0,.35));${style||''}">${L.map(l=>layerDiv(l)).join('')}</div>`; }
-/* menus: the hero facing you */
-function heroPort(h,cls,style){ return `<div class="port ${cls||''}" style="${style||''}">${heroLayers(h).map(l=>layerDiv(l,true)).join('')}</div>`; }
+  if(c.cv)return `<div ${attr||''} data-hk="${esc(c.key)}" class="sp hsp ${cls||''}" style="--fx:0%;--fy:0%;${style||''}">${compDiv()}${top}</div>`;
+  /* still merging: show the plain layers for a moment (untinted, so no extra full-size tint work) */
+  return `<div ${attr||''} ${c.fail?'':`data-hc="${esc(c.key)}"`} class="sp hsp ${cls||''}" style="--fx:0%;filter:drop-shadow(0 0 1.2px rgba(0,0,0,.85)) drop-shadow(0 5px 3px rgba(0,0,0,.35));${style||''}">${L.map(l=>layerDiv(c.fail?l:Object.assign({},l,{t:0}))).join('')}</div>`; }
+/* menus: the hero facing you. Only a turning hero (.rot) needs the 8-view strips; everything else uses the small single-view copies (p1_) */
+function heroPort(h,cls,style){ const strip=/\brot\b/.test(cls||''); return `<div class="port ${cls||''}" style="${style||''}">${heroLayers(h).map(l=>layerDiv(l,strip?true:1)).join('')}</div>`; }
+/* top layers (epic weapons, class look) with their glow baked in once: canvas shadowBlur every frame was slow on the iPad */
+const glowCache={};
+function glowSheet(src,col,blur,from){ const key=src+'|'+col+'|'+blur+(from?'|t':''); let g=glowCache[key]; if(g)return g.cv; g=glowCache[key]={}; const im=from||loadImg(src);
+  const go=()=>{ try{ const cv=document.createElement('canvas'); cv.width=im.naturalWidth||im.width; cv.height=im.naturalHeight||im.height; const c=cv.getContext('2d'); c.shadowColor=col; c.shadowBlur=blur; c.drawImage(im,0,0); g.cv=cv; }catch(e){} };
+  if(from||im.complete&&im.naturalWidth)go(); else im.addEventListener('load',go,{once:true}); return g.cv; }
 /* canvas drawing of the layered hero (exploring) */
 function drawHero(c,h,f,x,y,s,foot){ const hc=heroComp(h), L=heroLayers(h);
   const sx=f%HC, sy=Math.floor(f/HC);
   if(hc.cv){ const fs=hc.cv.height/HR; c.drawImage(hc.cv,sx*fs,sy*fs,fs,fs,x-s/2,y-s*foot,s,s); }
   const blinking=(performance.now()/1000)%4.3<.13;
-  for(const l of (hc.cv?L.filter(l=>l.w>=3||l.blink||l.blaze||l.cl):L)){ if(l.blink&&!blinking)continue; const src=layerSrc(l), col=tintCol(l.t), im=loadImg(src); if(col)tinted(src,col); const t=col?tintCache[src+'|'+col]:null, g=t&&t.cv?t.cv:im;
-    if(!im.naturalWidth)continue; const fs=im.naturalHeight/HR; if(l.w>=2){c.shadowColor=RARITY[l.w].c; c.shadowBlur=6+l.w*3} if(l.blaze){c.shadowColor='#ff7a20'; c.shadowBlur=12+6*Math.sin(performance.now()/180)} if(l.cl){c.shadowColor='#ffe8a0'; c.shadowBlur=8} c.drawImage(g,sx*fs,sy*fs,fs,fs,x-s/2,y-s*foot,s,s); c.shadowBlur=0; } }
-function preloadHero(h){ heroComp(h); heroLayers(h).forEach(l=>{ if(l.w>=3){ const src=layerSrc(l); loadImg(src); tinted(src,tintCol(l.t)); } }); }
+  for(const l of (hc.cv?L.filter(l=>l.w>=3||l.blink||l.blaze||l.cl):L)){ if(l.blink&&!blinking)continue; const src=layerSrc(l), im=loadImg(src);
+    if(!im.naturalWidth)continue; const fs=im.naturalHeight/HR;
+    const gc=l.blaze?glowSheet(src,'#ff7a20',15):l.w>=2?glowSheet(src,RARITY[l.w].c,6+l.w*3):l.cl?glowSheet(src,'#ffe8a0',8):null;
+    c.drawImage(gc||im,sx*fs,sy*fs,fs,fs,x-s/2,y-s*foot,s,s); } }
+function preloadHero(h){ heroComp(h); heroLayers(h).forEach(l=>{ if(l.w>=3||l.blaze||l.cl)loadImg(layerSrc(l)); }); }
 
 /* ---------- pets ----------
    Freed from a hunter's cage in Whispering Woods 1-3 (or the next level you play, for heroes already past it). Any hero can pick any pet.
@@ -2840,8 +2862,9 @@ function setPuff(t,x,y,sc,add){ const S=SETFX[t]; if(!S)return; const r=(a,b)=>a
 function petSpr(h,cls,style,attr){ const n=petN(h.pet.k), glow=ART.pets&&h.pet.lv>=PET_GLOW?`filter:drop-shadow(0 0 1.2px rgba(0,0,0,.85)) drop-shadow(0 0 9px ${PETS[h.pet.k].col});`:'';
   return `<div ${attr||''} class="sp hsp ${cls||''}" style="--fx:0%;${glow}${style||''}">${petLayers(h).map(l=>{ const src='img/'+l.f+'.webp', col=tintCol(l.t), u=tinted(src,col);
     return `<i ${col?`data-tk="${esc(src+'|'+col)}"`:''} style="background-image:url(${u});background-size:${n*100}% 100%;${l.w>=2?`filter:drop-shadow(0 0 ${l.w*2}px ${RARITY[l.w].c});`:''}"></i>`; }).join('')}</div>`; }
-function drawPet(c,h,f,x,y,s){ for(const l of petLayers(h)){ const src='img/'+l.f+'.webp', col=tintCol(l.t), im=loadImg(src); if(col)tinted(src,col); const t=col?tintCache[src+'|'+col]:null, g=t&&t.cv?t.cv:im;
-    if(!im.naturalWidth)continue; const fs=im.naturalHeight; c.drawImage(g,f*fs,0,fs,fs,x,y,s,s); } }
+function drawPet(c,h,f,x,y,s,glow){ for(const l of petLayers(h)){ const src='img/'+l.f+'.webp', col=tintCol(l.t), im=loadImg(src); if(col)tinted(src,col); const t=col?tintCache[src+'|'+col]:null; let g=t&&t.cv?t.cv:im;
+    if(!im.naturalWidth)continue; if(glow&&(!col||t&&t.cv))g=glowSheet(src+(col||''),glow,14,g)||g;   // glow baked once (was canvas shadowBlur every frame)
+    const fs=im.naturalHeight; c.drawImage(g,f*fs,0,fs,fs,x,y,s,s); } }
 function preloadPet(h){ if(h.pet)petLayers(h).forEach(l=>{ const src='img/'+l.f+'.webp'; loadImg(src); tinted(src,tintCol(l.t)); }); }
 </script>
 <script>
@@ -3431,14 +3454,22 @@ function vExplore(){ const st=stats(H);
     <div id="joyzone"></div><div id="joy" hidden><i></i></div>
     <div id="exover" ${EX.over?'':'hidden'}>${EX.over||''}</div></div>`; }
 function mountExplore(){ const cv=document.getElementById('ex'); if(!cv||!EX)return;
-  const fit=()=>{ const d=Math.min(2,window.devicePixelRatio||1); cv.width=Math.round(cv.clientWidth*d); cv.height=Math.round(cv.clientHeight*d); };
+  /* SPEED (session 6): the map is drawn at full sharpness; if the device can't keep up (slow frames for 2 s) it steps the
+     drawing resolution down a little (2x -> 1.6x -> 1.3x), and back up when there is room again. Kept per device in localStorage. */
+  let q=+(lsGet('hg_q')||0)||Math.min(2,window.devicePixelRatio||1);
+  const fit=()=>{ const d=Math.min(q,window.devicePixelRatio||1); cv.width=Math.round(cv.clientWidth*d); cv.height=Math.round(cv.clientHeight*d); };
   fit(); window.onresize=fit;
   const zone=document.getElementById('joyzone'), joy=document.getElementById('joy'), knob=joy.firstElementChild; let pid=null, ox=0, oy=0;
   zone.onpointerdown=e=>{ if(pid!==null||!EX||EX.busy)return; pid=e.pointerId; try{zone.setPointerCapture(pid)}catch(_){} ox=e.clientX; oy=e.clientY; joy.hidden=false; joy.style.left=(ox-60)+'px'; joy.style.top=(oy-60)+'px'; knob.style.transform=''; };
   zone.onpointermove=e=>{ if(e.pointerId!==pid||!EX)return; let dx=e.clientX-ox, dy=e.clientY-oy; const m=Math.hypot(dx,dy), R=55; if(m>R){dx*=R/m;dy*=R/m} knob.style.transform=`translate(${dx}px,${dy}px)`; EX.joy={x:m<8?0:dx/R,y:m<8?0:dy/R}; };
   zone.onpointerup=zone.onpointercancel=e=>{ if(e.pointerId!==pid)return; pid=null; joy.hidden=true; if(EX)EX.joy={x:0,y:0}; };
   cancelAnimationFrame(exRaf); let last=performance.now();
-  const loop=now=>{ if(!EX||S.screen!=='explore'||!cv.isConnected)return; const dt=Math.min(.05,(now-last)/1000); last=now; stepExplore(dt); drawExplore(cv); exRaf=requestAnimationFrame(loop); };
+  let fn=0, ft=0, slow=0;
+  const loop=now=>{ if(!EX||S.screen!=='explore'||!cv.isConnected)return; const raw=(now-last)/1000, dt=Math.min(.05,raw); last=now;
+    if(raw<.25&&!EX.busy){ fn++; ft+=raw; if(ft>2){ const avg=ft/fn, mx=Math.min(2,window.devicePixelRatio||1);
+        if(avg>1/45&&q>1.25){ q=Math.max(1.25,+(q-.35).toFixed(2)); lsSet('hg_q',q); fit(); slow=0; }
+        else if(avg<1/58&&q<mx&&++slow>=5){ q=Math.min(mx,+(q+.35).toFixed(2)); lsSet('hg_q',q); fit(); slow=0; }
+        fn=0; ft=0; } } stepExplore(dt); drawExplore(cv); exRaf=requestAnimationFrame(loop); };
   exRaf=requestAnimationFrame(loop); }
 const KEYMAP={ArrowLeft:'l',ArrowRight:'r',ArrowUp:'u',ArrowDown:'d',a:'l',d:'r',w:'u',s:'d'};
 addEventListener('keydown',e=>{ if(EX&&KEYMAP[e.key]){EX.keys[KEYMAP[e.key]]=1; e.preventDefault()} });
@@ -3570,11 +3601,11 @@ function drawExplore(cv){ const E=EX, L=E.L, T=L.T, c=cv.getContext('2d'), vh=TO
   items.push({y:L.exit.y-30,d:()=>drawGate(c,L.exit,!E.bossAlive,E.t)});
   if(L.boss&&E.bossAlive){ const W2=WORLDS[Math.floor(L.n/10)], id=(L.boss.kind==='boss'?W2.boss:W2.mini)[1], u=mobUnit(id), s=u.size*(L.boss.kind==='boss'?1.55:1.3);
     items.push({y:L.boss.y,d:()=>{ const im=loadImg(mobSheet(id)); if(!im.naturalWidth)return; circ(c,'rgba(0,0,0,.3)',L.boss.x,L.boss.y,s*.2,s*.05); const fs=im.naturalHeight, bk=1+.015*Math.sin(E.t*2.1);
-      c.shadowColor='#ff5040'; c.shadowBlur=18; c.drawImage(im,0,0,fs,fs,L.boss.x-s/2,L.boss.y-s*u.foot*bk,s,s*bk); c.shadowBlur=0; }}); }
+      c.drawImage(glowSheet(mobSheet(id),'#ff5040',18)||im,0,0,fs,fs,L.boss.x-s/2,L.boss.y-s*u.foot*bk,s,s*bk); }}); }
   if(E.cage)items.push({y:E.cage.y,d:()=>drawCage(c,E.cage,E.t)});
   if(H.pet&&H.pet.hp>0){ const tx=E.x-E.face*110, ty=E.y+18; E.px=E.px==null?tx:E.px+(tx-E.px)*.08; E.py=E.py==null?ty:E.py+(ty-E.py)*.08;
     items.push({y:E.py,d:()=>{ const im=loadImg(petSheet(H.pet.k)); if(!im.naturalWidth)return; const s=5*UNIT*.62*petScale(H), fs=im.naturalHeight, bob=E.moving?Math.abs(Math.sin(E.t*9))*(Math.round(im.naturalWidth/im.naturalHeight)>=12?4:10):0, pw=Math.round(im.naturalWidth/fs), f=E.moving?(pw>=12?8+Math.floor(E.t*9)%4:Math.floor(E.t*6)%2):0;
-      circ(c,'rgba(0,0,0,.25)',E.px,E.py,30,9); c.save(); c.translate(E.px,E.py-bob); c.scale(E.face,1); if(ART.pets&&H.pet.lv>=PET_GLOW){ c.shadowColor=PETS[H.pet.k].col; c.shadowBlur=14; } drawPet(c,H,f,-s/2,-s*.743,s); c.shadowBlur=0; c.restore(); }}); }
+      circ(c,'rgba(0,0,0,.25)',E.px,E.py,30,9); c.save(); c.translate(E.px,E.py-bob); c.scale(E.face,1); drawPet(c,H,f,-s/2,-s*.743,s,ART.pets&&H.pet.lv>=PET_GLOW?PETS[H.pet.k].col:null); c.restore(); }}); }
   if(E.ally===undefined){ E.ally=allyHero(); if(E.ally)preloadHero(E.ally); } if(E.ally){ const A=E.ally, tx=E.x-E.face*210, ty=E.y-26; E.ax=E.ax==null?tx:E.ax+(tx-E.ax)*.06; E.ay=E.ay==null?ty:E.ay+(ty-E.ay)*.06; const mv=Math.abs(tx-E.ax)+Math.abs(ty-E.ay)>14; E.af=(E.af||0)+(mv?1:0);
     items.push({y:E.ay,d:()=>{ const s=4.4*UNIT*.92; circ(c,'rgba(0,0,0,.25)',E.ax,E.ay,40,11); c.save(); c.translate(E.ax,E.ay); c.scale(E.ax<E.x?1:-1,1); drawHero(c,A,mv?WALK12[Math.floor(E.af/3)%12]:0,0,0,s,.776); c.restore(); }}); }
   items.push({y:E.y,d:()=>{ const s=4.4*UNIT*(1+rank(H)*.02); circ(c,'rgba(0,0,0,.3)',E.x,E.y,46,13);
@@ -3583,7 +3614,7 @@ function drawExplore(cv){ const E=EX, L=E.L, T=L.T, c=cv.getContext('2d'), vh=TO
       c.save(); c.translate(E.x,E.y); c.scale(E.face,br); drawHero(c,H,f,0,0,s,.776); c.restore();
       const set=E.setT===undefined?(E.setT=armourSet(H)):E.setT; if(set){ E.sp=E.sp||[]; if(Math.random()<.45)setPuff(set,E.x,E.y-s*.3,s*.45,p=>E.sp.push(Object.assign({life:0,vx:0,vy:0,rot:0,vr:0,alpha:1,grow:0},p)));   // matching armour set (session 4)
         c.save(); c.globalCompositeOperation='lighter'; E.sp=E.sp.filter(p=>{ p.life+=1/60; if(p.life>=p.max)return false; p.x+=p.vx/60; p.y+=p.vy/60; p.rot+=p.vr/60; const k=1-p.life/p.max, sz=p.size*1.6*(1+(p.grow||0)*p.life);
-          c.globalAlpha=k*(p.alpha==null?1:p.alpha); c.fillStyle=p.col; if(p.glow){c.shadowColor=p.col; c.shadowBlur=8;} else c.shadowBlur=0;
+          c.globalAlpha=k*(p.alpha==null?1:p.alpha); c.fillStyle=p.col; if(p.glow){ const a0=c.globalAlpha; c.globalAlpha=a0*.3; c.beginPath(); c.arc(p.x,p.y,sz*2.6,0,7); c.fill(); c.globalAlpha=a0; }
           if(p.shape==='shard'){ c.save(); c.translate(p.x,p.y); c.rotate(p.rot); c.fillRect(-sz,-sz*.35,sz*2,sz*.7); c.restore(); } else { c.beginPath(); c.arc(p.x,p.y,sz,0,7); c.fill(); } return true; }); c.restore(); } }});
   items.sort((a,b)=>a.y-b.y); for(const it of items)it.d();
   drawNight(c,E,cv,k,cam,camY,lights);
@@ -3675,7 +3706,7 @@ function vBattle(){ const hs=4.4*BU*(1+rank(H)*.02), multi=B.es.length>1;
 let bIdle=0;
 function mountBattle(){ clearInterval(bIdle); ambMount(B.raid?6:B.es[0].scene); battleUI();
   const set=armourSet(H); if(set)bIdle=setInterval(()=>{ const hb=$b('bh'); if(!hb||!fxMount())return; const p=fxPos(hb,.6), sc=hb.getBoundingClientRect().height*FX.d*.55; setPuff(set,p.x,p.y,sc,fxAdd); },110); }
-function bFrame(el,f,n){ if(!el)return; if(n===HN){ const q=heroFx(f); el.style.setProperty('--fx',q.x); el.style.setProperty('--fy',q.y); return; } const p=fpos(f,n); el.style.backgroundPositionX=p; el.style.setProperty('--fx',p); }
+function bFrame(el,f,n){ if(!el)return; if(n===HN){ const q=heroFx(f); el.style.setProperty('--fx',q.x); el.style.setProperty('--fy',q.y); if(el.dataset.hk)paintHcv(el,f); else el.dataset.f=f; return; } const p=fpos(f,n); el.style.backgroundPositionX=p; el.style.setProperty('--fx',p); }
 /* the hero's moves: 3 class skills + the equipped weapon's own skill (if it has one) */
 /* monsters that cast instead of running in: [spell, colour] */
 function foeSpell(id){ if(id.includes('lich')||id==='cultist')return ['hex','#b070ff']; if(id.includes('flame')||id==='fire_imp'||id==='whelp')return ['fire','#ff8a3c']; if(id==='ice_witch'||id==='eye_frost')return ['frost','#9fdcff'];
