@@ -2395,6 +2395,22 @@ button.wsk{border-color:#c07bff;box-shadow:inset 0 0 10px rgba(192,123,255,.35)}
 .petpick{max-width:min(720px,94vw);max-height:92%;overflow:auto;text-align:center}
 .petgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px} .petgrid .card{align-items:center;text-align:center;gap:2px}
 .fbar.petbar i{background:var(--moss)}
+.campsc{position:absolute;inset:0;overflow:hidden;container-type:size;background:#0b0d12}
+.campbg{position:absolute;left:42%;top:50%;width:max(122cqw,175cqh);aspect-ratio:1.6;translate:-50% -52%;background:url(img/bg_camp.webp) 0 0/100% 100%}
+.cfire{position:absolute;left:50%;top:49%;width:7%;aspect-ratio:1;translate:-50% -78%}
+.cfire .fl{position:absolute;left:50%;bottom:0;width:60%;height:90%;translate:-50% 0;border-radius:50% 50% 45% 45%/70% 70% 30% 30%;transform-origin:50% 100%;
+  background:radial-gradient(ellipse 50% 60% at 50% 75%,#fff6c0 0,#ffc640 30%,#ff7a1a 60%,rgba(255,60,10,0) 75%);mix-blend-mode:screen;animation:flick .42s ease-in-out infinite alternate}
+.cfire .f1{width:45%;height:72%;left:32%;animation-duration:.35s;animation-delay:-.2s} .cfire .f2{width:45%;height:66%;left:68%;animation-duration:.5s;animation-delay:-.1s}
+.cfire .f3{width:34%;height:110%;animation-duration:.3s;opacity:.8}
+@keyframes flick{0%{transform:scale(1,1) skewX(-4deg)}50%{transform:scale(.9,1.12) skewX(3deg)}100%{transform:scale(1.06,.92) skewX(-2deg)}}
+.cfire .em{position:absolute;left:50%;bottom:50%;width:3px;height:3px;border-radius:50%;background:#ffd070;box-shadow:0 0 6px #ff9a30;animation:ember 2.6s linear infinite}
+@keyframes ember{0%{transform:translate(0,0);opacity:0}10%{opacity:1}100%{transform:translate(var(--x),-260%) ;opacity:0}}
+.cfglow{position:absolute;left:50%;top:47%;width:42%;aspect-ratio:1.4;translate:-50% -50%;background:radial-gradient(closest-side,rgba(255,150,60,.35),rgba(255,120,40,0));mix-blend-mode:screen;animation:glowp 1.3s ease-in-out infinite alternate}
+@keyframes glowp{from{opacity:.65;scale:.96}to{opacity:1;scale:1.05}}
+.campsc .maren{position:absolute;left:5%;bottom:-2%;height:min(84%,46cqw);filter:drop-shadow(10px 0 14px rgba(255,140,60,.28)) drop-shadow(0 6px 6px rgba(0,0,0,.55));animation:breathe 3.2s ease-in-out infinite;transform-origin:50% 100%}
+.campsc .camp-talk{position:absolute;right:3%;bottom:5%;width:min(43%,520px);max-height:88%;overflow:auto;background:rgba(24,27,32,.9)}
+.campsc .camp-talk p{font-size:16px}
+@media (prefers-reduced-motion:reduce){.cfire .fl,.cfire .em,.cfglow,.campsc .maren{animation:none}}
 .story{max-width:min(580px,92vw);text-align:left;gap:10px} .story p{font-size:17px;line-height:1.45} .story h3{color:var(--gold)}
 .story-j p{font-size:14px;line-height:1.4}
 .stage canvas.amb{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:5}
@@ -3067,7 +3083,12 @@ const storySeen=id=>(H.story||[]).includes(id);
 /* plays a scene in the exploring overlay (once per hero), then calls done */
 function story(id,done,extra){ const S_=STORY[id]; if(!S_||!H||storySeen(id)||!EX){ if(done)done(); return; }
   storyCb=done||null; storyPage=0; storyId=id; EX.busy=true; EX.joy={x:0,y:0}; EX.keys={}; EX.moving=false; EX.storyExtra=extra||''; storyShow(); }
+/* Elder Maren tells the story at the camp (to-do 2): rendered camp, a crackling fire with rising embers, Maren in the foreground */
+function campScene(talk){ const fl=[0,1,2,3].map(i=>`<i class="fl f${i}"></i>`).join(''), em=[...Array(9)].map((_,i)=>`<i class="em" style="--x:${(i*37)%60-30}px;animation-delay:-${(i*.47).toFixed(2)}s"></i>`).join('');
+  return `<div class="campsc"><div class="campbg"><div class="cfglow"></div><div class="cfire">${fl}${em}</div></div><img class="maren" src="img/maren.webp" alt="Elder Maren">${talk}</div>`; }
 function storyShow(){ const S_=STORY[storyId], pg=S_.p[storyPage], last=storyPage>=S_.p.length-1;
+  if(pg[0]==='Elder Maren'){ EX.over=campScene(`<div class="panel col story camp-talk"><h3>${esc(S_.t)}</h3><b class="gold">Elder Maren</b><p>${esc(pg[1])}</p>${last&&EX.storyExtra?`<p class="dim">${EX.storyExtra}</p>`:''}
+    <div class="row" style="justify-content:space-between"><span class="small dim">${storyPage+1} / ${S_.p.length}</span><button class="go" data-act="storynext">${last?'Continue':'Next'}</button></div></div>`); render(); return; }
   EX.over=`<div class="panel col story"><h3>${esc(S_.t)}</h3>${pg[0]?`<b class="gold">${esc(pg[0])}</b>`:''}<p>${esc(pg[1])}</p>${last&&EX.storyExtra?`<p class="dim">${EX.storyExtra}</p>`:''}
     <div class="row" style="justify-content:space-between"><span class="small dim">${storyPage+1} / ${S_.p.length}</span><button class="go" data-act="storynext">${last?'Continue':'Next'}</button></div></div>`; render(); }
 function storyNext(){ const S_=STORY[storyId]; if(!S_)return; if(storyPage<S_.p.length-1){ storyPage++; storyShow(); return; }
