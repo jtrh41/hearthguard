@@ -2342,13 +2342,17 @@ button.pow .sub{color:#5a2c0c}
 @keyframes glow{from{box-shadow:0 0 4px #f2c35b}to{box-shadow:0 0 22px #ffd870}}
 .ttl{height:100%;display:grid;grid-template-rows:minmax(150px,52%) minmax(0,1fr);gap:8px;padding-inline:4px}
 .ttl .hero-stage.wide{max-height:none} .ttl .lineup{height:86%;justify-content:space-evenly;left:1%;right:1%} .ttl .lineup .port{margin:0;height:min(100cqh,23.5cqw)}
+/* 5 heroes (session 6): the paladin's long hammer reached into the wizard - nudge each one so everyone has room */
+.lineup .port.lu-knight{translate:-10% 0} .lineup .port.lu-paladin{translate:-18% 0} .lineup .port.lu-wizard{translate:14% 0} .lineup .port.lu-ranger{translate:8% 0} .lineup .port.lu-barbarian{translate:2% 0}
 .ttl-head{position:absolute;left:12px;top:8px;z-index:3;text-shadow:0 2px 4px #000} .ttl-head p{margin:0} .ttl-share{position:absolute;right:8px;top:8px;z-index:3}
 .ttl .grid2{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
 .crt{height:100%;display:grid;grid-template-rows:auto auto minmax(0,1fr);gap:8px;padding-inline:4px}
 .crt-name{display:flex;align-items:center;gap:8px;flex-wrap:wrap} .crt-name label{font-weight:800;color:var(--gold,#e8c060)} .crt-name input{flex:1;min-width:140px} .crt-name button{flex:none}
 .crt-cls{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;min-height:0}
 .crt-cls .card{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;text-align:center;gap:2px;min-height:0;padding:6px 6px 8px;overflow:hidden}
-.crt-cls .card .port{flex:1 1 auto;min-height:0;height:0;width:auto;max-width:100%}
+.crt-cls .card .port{flex:1 1 auto;min-height:0;height:0;width:100%;aspect-ratio:auto;container-type:size}
+/* the class cards got narrow with 5 classes: size the hero picture to FIT the card (keeps its shape) instead of stretching it (session 6) */
+.crt-cls .card .port>i{--w:min(150cqw,100cqh*614/758);--h:calc(var(--w)*758/614);inset:auto;width:calc(var(--w)*1.66504);height:calc(var(--h)*1.05409);left:calc((100cqw - var(--w))/2 - var(--w)*.33171);top:calc(100cqh - var(--h)*1.0277)}
 .crt-cls .card .sub{font-size:12px;line-height:1.25}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .card{display:flex;gap:10px;align-items:center;text-align:left;width:100%}
@@ -2371,7 +2375,7 @@ input[type=text]{font:inherit;color:var(--parch);background:#0c0e11;border:2px s
 .sp{background-repeat:no-repeat;aspect-ratio:1;flex:none}
 .sp.mini{width:80px;height:80px;margin:-14px -12px -6px}
 /* standing still: one pose that breathes smoothly (flipping between two poses looked choppy) */
-.sp.idle,.sp.idle8{animation:breathe 2.8s ease-in-out infinite;transform-origin:50% 78%}
+.sp.idle,.sp.idle8{animation:breathe 2.8s ease-in-out infinite;transform-origin:50% 78%;will-change:transform}
 @keyframes breathe{50%{scale:1.012 .98}}
 .scene{position:absolute;inset:0;width:100%;height:100%}
 .aura{position:absolute;z-index:0;border-radius:50%;opacity:.6;pointer-events:none}
@@ -2407,7 +2411,7 @@ input[type=text]{font:inherit;color:var(--parch);background:#0c0e11;border:2px s
 .lookbox .bigicon{display:flex;align-items:center;justify-content:center;height:100%;border:2px solid var(--line);border-radius:10px;background:#0c0e11}
 .port.mini{width:58px;margin:-6px -2px -6px 0}
 .hero-stage .port.big{position:absolute;left:50%;bottom:3%;height:92%;max-width:96%;translate:-50% 0;z-index:1}
-.port.idle{animation:breathe 2.8s ease-in-out infinite;transform-origin:50% 95%}
+.port.idle{animation:breathe 2.8s ease-in-out infinite;transform-origin:50% 95%;will-change:transform}
 .lineup{position:absolute;left:0;right:0;bottom:4%;height:64%;display:flex;justify-content:center;align-items:flex-end;container-type:size} .lineup .port{height:min(100cqh,24cqw);margin:0 -2.5%;overflow:visible}
 .ember{color:#ff9a50}
 .tabs{display:flex;gap:4px;flex-wrap:wrap} .tabs .on{border-color:var(--gold);color:var(--gold)}
@@ -2875,7 +2879,7 @@ function preloadPet(h){ if(h.pet)petLayers(h).forEach(l=>{ const src='img/'+l.f+
 const FX={cv:null,c:null,ps:[],bolts:[],raf:0,last:0};
 function fxMount(){ const st=document.getElementById('bstage'); if(!st)return null; let cv=st.querySelector('canvas.fx');
   if(!cv){ cv=document.createElement('canvas'); cv.className='fx'; st.appendChild(cv); }
-  const d=Math.min(2,window.devicePixelRatio||1), r=st.getBoundingClientRect(); cv.width=Math.round(r.width*d); cv.height=Math.round(r.height*d);
+  const d=Math.min(1.5,window.devicePixelRatio||1), r=st.getBoundingClientRect(); cv.width=Math.round(r.width*d); cv.height=Math.round(r.height*d);
   FX.cv=cv; FX.c=cv.getContext('2d'); FX.d=d; FX.r=r; return cv; }
 function fxPos(el,fy){ const r=el.getBoundingClientRect(), s=FX.r; return {x:(r.left-s.left+r.width/2)*FX.d,y:(r.top-s.top+r.height*(fy==null?.55:fy))*FX.d}; }
 function fxAdd(p){ FX.ps.push(Object.assign({vx:0,vy:0,life:0,max:.6,size:6,col:'#fff',drag:.9,grav:0,glow:1,shape:'dot',rot:0,vr:0},p)); fxRun(); }
@@ -2976,7 +2980,7 @@ function ambDraw(c,A,w,h,dt,theme,noVig){ A.t+=dt; const d=Math.min(2,window.dev
     if(A.kind==='blizzard'){ p.y+=Math.sin(p.ph*2)*.8*d; if(p.x<-20||p.y>h+10)Object.assign(p,ambNew('blizzard',w,h)); c.globalAlpha=.8; c.fillStyle='#fff'; c.beginPath(); c.arc(p.x,p.y,p.s*d,0,7); c.fill(); continue; }
     if(A.kind==='ash'){ p.x+=Math.sin(p.ph*1.1)*.6*d; if(p.y>h+10)Object.assign(p,ambNew('ash',w,h)); c.globalAlpha=p.c==='#ff8a3c'?.5+.4*Math.sin(p.ph*4):.55; c.fillStyle=p.c; c.save(); c.translate(p.x,p.y); c.rotate(p.ph); c.fillRect(-p.s*d,-p.s*.5*d,p.s*2*d,p.s*d); c.restore(); continue; }
     if(A.kind==='snow'){ p.x+=Math.sin(p.ph*1.3)*.4*d; if(p.y>h+10||p.x<-20)Object.assign(p,ambNew('snow',w,h)); c.globalAlpha=.85; c.fillStyle='#fff'; c.beginPath(); c.arc(p.x,p.y,p.s*d,0,7); c.fill(); }
-    else if(A.kind==='ember'){ p.x+=Math.sin(p.ph*2)*.5*d; if(p.y<-10)Object.assign(p,ambNew('ember',w,h)); c.globalAlpha=.55+.45*Math.sin(p.ph*5); c.fillStyle=p.c; c.shadowColor=p.c; c.shadowBlur=8*d; c.beginPath(); c.arc(p.x,p.y,p.s*d,0,7); c.fill(); c.shadowBlur=0; }
+    else if(A.kind==='ember'){ p.x+=Math.sin(p.ph*2)*.5*d; if(p.y<-10)Object.assign(p,ambNew('ember',w,h)); c.globalAlpha=.55+.45*Math.sin(p.ph*5); c.fillStyle=p.c; const a0=c.globalAlpha; c.globalAlpha=a0*.25; c.beginPath(); c.arc(p.x,p.y,p.s*d*3,0,7); c.fill(); c.globalAlpha=a0; c.beginPath(); c.arc(p.x,p.y,p.s*d,0,7); c.fill(); }
     else if(A.kind==='fog'){ if(p.x-p.s*3>w)Object.assign(p,ambNew('fog',w,h),{x:-p.s*3}); const g=c.createRadialGradient(p.x,p.y,0,p.x,p.y,p.s*3); g.addColorStop(0,'rgba(225,235,230,.16)'); g.addColorStop(1,'rgba(225,235,230,0)'); c.globalAlpha=1; c.fillStyle=g; c.fillRect(p.x-p.s*3,p.y-p.s*3,p.s*6,p.s*6); }
     else if(A.kind==='dust'){ if(p.x<0||p.x>w||p.y<0||p.y>h)Object.assign(p,ambNew('dust',w,h,true)); c.globalAlpha=.25+.2*Math.sin(p.ph*2); c.fillStyle='#ffe0b0'; c.beginPath(); c.arc(p.x,p.y,p.s*d,0,7); c.fill(); }
     else { if(p.x<-10||p.x>w+10||p.y<h*.1||p.y>h)Object.assign(p,ambNew('firefly',w,h,true)); p.vx+=(Math.random()-.5)*20*dt; p.vy+=(Math.random()-.5)*20*dt; c.globalAlpha=Math.max(0,.4+.6*Math.sin(p.ph*3)); c.fillStyle='#fff6a0'; c.shadowColor='#fff060'; c.shadowBlur=10*d; c.beginPath(); c.arc(p.x,p.y,p.s*d,0,7); c.fill(); c.shadowBlur=0; } }
@@ -2988,7 +2992,7 @@ function ambDraw(c,A,w,h,dt,theme,noVig){ A.t+=dt; const d=Math.min(2,window.dev
 const BTHEME=['woods','mines','marsh','frost','spire','camp','spire'];
 let ambRaf=0;
 function ambMount(scene){ cancelAnimationFrame(ambRaf); const st=document.getElementById('bstage'); if(!st)return; const cv=document.createElement('canvas'); cv.className='amb'; st.appendChild(cv);
-  const d=Math.min(2,window.devicePixelRatio||1), r=st.getBoundingClientRect(); cv.width=Math.round(r.width*d); cv.height=Math.round(r.height*d);
+  const d=Math.min(1.5,window.devicePixelRatio||1), r=st.getBoundingClientRect(); cv.width=Math.round(r.width*d); cv.height=Math.round(r.height*d);
   const theme=BTHEME[scene]||'woods', A=ambInit(theme,cv.width,cv.height), W2=CURWX&&CURWX.kind?ambInitK(CURWX.kind,Math.round(CURWX.n*.7),cv.width,cv.height):null, c=cv.getContext('2d'); let last=performance.now();
   const tick=now=>{ if(!cv.isConnected)return; const dt=Math.min(.05,(now-last)/1000); last=now; c.clearRect(0,0,cv.width,cv.height); ambDraw(c,A,cv.width,cv.height,dt,theme); if(W2)ambDraw(c,W2,cv.width,cv.height,dt,theme,1); ambRaf=requestAnimationFrame(tick); };
   ambRaf=requestAnimationFrame(tick); }
@@ -3628,14 +3632,14 @@ function drawCage(c,g,t){ c_=c; const x=g.x, y=g.y+20; circ(c,'rgba(0,0,0,.3)',x
   if(!g.open){ c.globalAlpha=.45+.2*Math.sin(t*3); circ(c,'#ffe080',x,y-60,44,48); c.globalAlpha=1; }
   if(prImg(g.open?'cage_open':'cage',x,y,1))return; drawCageOld(c,g,t); }
 function drawFire(c,f,t){ c_=c; const x=f.x, y=f.y+20;
-  if(prImg('campfire',x,y,1)){ const fl=1+.12*Math.sin(t*9), fl2=1+.15*Math.sin(t*13+1); c.shadowColor='#ffb040'; c.shadowBlur=30; c.globalCompositeOperation='lighter';
-    poly(c,'#ff6a1a',[x-18,y-8,x-4,y-62*fl,x+6,y-30,x+12,y-58*fl2,x+20,y-8]); poly(c,'#ffc040',[x-10,y-9,x,y-40*fl2,x+10,y-9]); c.globalCompositeOperation='source-over'; c.shadowBlur=0; return; }
+  if(prImg('campfire',x,y,1)){ const fl=1+.12*Math.sin(t*9), fl2=1+.15*Math.sin(t*13+1); c.globalCompositeOperation='lighter'; softGlow(c,x,y-34,78*fl,'255,176,64',.4);   // a soft glow instead of canvas shadowBlur (slow on the iPad)
+    poly(c,'#ff6a1a',[x-18,y-8,x-4,y-62*fl,x+6,y-30,x+12,y-58*fl2,x+20,y-8]); poly(c,'#ffc040',[x-10,y-9,x,y-40*fl2,x+10,y-9]); c.globalCompositeOperation='source-over'; return; }
   drawFireOld(c,f,t); }
 function drawChest(c,ch){ c_=c; if(prImg(ch.open?'chest_open':'chest',ch.x,ch.y+6,1))return; drawChestOld(c,ch); }
 function drawGate(c,g,open,t){ c_=c; const x=g.x, y=g.y+40, M=PROPMETA.gate, im=loadImg('img/pr_gate.webp');
   if(M&&im.naturalWidth){ const sz=M.o*UNIT*.85, L=x-sz*0.374, T=y-sz*M.fy, o=GATEOPEN, ox=L+o[0]*sz, oy=T+o[1]*sz, ow=(o[2]-o[0])*sz, oh=(o[3]-o[1])*sz;
-    circ(c,'rgba(0,0,0,.25)',x,y,sz*.4,18); c.shadowColor=open?'#7fe0ff':'#ff5040'; c.shadowBlur=30;
-    c.fillStyle=open?`rgba(140,230,255,${.6+.25*Math.sin(t*4)})`:'rgba(120,30,30,.6)'; c.beginPath(); c.moveTo(ox,oy+oh); c.lineTo(ox,oy+ow/2); c.arc(ox+ow/2,oy+ow/2,ow/2,Math.PI,0); c.lineTo(ox+ow,oy+oh); c.closePath(); c.fill(); c.shadowBlur=0;
+    circ(c,'rgba(0,0,0,.25)',x,y,sz*.4,18); c.globalCompositeOperation='lighter'; softGlow(c,ox+ow/2,oy+oh*.55,Math.max(ow,oh)*.8,open?'127,224,255':'255,80,64',.35); c.globalCompositeOperation='source-over';
+    c.fillStyle=open?`rgba(140,230,255,${.6+.25*Math.sin(t*4)})`:'rgba(120,30,30,.6)'; c.beginPath(); c.moveTo(ox,oy+oh); c.lineTo(ox,oy+ow/2); c.arc(ox+ow/2,oy+ow/2,ow/2,Math.PI,0); c.lineTo(ox+ow,oy+oh); c.closePath(); c.fill();
     c.drawImage(im,L,T,sz,sz);
     if(!open){ c.strokeStyle='#2a2f36'; c.lineWidth=6; for(let i=1;i<4;i++){ const bx=ox+ow*i/4; c.beginPath(); c.moveTo(bx,oy+oh); c.lineTo(bx,oy+ow*.25); c.stroke(); } }
     return; }
@@ -3662,6 +3666,9 @@ function drawGateOld(c,g,open,t){ const x=g.x, y=g.y+40; circ(c,'rgba(0,0,0,.25)
   poly(c,'#6b7480',[x+46,y,x+74,y,x+74,y-150,x+46,y-150]); poly(c,'#8a94a2',[x+46,y,x+58,y,x+58,y-150,x+46,y-150]);
   c.strokeStyle='#6b7480'; c.lineWidth=26; c.beginPath(); c.arc(x,y-140,60,Math.PI,0); c.stroke();
   if(!open){ c.strokeStyle='#2a2f36'; c.lineWidth=6; for(let i=-30;i<=30;i+=20){ c.beginPath(); c.moveTo(x+i,y); c.lineTo(x+i,y-150); c.stroke(); } } }
+
+/* a round soft glow (radial gradient): far cheaper than canvas shadowBlur on the iPad (session 6) */
+function softGlow(c,x,y,r,rgb,a){ const g=c.createRadialGradient(x,y,0,x,y,r); g.addColorStop(0,`rgba(${rgb},${a})`); g.addColorStop(1,`rgba(${rgb},0)`); c.fillStyle=g; c.fillRect(x-r,y-r,r*2,r*2); }
 </script>
 <script>
 "use strict";
@@ -3981,7 +3988,7 @@ function lookOverlay(){ const it=S.look&&H.bag.find(i=>i.i===S.look); if(!it)ret
     ${H.eq[it.s]===it.i?'<span class="chip" style="align-self:flex-start">you are wearing this</span>':isPetItem(it)?'':'<p class="small dim">This is how you would look wearing it.</p>'}</div></div></div>`; }
 function startLookSpin(){ clearInterval(lookSpin); const z=document.querySelector('.rotzone.look'); if(!z)return; lookSpin=setInterval(()=>{ if(!document.body.contains(z)){clearInterval(lookSpin);return} if(!rotDrag)setRa(z,(+z.dataset.ra||0)+1); },700); }
 const LINEUP=['knight','paladin','wizard','ranger','barbarian'];
-const lineup=()=>`<div class="hero-stage">${scene(5)}<div class="lineup">${LINEUP.map((k,i)=>heroPort(kit(k),'idle',`animation-delay:-${i*.3}s`)).join('')}</div></div>`;
+const lineup=()=>`<div class="hero-stage">${scene(5)}<div class="lineup">${LINEUP.map((k,i)=>heroPort(kit(k),'idle lu-'+k,`animation-delay:-${i*.3}s`)).join('')}</div></div>`;
 const page=(left,right)=>`<div class="pg">${left}<div class="scroll col">${right}</div></div>`;
 const topBar=(title,btns)=>`<div class="top"><h2>${title}</h2><span class="row">${btns||'<button class="ghost" data-act="go" data-to="camp">Camp</button>'}</span></div>`;
 
@@ -3995,7 +4002,7 @@ function vWho(){ const all=allHeroes(), ids=Object.keys(all).sort((x,y)=>(all[y]
     return `<div class="card-wrap"><button class="card" data-act="pick" data-id="${id}" ${loaded?'':'disabled'}>${heroPort(h,'mini')}
       <span class="grow"><b>${esc(h.name)}</b><span class="sub">Level ${h.lvl} ${CLASSES[h.cls].name} · ${h.cleared||0} of ${LEVELS} levels</span></span></button>${S.manage?`<button class="ghost x" data-act="askretire" data-id="${id}" aria-label="Retire ${esc(h.name)}">✕</button>`:''}</div>`; }).join('');
   /* all four heroes across a wide banner, the hero choice along the bottom (owner: the side pane only fit two of the four) */
-  return `<div class="ttl"><div class="hero-stage wide">${scene(5)}<div class="lineup">${LINEUP.map((k,i)=>heroPort(kit(k),'idle',`animation-delay:-${i*.3}s`)).join('')}</div>
+  return `<div class="ttl"><div class="hero-stage wide">${scene(5)}<div class="lineup">${LINEUP.map((k,i)=>heroPort(kit(k),'idle lu-'+k,`animation-delay:-${i*.3}s`)).join('')}</div>
     <div class="ttl-head"><h1>Hearthguard</h1><p class="dim">One family. One guild. A realm that needs saving.</p></div>${window.HG_CLOUD&&loaded?'<button class="ghost ttl-share" data-act="go" data-to="share">Share the game</button>':''}</div>
     <div class="scroll col"><div class="panel col"><div class="top"><h3>Choose a hero</h3>${ids.length?`<button class="ghost" data-act="manage">${S.manage?'Done':'Retire a hero'}</button>`:''}</div>${loaded?'':'<p class="dim small">Reaching the guild hall…</p>'}
     <div class="grid2">${rows}<button class="card newhero" data-act="newhero" ${loaded&&!full?'':'disabled'}><span class="plus">+</span><span class="grow"><b>New hero</b><span class="sub">${full?'The guild is full ('+MAXHEROES+' heroes)':'Pick a class and give them a name'}</span></span></button></div>
