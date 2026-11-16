@@ -2381,9 +2381,9 @@ input[type=text]{font:inherit;color:var(--parch);background:#0c0e11;border:2px s
 .aura{position:absolute;z-index:0;border-radius:50%;opacity:.6;pointer-events:none}
 .hero-stage{position:relative;height:100%;max-height:430px;min-height:0;border:2px solid var(--line);border-radius:10px;overflow:hidden}
 .hsp>i{position:absolute;inset:0;background-repeat:no-repeat;background-position:var(--fx) var(--fy,0%)}
-.port{position:relative;aspect-ratio:614/758;flex:none;overflow:hidden} .port>i{position:absolute;inset:0;background-repeat:no-repeat}
+.port{position:relative;aspect-ratio:614/758;flex:none;overflow:hidden} .port>i{position:absolute;inset:0;background-repeat:no-repeat;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat}
 /* hero portraits are strips of 8 views (session 5). The box is the old picture; each view is wider so a turned weapon can hang outside it (only where .rot lets it show) */
-.port>i.pl{inset:auto;left:-33.171%;top:-2.770%;width:166.504%;height:105.409%;background-size:800% 100%;background-position:calc(var(--ra,0) * 100% / 7) 0}
+.port>i.pl{inset:auto;left:-33.171%;top:-2.770%;width:166.504%;height:105.409%;background-size:800% 100%;background-position:calc(var(--ra,0) * 100% / 7) 0} .port>i.pl.tm{-webkit-mask-size:800% 100%;mask-size:800% 100%;-webkit-mask-position:calc(var(--ra,0) * 100% / 7) 0;mask-position:calc(var(--ra,0) * 100% / 7) 0}
 .port.rot{overflow:visible} .rotzone{touch-action:none;cursor:grab} .rothint{position:absolute;right:8px;top:8px;z-index:3;font-size:12px;font-weight:800;color:var(--parch);background:rgba(12,14,17,.7);border:1px solid var(--line);border-radius:99px;padding:3px 10px;pointer-events:none}
 .tal{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px;align-items:start} .tal .col{gap:6px}
 .talc.got{border-color:#8a6a1e} .talc.locked{opacity:.55} .talc.cap{border-color:var(--gold)} .pips{display:inline-flex;gap:3px} .pips i{width:9px;height:9px;border-radius:50%;background:#0c0e11;border:1px solid var(--line)} .pips i.on{background:var(--gold);border-color:#fff0b0}
@@ -2439,7 +2439,7 @@ button.wsk{border-color:#c07bff;box-shadow:inset 0 0 10px rgba(192,123,255,.35)}
 @keyframes enragep{to{filter:drop-shadow(0 0 1.2px rgba(0,0,0,.85)) drop-shadow(0 0 26px var(--ec)) saturate(1.5) contrast(1.12) brightness(1.08)}}
 .hsp>i.blaze:not(.pulse){filter:drop-shadow(0 0 4px #ffb040) brightness(1.05)}
 .hsp>i.clglow:not(.pulse){filter:drop-shadow(0 0 2px #ffe8a0)}
-.icon{position:relative;flex:none;border-radius:10px;overflow:hidden;display:inline-block} .icon>i{position:absolute;inset:0;background-repeat:no-repeat;filter:drop-shadow(0 2px 2px rgba(0,0,0,.6))}
+.icon{position:relative;flex:none;border-radius:10px;overflow:hidden;display:inline-block} .icon>i{position:absolute;inset:0;background-repeat:no-repeat;filter:drop-shadow(0 2px 2px rgba(0,0,0,.6))} .icon>b.tws{position:absolute;inset:0;filter:drop-shadow(0 2px 2px rgba(0,0,0,.6))} .tws>i{position:absolute;inset:0;background-repeat:no-repeat;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat}
 .campsc{position:absolute;inset:0;overflow:hidden;container-type:size;background:#0b0d12}
 .campbg{position:absolute;left:42%;top:50%;width:max(122cqw,175cqh);aspect-ratio:1.6;translate:-50% -52%;background:url(img/bg_camp.webp) 0 0/100% 100%}
 .cfire{position:absolute;left:50%;top:49%;width:7%;aspect-ratio:1;translate:-50% -78%}
@@ -2473,7 +2473,7 @@ button.wsk{border-color:#c07bff;box-shadow:inset 0 0 10px rgba(192,123,255,.35)}
 @keyframes slam{from{transform:scale(3);opacity:0}to{transform:scale(1);opacity:1}} @keyframes fadeup{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 /* SPEED (session 6): glows pulse by opacity only (a still glow copy of the layer); animating filter itself lagged on the iPad */
 .hsp>i.pulse{opacity:0;will-change:opacity;animation:pulsep 2.4s ease-in-out infinite alternate} .hsp>i.pulse.legend{animation-duration:1.8s} .hsp>i.pulse.blaze{animation-duration:1.1s} .hsp>i.pulse.clglow{animation-duration:2.2s} @keyframes pulsep{to{opacity:1}}
-.hsp>canvas.hcv{position:absolute;inset:0;width:100%;height:100%} .port>i.pl1{inset:auto;left:-33.171%;top:-2.770%;width:166.504%;height:105.409%;background-size:100% 100%}
+.hsp>canvas.hcv{position:absolute;inset:0;width:100%;height:100%} .port>i.pl1{inset:auto;left:-33.171%;top:-2.770%;width:166.504%;height:105.409%;background-size:100% 100%;-webkit-mask-size:100% 100%;mask-size:100% 100%}
 
 .item.r3{box-shadow:0 3px 0 #08090b,0 0 14px rgba(192,123,255,.35)} .item.r4{animation:itemleg 2.2s ease-in-out infinite}
 @keyframes itemleg{0%,100%{box-shadow:0 3px 0 #08090b,0 0 10px rgba(255,176,64,.35)}50%{box-shadow:0 3px 0 #08090b,0 0 22px rgba(255,216,112,.7)}}
@@ -2728,7 +2728,12 @@ function tinted(src,col){ if(!col)return src; const key=src+'|'+col; let t=tintC
 const PW=1024, PH=799;   // one view of a p_ strip (8 views side by side)
 function layerSrc(l,portrait){ return 'img/'+(portrait===1?'p1_':portrait?'p_':'')+l.f+'.webp'; }   // portrait: true = 8-view strip, 1 = view 0 only
 const tintCol=t=>(TINTS[t]||TINTS[0]).c;
-function layerDiv(l,portrait){ const src=layerSrc(l,portrait), col=tintCol(l.t), u=tinted(src,col);
+/* SPEED (session 6): menu pictures are tinted by the graphics chip (multiply blend + the picture as its own mask) instead of
+   painting a tinted copy on a canvas and encoding it (slow on the iPad, and it happened for every armour piece and colour). */
+const cssTint=(src,col)=>`background-image:url(${src});background-color:${col};background-blend-mode:multiply;-webkit-mask-image:url(${src});mask-image:url(${src});`;
+function layerDiv(l,portrait){ const src=layerSrc(l,portrait), col=tintCol(l.t);
+  if(portrait&&col){ const kl=(l.blink?'blink':'')+(portrait===1?' pl1':' pl'); return `<i class="${kl.trim()} tm" style="${cssTint(src,col)}"></i>`; }
+  const u=tinted(src,col);
   const glow=l.w>=2?`filter:drop-shadow(0 0 ${l.w*2}px ${RARITY[l.w].c});`:'';
   const kl=(l.blink?'blink':l.blaze?'blaze':l.cl?'clglow':l.w>=4?'legend':l.w>=3?'epic':'')+(portrait===1?' pl1':portrait?' pl':'');
   /* portraits (session 5): each p_ picture is a strip of 8 views, 45 degrees apart (frame 0 = the old menu picture); --ra on the .port picks the view */
@@ -2741,15 +2746,17 @@ const PULSE={epic:'drop-shadow(0 0 9px #c07bff)',legend:'drop-shadow(0 0 16px #f
 /* an item's picture for the bag and the Forge: the piece cut out of its front-facing picture, in its tint, on a rarity-coloured tile */
 function itemIcon(it,size){ size=size||58;
   if(isPetItem(it)){ const pk=(H&&H.pet?H.pet.k:'wolf')+(H&&H.pet?petForm(H):''), f='pt_'+pk+'_'+it.s.slice(1), b=ICONBOX['s_'+f], rc=RARITY[it.r].c, tile=`width:${size}px;height:${size}px;background:radial-gradient(circle at 50% 45%,${rc}55,#0c0e11 72%);border:2px solid ${rc}aa`;
-    if(!b)return `<span class="icon" style="${tile}"></span>`; const src='img/f0_'+f+'.webp', col=it.s==='pcharm'?null:tintCol(it.t), u=tinted(src,col), k=size*.84/Math.max((b[2]-b[0])*512,(b[3]-b[1])*512), ox=size/2-(b[0]+b[2])/2*512*k, oy=size/2-(b[1]+b[3])/2*512*k;
-    return `<span class="icon" style="${tile}"><i ${col?`data-tk="${esc(src+'|'+col)}"`:''} style="background-image:url(${u});background-size:${(512*k).toFixed(1)}px ${(512*k).toFixed(1)}px;background-position:${ox.toFixed(1)}px ${oy.toFixed(1)}px"></i></span>`; }
+    if(!b)return `<span class="icon" style="${tile}"></span>`; const src='img/f0_'+f+'.webp', col=it.s==='pcharm'?null:tintCol(it.t), k=size*.84/Math.max((b[2]-b[0])*512,(b[3]-b[1])*512), ox=size/2-(b[0]+b[2])/2*512*k, oy=size/2-(b[1]+b[3])/2*512*k;
+    const geo=`background-size:${(512*k).toFixed(1)}px ${(512*k).toFixed(1)}px;background-position:${ox.toFixed(1)}px ${oy.toFixed(1)}px;`;
+    return `<span class="icon" style="${tile}">${col?`<b class="tws"><i style="${cssTint(src,col)}${geo}${geo.replace(/background/g,'-webkit-mask')}${geo.replace(/background/g,'mask')}"></i></b>`:`<i style="background-image:url(${src});${geo}"></i>`}</span>`; }
   const f=it.s==='weapon'?'hw_'+it.k+weaponTier(it):'hl_'+H.cls+'_'+heroGrip(H)+'_'+armourLayer(H,it,it.s); let b=ICONBOX[f];
   const rc=RARITY[it.r].c, tile=`width:${size}px;height:${size}px;background:radial-gradient(circle at 50% 45%,${rc}55,#0c0e11 72%);border:2px solid ${rc}aa`;
   if(!b)return `<span class="icon" style="${tile}"></span>`;
   const side=it.s==='cloak'&&ICONBOX['s_'+f]; if(side)b=side;   // a cloak hides behind the hero from the front: show it from the side (sheet frame 0)
-  const src=side?'img/f0_'+f+'.webp':'img/p1_'+f+'.webp', col=it.s==='weapon'?null:tintCol(it.t), u=tinted(src,col), W=side?512:PW, Hh=side?512:PH, bw=(b[2]-b[0])*W, bh=(b[3]-b[1])*Hh, k=size*.84/Math.max(bw,bh);
+  const src=side?'img/f0_'+f+'.webp':'img/p1_'+f+'.webp', col=it.s==='weapon'?null:tintCol(it.t), W=side?512:PW, Hh=side?512:PH, bw=(b[2]-b[0])*W, bh=(b[3]-b[1])*Hh, k=size*.84/Math.max(bw,bh);
   const ox=size/2-(b[0]+b[2])/2*W*k, oy=size/2-(b[1]+b[3])/2*Hh*k;
-  return `<span class="icon" style="${tile}"><i ${col?`data-tk="${esc(src+'|'+col)}"`:''} style="background-image:url(${u});background-size:${(W*k).toFixed(1)}px ${(Hh*k).toFixed(1)}px;background-position:${ox.toFixed(1)}px ${oy.toFixed(1)}px"></i></span>`; }
+  const geo=`background-size:${(W*k).toFixed(1)}px ${(Hh*k).toFixed(1)}px;background-position:${ox.toFixed(1)}px ${oy.toFixed(1)}px;`;
+  return `<span class="icon" style="${tile}">${col?`<b class="tws"><i style="${cssTint(src,col)}${geo}${geo.replace(/background/g,'-webkit-mask')}${geo.replace(/background/g,'mask')}"></i></b>`:`<i style="background-image:url(${src});${geo}"></i>`}</span>`; }
 /* battle / side view: one frame of the layered sheets. bFrame moves every layer via --fx. */
 /* SPEED: all of a hero's layers (tinted, weapon glow and outline/shadow baked in) are merged ONCE into one sheet per look.
    Stacking 5-7 huge see-through sheets with live CSS shadow filters made attacks lag on the iPad once gear (a helmet) was added.
@@ -2788,7 +2795,7 @@ function heroSpr(h,cls,style,attr){ const c=heroComp(h), L=heroLayers(h), top=L.
   /* still merging: show the plain layers for a moment (untinted, so no extra full-size tint work) */
   return `<div ${attr||''} ${c.fail?'':`data-hc="${esc(c.key)}"`} class="sp hsp ${cls||''}" style="--fx:0%;filter:drop-shadow(0 0 1.2px rgba(0,0,0,.85)) drop-shadow(0 5px 3px rgba(0,0,0,.35));${style||''}">${L.map(l=>layerDiv(c.fail?l:Object.assign({},l,{t:0}))).join('')}</div>`; }
 /* menus: the hero facing you. Only a turning hero (.rot) needs the 8-view strips; everything else uses the small single-view copies (p1_) */
-function heroPort(h,cls,style){ const strip=/\brot\b/.test(cls||''); return `<div class="port ${cls||''}" style="${style||''}">${heroLayers(h).map(l=>layerDiv(l,strip?true:1)).join('')}</div>`; }
+function heroPort(h,cls,style){ const strip=/\brot\b/.test(cls||'')&&!/\bone\b/.test(cls||''); return `<div class="port ${cls||''}" style="${style||''}">${heroLayers(h).map(l=>layerDiv(l,strip?true:1)).join('')}</div>`; }
 /* top layers (epic weapons, class look) with their glow baked in once: canvas shadowBlur every frame was slow on the iPad */
 const glowCache={};
 function glowSheet(src,col,blur,from){ const key=src+'|'+col+'|'+blur+(from?'|t':''); let g=glowCache[key]; if(g)return g.cv; g=glowCache[key]={}; const im=from||loadImg(src);
@@ -3966,12 +3973,14 @@ const bar=(v,m,cls)=>`<div class="bar ${cls||''}"><i style="width:${Math.max(0,M
 const kits={};
 const kit=cls=>{ if(!kits[cls]){ const h={cls,lvl:1}; starterKit(h,1,null,1,true,true); kits[cls]=h; } return kits[cls]; };
 /* left pane: the hero facing you, wearing exactly what they have on */
-const heroPane=(h,rot)=>rot?`<div class="hero-stage rotzone" data-ra="${S.ra||0}">${scene(5)}${aura(h,'left:28%;right:28%;bottom:2%;height:16%')}${heroPort(h,'big idle rot',`--ra:${S.ra||0}`)}${h.pet?petImg(h.pet.k,'side idle'):''}<div class="rothint">◀ drag to turn ▶</div></div>`
+const heroPane=(h,rot)=>rot?`<div class="hero-stage rotzone" data-ra="${S.ra||0}">${scene(5)}${aura(h,'left:28%;right:28%;bottom:2%;height:16%')}${heroPort(h,'big idle rot'+(S.turned?'':' one'),`--ra:${S.ra||0}`)}${h.pet?petImg(h.pet.k,'side idle'):''}<div class="rothint">◀ drag to turn ▶</div></div>`
   :`<div class="hero-stage">${scene(5)}${aura(h,'left:28%;right:28%;bottom:2%;height:16%')}${heroPort(h,'big idle')}${h.pet?petImg(h.pet.k,'side idle'):''}</div>`;
 /* turning the hero round (session 5): drag sideways over a .rotzone; 8 views, 45 degrees apart */
 function setRa(z,a){ a=((a%8)+8)%8; z.dataset.ra=a; if(!z.classList.contains('look'))S.ra=a; z.querySelectorAll('.port.rot').forEach(p=>p.style.setProperty('--ra',a)); }
 let rotDrag=null, lookSpin=0;
-app.addEventListener('pointerdown',ev=>{ const z=ev.target.closest('.rotzone'); if(!z||ev.target.closest('button'))return; rotDrag={x:ev.clientX,a:+z.dataset.ra||0,z,moved:0}; z.style.cursor='grabbing'; clearInterval(lookSpin); });
+app.addEventListener('pointerdown',ev=>{ const z=ev.target.closest('.rotzone'); if(!z||ev.target.closest('button'))return; const one=z.querySelector('.port.rot.one'); if(one&&H&&!one.dataset.wait){ one.dataset.wait=1;   // fetch the 8 views, swap them in once they are ready (no blank moment)
+    const ims=heroLayers(H).map(l=>loadImg(layerSrc(l,true))); Promise.all(ims.map(i=>i.decode?i.decode().catch(()=>{}):0)).then(()=>{ if(!one.isConnected)return; S.turned=1; one.outerHTML=heroPort(H,'big idle rot',`--ra:${z.dataset.ra||S.ra||0}`); }); }   // load the 8 views only once you start turning (session 6)
+  rotDrag={x:ev.clientX,a:+z.dataset.ra||0,z,moved:0}; z.style.cursor='grabbing'; clearInterval(lookSpin); });
 addEventListener('pointermove',ev=>{ if(!rotDrag)return; const d=ev.clientX-rotDrag.x, step=Math.max(28,rotDrag.z.clientWidth/14); rotDrag.moved=Math.max(rotDrag.moved,Math.abs(d)); setRa(rotDrag.z,rotDrag.a-Math.round(d/step)); });
 addEventListener('pointerup',()=>{ if(rotDrag)rotDrag.z.style.cursor=''; rotDrag=null; }); addEventListener('pointercancel',()=>{ rotDrag=null; });
 /* inspect a piece of gear (session 5): your hero wearing it, turning slowly (drag to turn yourself), with its numbers */
