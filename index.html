@@ -2340,6 +2340,16 @@ button.go .sub{color:#c5d8f5}
 button.pow{grid-column:1/-1;background:linear-gradient(#f2c35b,#e08a2a);border-color:#fff0b0;color:#3a1c08;animation:glow 1s infinite alternate}
 button.pow .sub{color:#5a2c0c}
 @keyframes glow{from{box-shadow:0 0 4px #f2c35b}to{box-shadow:0 0 22px #ffd870}}
+.ttl{height:100%;display:grid;grid-template-rows:minmax(150px,52%) minmax(0,1fr);gap:8px;padding-inline:4px}
+.ttl .hero-stage.wide{max-height:none} .ttl .lineup{height:86%;justify-content:space-evenly;left:16%;right:2%} .ttl .lineup .port{margin:0}
+.ttl-head{position:absolute;left:12px;top:8px;z-index:3;text-shadow:0 2px 4px #000} .ttl-head p{margin:0} .ttl-share{position:absolute;right:8px;top:8px;z-index:3}
+.ttl .grid2{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+.crt{height:100%;display:grid;grid-template-rows:auto auto minmax(0,1fr);gap:8px;padding-inline:4px}
+.crt-name{display:flex;align-items:center;gap:8px;flex-wrap:wrap} .crt-name label{font-weight:800;color:var(--gold,#e8c060)} .crt-name input{flex:1;min-width:140px} .crt-name button{flex:none}
+.crt-cls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;min-height:0}
+.crt-cls .card{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;text-align:center;gap:2px;min-height:0;padding:6px 6px 8px;overflow:hidden}
+.crt-cls .card .port{flex:1 1 auto;min-height:0;height:0;width:auto;max-width:100%}
+.crt-cls .card .sub{font-size:12px;line-height:1.25}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .card{display:flex;gap:10px;align-items:center;text-align:left;width:100%}
 .locked{opacity:.5}
@@ -2612,13 +2622,42 @@ function layerDiv(l,portrait){ const src=layerSrc(l,portrait), col=tintCol(l.t),
   const glow=l.w>=2?`filter:drop-shadow(0 0 ${l.w*2}px ${RARITY[l.w].c});`:'';
   return `<i ${l.w>=4?'class="legend" ':l.w>=3?'class="epic" ':''}${col?`data-tk="${esc(src+'|'+col)}"`:''} style="background-image:url(${u});${portrait?'background-size:100% 100%':'background-size:'+HN*100+'% 100%'};${glow}"></i>`; }
 /* battle / side view: one frame of the layered sheets. bFrame moves every layer via --fx. */
-function heroSpr(h,cls,style,attr){ return `<div ${attr||''} class="sp hsp ${cls||''}" style="--fx:0%;filter:drop-shadow(0 0 1.2px rgba(0,0,0,.85)) drop-shadow(0 5px 3px rgba(0,0,0,.35));${style||''}">${heroLayers(h).map(l=>layerDiv(l)).join('')}</div>`; }
+/* SPEED: all of a hero's layers (tinted, weapon glow and outline/shadow baked in) are merged ONCE into one sheet per look.
+   Stacking 5-7 huge see-through sheets with live CSS shadow filters made attacks lag on the iPad once gear (a helmet) was added.
+   Epic/legendary weapons stay their own layer so their glow can still pulse. */
+const compCache={};
+function heroComp(h){ const L=heroLayers(h), base=L.filter(l=>!(l.w>=3)), key=base.map(l=>l.f+':'+l.t+':'+(l.w||0)).join('|');
+  let c=compCache[key]; if(c)return c; c=compCache[key]={key};
+  const ims=base.map(l=>loadImg(layerSrc(l)));
+  const go=()=>{ if(c.busy||c.cv||!ims.every(i=>i.complete&&i.naturalWidth))return; c.busy=1;
+    try{ const W=ims[0].naturalWidth, Hh=ims[0].naturalHeight, mk=()=>{const v=document.createElement('canvas'); v.width=W; v.height=Hh; return v;};
+      const comp=mk(), cc=comp.getContext('2d'), tmp=mk(), tc=tmp.getContext('2d');
+      base.forEach((l,i)=>{ const im=ims[i], col=tintCol(l.t); let src=im;
+        if(col){ tc.globalCompositeOperation='source-over'; tc.clearRect(0,0,W,Hh); tc.drawImage(im,0,0); tc.globalCompositeOperation='multiply'; tc.fillStyle=col; tc.fillRect(0,0,W,Hh);
+          tc.globalCompositeOperation='destination-in'; tc.drawImage(im,0,0); src=tmp; }
+        if(l.w>=2){ cc.shadowColor=RARITY[l.w].c; cc.shadowBlur=l.w*5; } cc.drawImage(src,0,0); cc.shadowBlur=0; });
+      tmp.width=tmp.height=0;
+      const out=mk(), oc=out.getContext('2d');
+      oc.shadowColor='rgba(0,0,0,.35)'; oc.shadowOffsetY=12; oc.shadowBlur=8; oc.drawImage(comp,0,0);
+      oc.shadowOffsetY=0; oc.shadowColor='rgba(0,0,0,.85)'; oc.shadowBlur=3; oc.drawImage(comp,0,0); oc.shadowBlur=0;
+      comp.width=comp.height=0; c.cv=out;
+      out.toBlob(b=>{ if(!b)return; c.url=URL.createObjectURL(b); document.querySelectorAll('[data-hc]').forEach(el=>{ if(el.dataset.hc===key)swapComp(el,c); }); },'image/webp',.92);
+    }catch(e){ c.fail=1; } };
+  ims.forEach(i=>{ if(!(i.complete&&i.naturalWidth))i.addEventListener('load',go,{once:true}); }); go(); return c; }
+const compDiv=c=>`<i style="background-image:url(${c.url});background-size:${HN*100}% 100%"></i>`;
+function swapComp(el,c){ const top=[...el.querySelectorAll('i.epic,i.legend')].map(i=>i.outerHTML).join(''); el.innerHTML=compDiv(c)+top; el.style.filter='none'; el.removeAttribute('data-hc'); }
+/* battle / side view: one frame of the layered sheets. bFrame moves every layer via --fx. */
+function heroSpr(h,cls,style,attr){ const c=heroComp(h), L=heroLayers(h), top=L.filter(l=>l.w>=3).map(l=>layerDiv(l)).join('');
+  if(c.url)return `<div ${attr||''} class="sp hsp ${cls||''}" style="--fx:0%;${style||''}">${compDiv(c)}${top}</div>`;
+  return `<div ${attr||''} ${c.fail?'':`data-hc="${esc(c.key)}"`} class="sp hsp ${cls||''}" style="--fx:0%;filter:drop-shadow(0 0 1.2px rgba(0,0,0,.85)) drop-shadow(0 5px 3px rgba(0,0,0,.35));${style||''}">${L.map(l=>layerDiv(l)).join('')}</div>`; }
 /* menus: the hero facing you */
 function heroPort(h,cls,style){ return `<div class="port ${cls||''}" style="${style||''}">${heroLayers(h).map(l=>layerDiv(l,true)).join('')}</div>`; }
 /* canvas drawing of the layered hero (exploring) */
-function drawHero(c,h,f,x,y,s,foot){ for(const l of heroLayers(h)){ const src=layerSrc(l), col=tintCol(l.t), im=loadImg(src); if(col)tinted(src,col); const t=col?tintCache[src+'|'+col]:null, g=t&&t.cv?t.cv:im;
+function drawHero(c,h,f,x,y,s,foot){ const hc=heroComp(h), L=heroLayers(h);
+  if(hc.cv){ const fs=hc.cv.height; c.drawImage(hc.cv,f*fs,0,fs,fs,x-s/2,y-s*foot,s,s); }
+  for(const l of (hc.cv?L.filter(l=>l.w>=3):L)){ const src=layerSrc(l), col=tintCol(l.t), im=loadImg(src); if(col)tinted(src,col); const t=col?tintCache[src+'|'+col]:null, g=t&&t.cv?t.cv:im;
     if(!im.naturalWidth)continue; const fs=im.naturalHeight; if(l.w>=2){c.shadowColor=RARITY[l.w].c; c.shadowBlur=6+l.w*3} c.drawImage(g,f*fs,0,fs,fs,x-s/2,y-s*foot,s,s); c.shadowBlur=0; } }
-function preloadHero(h){ heroLayers(h).forEach(l=>{ const src=layerSrc(l); loadImg(src); tinted(src,tintCol(l.t)); }); }
+function preloadHero(h){ heroComp(h); heroLayers(h).forEach(l=>{ if(l.w>=3){ const src=layerSrc(l); loadImg(src); tinted(src,tintCol(l.t)); } }); }
 
 /* ---------- pets ----------
    Freed from a hunter's cage in Whispering Woods 1-3 (or the next level you play, for heroes already past it). Any hero can pick any pet.
@@ -2807,19 +2846,21 @@ const need=l=>30+l*l*12;   // slower levelling (owner, 2026-11-15); max level 10
 const expLv=n=>Math.round(.9*n+1);
 /* what gear a hero at level n is expected to wear: all five pieces, mostly common/uncommon, found near level n and upgraded about 3 times */
 const gearAt=n=>{ const L=expLv(n), p=L*1.5; return {atk:1.2*p+2+.4*L,hp:7.5*p+14+2.2*L,def:.38*p}; };
-const lvHp=n=>Math.round(5.5*(6+2.2*expLv(n)+gearAt(n).atk)*(1+n*.01));   // +20% for pets helping (2026-11-15)
-const lvAtk=n=>(40+12*expLv(n)+gearAt(n).hp)/7+gearAt(n).def;
-const lvXp=n=>Math.round(need(expLv(n))/18), lvGold=n=>Math.round(6*Math.pow(1.09,n)*(1+n/10));
+/* EASIER (owner, 2026-11-15 session 3: 'the game is now too hard'): monsters have about 30% less health and hit about 30% softer, bosses less tanky, 40% more XP */
+const EASE={hp:.7,atk:.7,xp:1.4};
+const lvHp=n=>Math.round(EASE.hp*5.5*(6+2.2*expLv(n)+gearAt(n).atk)*(1+n*.01));   // +20% for pets helping (2026-11-15)
+const lvAtk=n=>EASE.atk*((40+12*expLv(n)+gearAt(n).hp)/7+gearAt(n).def);
+const lvXp=n=>Math.round(EASE.xp*need(expLv(n))/18), lvGold=n=>Math.round(6*Math.pow(1.09,n)*(1+n/10));
 const levelName=n=>WORLDS[Math.floor(n/10)].n+' '+(Math.floor(n/10)+1)+'-'+(n%10+1);
 const levelBoss=n=>n%10===9?'boss':n%10===4?'mini':null;
 function makeFoe(n,kind){ const W=WORLDS[Math.floor(n/10)], m=kind==='boss'?W.boss:kind==='mini'?W.mini:W.mobs[Math.floor(Math.random()*W.mobs.length)];
-  const hm=kind==='boss'?4.2:kind==='mini'?3:rnd(.9,1.15), am=kind==='boss'?1.55:kind==='mini'?1.35:1, hp=Math.round(lvHp(n)*hm);
+  const hm=kind==='boss'?3.4:kind==='mini'?2.5:rnd(.9,1.1), am=kind==='boss'?1.4:kind==='mini'?1.25:1, hp=Math.round(lvHp(n)*hm);
   return {n:m[0],id:m[1],hp,max:hp,atk:lvAtk(n)*am,kind,big:kind!=='mob',xp:lvXp(n)*(kind==='boss'?5:kind==='mini'?3:1),gold:lvGold(n)*(kind==='boss'?7:kind==='mini'?4:1),scene:Math.floor(n/10),lv:n}; }
 /* a chest that bites (found among chests from level 1-4 on). Always drops gear. */
 function makeMimic(n){ const f=makeFoe(n,'mob'); return Object.assign(f,{n:'Mimic',id:'mimic',hp:Math.round(f.hp*1.6),max:Math.round(f.hp*1.6),atk:f.atk*1.25,xp:f.xp*2,gold:f.gold*3}); }
 /* A fight: one monster, or a group. Groups get likelier each world; bosses bring minions from world 2 on. Group members are a bit weaker one by one. */
 function makeFoes(n,kind){ const w=Math.floor(n/10), out=[makeFoe(n,kind)]; let extra=0;
-  if(kind==='mob'){ if(n>=2){ const r=Math.random(); extra=r<(w>=2?.08*w:0)?2:r<.3+.08*w?1:0; } }
+  if(kind==='mob'){ if(n>=2){ const r=Math.random(); extra=r<(w>=2?.05*w:0)?2:r<.2+.06*w?1:0; } }
   else extra=kind==='boss'?(w?2:1):(w?1:0);
   const sc=(f,h,a,x)=>{f.hp=f.max=Math.max(1,Math.round(f.hp*h)); f.atk*=a; f.xp=Math.round(f.xp*x); f.gold=Math.round(f.gold*x); return f};
   if(kind==='mob'&&extra)sc(out[0],.75,.7,.8);
@@ -3203,6 +3244,34 @@ function drawMini(c,E,W,H2){ const L=E.L, span=56, cw=Math.min(9,W*.26/span), w=
   L.chests.forEach(ch=>{ if(!ch.open)dot(ch.x,ch.y,'#f2c35b',cw*.45) }); L.fires.forEach(f=>dot(f.x,f.y,'#ff8a3c',cw*.5));
   if(L.boss&&E.bossAlive)dot(L.boss.x,L.boss.y,'#ff4a3a',cw*.6); dot(L.exit.x,L.exit.y,'#7fe0ff',cw*.6); dot(E.x,E.y,'#ffffff',cw*.6);
   c.restore(); }
+/* ---------- ground textures (to-do 1): grass, dirt paths, cave stone, marsh mud, snow, spire cobbles. One 256 px tile per theme, made once. ---------- */
+const TEXC={};
+function groundTex(T,kind){ const key=T.ground+kind; if(TEXC[key])return TEXC[key];
+  const S2=256, cv=document.createElement('canvas'); cv.width=cv.height=S2; const c=cv.getContext('2d'), R=seeded(kind==='path'?77:33), th=Object.keys(THEMES).find(k=>THEMES[k]===T)||'woods';
+  const base=kind==='path'?T.path:T.ground, sh=(col,a)=>{ c.globalAlpha=a; c.fillStyle=col; };
+  const wrap=(f)=>{ for(const dx of [-S2,0,S2])for(const dy of [-S2,0,S2]){ c.save(); c.translate(dx,dy); f(); c.restore(); } };
+  const blob=(x,y,rx,ry,col,a)=>wrap(()=>{ sh(col,a); c.beginPath(); c.ellipse(x,y,rx,ry,0,0,7); c.fill(); });
+  c.fillStyle=base; c.fillRect(0,0,S2,S2);
+  for(let i=0;i<26;i++)blob(R()*S2,R()*S2,20+R()*40,12+R()*26,R()<.5?'#000':'#fff',.035+R()*.03);   // soft light/dark patches
+  for(let i=0;i<500;i++){ sh(R()<.5?'#000':'#fff',.06+R()*.08); c.fillRect(R()*S2,R()*S2,1.5+R()*2,1.5+R()*2); }   // grain
+  if(kind==='path'){
+    if(th==='mines'||th==='spire'){   // fitted flagstones / cobbles
+      const rows=th==='spire'?6:4; for(let r=0;r<rows;r++){ const h=S2/rows, off=(r%2)*h*.6; for(let x=-h;x<S2+h;x+=h*1.25){ const w=h*1.25-5;
+        sh('#000',.28); c.beginPath(); c.roundRect?c.roundRect(x+off+1,r*h+3,w,h-5,6):c.rect(x+off+1,r*h+3,w,h-5); c.fill(); sh(R()<.5?'#fff':'#000',.05+R()*.06); c.beginPath(); c.roundRect?c.roundRect(x+off,r*h+2,w,h-6,6):c.rect(x+off,r*h+2,w,h-6); c.fill();
+        sh('#fff',.08); c.fillRect(x+off+5,r*h+4,w-10,2); } } }
+    else { for(let i=0;i<55;i++){ const x=R()*S2,y=R()*S2,rx=2+R()*5,col=th==='frost'?'#8fa8c0':R()<.5?'#5a4a38':'#e8dcc0'; blob(x+1,y+1.5,rx,rx*.7,'#000',.25); blob(x,y,rx,rx*.7,col,.55); }   // pebbles
+      if(th==='frost')for(let i=0;i<14;i++){ const x=R()*S2,y=R()*S2; blob(x,y,7,4,'#6f88a2',.18); blob(x+12,y+8,7,4,'#6f88a2',.18); }   // boot prints
+      if(th==='marsh')for(let i=0;i<6;i++)blob(R()*S2,R()*S2,18+R()*16,7+R()*5,'#3a4a3a',.35);   // muddy puddles
+      for(let i=0;i<10;i++){ sh('#000',.07); c.lineWidth=2; const y=R()*S2; c.beginPath(); c.moveTo(0,y); c.bezierCurveTo(80,y+R()*12-6,170,y+R()*12-6,S2,y); c.stroke(); } } }   // wheel ruts
+  else {
+    if(th==='woods'||th==='marsh'){ const cols=th==='woods'?['#5f9a48','#2f6a2a','#78b058','#3f7f36']:['#5a7a4a','#2a4a38','#7a8a52','#3f5a42'];
+      for(let i=0;i<900;i++){ const x=R()*S2,y=R()*S2,h=4+R()*7,lean=R()*4-2; sh(cols[i%4],.55+R()*.35); c.lineWidth=1.3; c.beginPath(); c.moveTo(x,y); c.lineTo(x+lean,y-h); c.stroke(); }   // grass blades
+      if(th==='woods')for(let i=0;i<12;i++){ const x=R()*S2,y=R()*S2; blob(x,y,2.4,2.4,['#f4f0e0','#ffd94a','#e888b0'][i%3],.9); }   // tiny flowers
+      else for(let i=0;i<8;i++)blob(R()*S2,R()*S2,16+R()*14,6+R()*4,'#1e3a3a',.45); }   // dark bog water
+    else if(th==='frost'){ for(let i=0;i<20;i++)blob(R()*S2,R()*S2,22+R()*30,8+R()*10,'#9fb8d4',.18); for(let i=0;i<70;i++){ sh('#fff',.8+R()*.2); c.fillRect(R()*S2,R()*S2,1.6,1.6); } }   // drifts + sparkle
+    else { for(let i=0;i<16;i++){ sh('#000',.35); c.lineWidth=1.2; let x=R()*S2,y=R()*S2; c.beginPath(); c.moveTo(x,y); for(let k=0;k<4;k++){ x+=R()*30-15; y+=R()*30-15; c.lineTo(x,y); } c.stroke(); }   // cracks
+      for(let i=0;i<40;i++){ const x=R()*S2,y=R()*S2,r=1.5+R()*4; blob(x,y,r,r*.7,th==='spire'?'#6a58a0':'#6a605a',.45); } } }
+  c.globalAlpha=1; return TEXC[key]=cv; }
 function drawExplore(cv){ const E=EX, L=E.L, T=L.T, c=cv.getContext('2d'), vh=TOP+VIEWROWS*CELL, k=cv.height/vh, vw=cv.width/k, W=L.C*CELL;
   const cam=Math.max(0,Math.min(W-vw,E.x-vw*.42)); E.cam=cam;
   const want=Math.max(0,Math.min(TOP+ROWS*CELL-vh,TOP+E.y-vh*.6)); E.camY=E.camY==null?want:E.camY+(want-E.camY)*.12; const camY=E.camY;
@@ -3211,14 +3280,15 @@ function drawExplore(cv){ const E=EX, L=E.L, T=L.T, c=cv.getContext('2d'), vh=TO
   const sky=c.createLinearGradient(0,0,0,TOP); sky.addColorStop(0,T.sky[0]); sky.addColorStop(1,T.sky[1]); c.fillStyle=sky; c.fillRect(0,0,vw,TOP+2);
   c.fillStyle=T.far; c.beginPath(); c.moveTo(0,TOP); const R=seeded(L.n+5), off=cam*.25; for(let i=0;i<400;i++){ const x=i*150-off, h=60+R()*110; if(x>-200&&x<vw+200){c.lineTo(x,TOP-h); c.lineTo(x+75,TOP-h*.55);} } c.lineTo(vw,TOP); c.closePath(); c.fill();
   c.translate(-cam,TOP);
-  c.fillStyle=T.ground; c.fillRect(cam-10,-4,vw+20,ROWS*CELL+260);
+  if(!E.pat)E.pat={g:c.createPattern(groundTex(T,'ground'),'repeat'),p:c.createPattern(groundTex(T,'path'),'repeat')};
+  c.fillStyle=E.pat.g||T.ground; c.fillRect(cam-10,-4,vw+20,ROWS*CELL+260);
   const c0=Math.max(0,Math.floor(cam/CELL)-1), c1=Math.min(L.C-1,Math.ceil((cam+vw)/CELL)+1), r0=Math.max(0,Math.floor((camY-TOP)/CELL)-1), r1=Math.min(ROWS-1,Math.ceil((camY-TOP+vh)/CELL)+1);
   for(let r=r0;r<=r1;r++)for(let col=c0;col<=c1;col++){ const x=col*CELL, y=r*CELL; const h=(col*31+r*17)%7;
-    if(L.g[r][col]){ c.fillStyle=T.path; c.fillRect(x-1,y-1,CELL+2,CELL+2); c.fillStyle=T.edge;
+    if(L.g[r][col]){ c.fillStyle=E.pat.p||T.path; c.fillRect(x-1,y-1,CELL+2,CELL+2); c.fillStyle=T.edge; c.globalAlpha=.75;
       if(r===0||!L.g[r-1][col])c.fillRect(x,y,CELL,12); if(r===ROWS-1||!L.g[r+1][col])c.fillRect(x,y+CELL-8,CELL,8);
       if(col===0||!L.g[r][col-1])c.fillRect(x,y,8,CELL); if(col===L.C-1||!L.g[r][col+1])c.fillRect(x+CELL-8,y,8,CELL);
-      c.globalAlpha=.35; circ(c,T.edge,x+30+h*14,y+40+h*9,7,4); circ(c,T.edge,x+110-h*8,y+115-h*6,5,3); c.globalAlpha=1; }
-    else { circ(c,T.dot,x+35+h*12,y+50+h*8,16,7); circ(c,T.dot,x+120-h*9,y+120-h*5,12,5); } }
+      c.globalAlpha=1; }
+    else { c.globalAlpha=.5; circ(c,T.dot,x+35+h*12,y+50+h*8,16,7); c.globalAlpha=1; } }
   // everything standing on the ground, back to front. Scenery in front of the hero turns see-through.
   const items=[], yTop=camY-TOP-60, yBot=camY-TOP+vh+700;
   for(let col=Math.max(0,c0-2);col<=Math.min(L.C-1,c1+2);col++)for(const p of L.pcol[col]){ if(p.y<yTop||p.y>yBot)continue;
@@ -3511,17 +3581,20 @@ function vWho(){ const all=allHeroes(), ids=Object.keys(all).sort((x,y)=>(all[y]
       <div class="grid2"><button data-act="noretire">Keep ${esc(h.name)}</button><button class="danger" data-act="retire" data-id="${id}">Retire</button></div></div>`;
     return `<div class="card-wrap"><button class="card" data-act="pick" data-id="${id}" ${loaded?'':'disabled'}>${heroPort(h,'mini')}
       <span class="grow"><b>${esc(h.name)}</b><span class="sub">Level ${h.lvl} ${CLASSES[h.cls].name} · ${h.cleared||0} of ${LEVELS} levels</span></span></button>${S.manage?`<button class="ghost x" data-act="askretire" data-id="${id}" aria-label="Retire ${esc(h.name)}">✕</button>`:''}</div>`; }).join('');
-  return page(lineup(),`<div class="top"><div><h1>Hearthguard</h1><p class="dim">One family. One guild. A realm that needs saving.</p></div>${window.HG_CLOUD&&loaded?'<button class="ghost" data-act="go" data-to="share">Share the game</button>':''}</div>
-    <div class="panel col"><div class="top"><h3>Choose a hero</h3>${ids.length?`<button class="ghost" data-act="manage">${S.manage?'Done':'Retire a hero'}</button>`:''}</div>${loaded?'':'<p class="dim small">Reaching the guild hall…</p>'}
+  /* all four heroes across a wide banner, the hero choice along the bottom (owner: the side pane only fit two of the four) */
+  return `<div class="ttl"><div class="hero-stage wide">${scene(5)}<div class="lineup">${['knight','wizard','ranger','barbarian'].map((k,i)=>heroPort(kit(k),'idle',`animation-delay:-${i*.3}s`)).join('')}</div>
+    <div class="ttl-head"><h1>Hearthguard</h1><p class="dim">One family. One guild. A realm that needs saving.</p></div>${window.HG_CLOUD&&loaded?'<button class="ghost ttl-share" data-act="go" data-to="share">Share the game</button>':''}</div>
+    <div class="scroll col"><div class="panel col"><div class="top"><h3>Choose a hero</h3>${ids.length?`<button class="ghost" data-act="manage">${S.manage?'Done':'Retire a hero'}</button>`:''}</div>${loaded?'':'<p class="dim small">Reaching the guild hall…</p>'}
     <div class="grid2">${rows}<button class="card newhero" data-act="newhero" ${loaded&&!full?'':'disabled'}><span class="plus">+</span><span class="grow"><b>New hero</b><span class="sub">${full?'The guild is full ('+MAXHEROES+' heroes)':'Pick a class and give them a name'}</span></span></button></div>
-    ${offline&&loaded?'<p class="dim small">Playing offline. Progress saves on this device until the guild hall can be reached.</p>':''}</div>`);
+    ${offline&&loaded?'<p class="dim small">Playing offline. Progress saves on this device until the guild hall can be reached.</p>':''}</div></div></div>`;
 }
+/* new hero: name + Begin on top, all four classes side by side along the bottom (owner: only two showed on the iPhone) */
 function vCreate(){ const cur=S.cls||'knight';
-  return page(heroPane(kit(cur)),`${topBar('New hero','<button class="ghost" data-act="go" data-to="who">Back</button>')}
-  <div class="panel col"><h3><label for="heroname">Name your hero</label></h3><input type="text" id="heroname" maxlength="12" value="${esc(S.name||'')}" placeholder="Type a name" autocomplete="off"></div>
-  <div class="panel col"><h3>Choose a starting class</h3><div class="grid2">${Object.keys(CLASSES).map(k=>{const c=CLASSES[k];
-    return `<button class="card ${k===cur?'go':''}" data-act="cls" data-id="${k}">${heroPort(kit(k),'mini')}<span class="grow"><b>${c.name}</b><span class="sub">${c.blurb}</span></span></button>`}).join('')}</div></div>
-  <button class="go" data-act="create">Begin the adventure</button>`);
+  return `<div class="crt">${topBar('New hero','<button class="ghost" data-act="go" data-to="who">Back</button>')}
+  <div class="crt-name"><label for="heroname">Name your hero</label><input type="text" id="heroname" maxlength="12" value="${esc(S.name||'')}" placeholder="Type a name" autocomplete="off">
+    <button class="go" data-act="create">Begin the adventure</button></div>
+  <div class="crt-cls">${Object.keys(CLASSES).map(k=>{const c=CLASSES[k];
+    return `<button class="card ${k===cur?'go':''}" data-act="cls" data-id="${k}">${heroPort(kit(k),k===cur?'idle':'')}<b>${c.name}</b><span class="sub">${c.blurb}</span></button>`}).join('')}</div></div>`;
 }
 function heroCard(){ const st=stats(H);
   return `<div class="panel col" style="gap:5px">
