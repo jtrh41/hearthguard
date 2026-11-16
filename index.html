@@ -2381,6 +2381,12 @@ input[type=text]{font:inherit;color:var(--parch);background:#0c0e11;border:2px s
 /* hero portraits are strips of 8 views (session 5). The box is the old picture; each view is wider so a turned weapon can hang outside it (only where .rot lets it show) */
 .port>i.pl{inset:auto;left:-33.171%;top:-2.770%;width:166.504%;height:105.409%;background-size:800% 100%;background-position:calc(var(--ra,0) * 100% / 7) 0}
 .port.rot{overflow:visible} .rotzone{touch-action:none;cursor:grab} .rothint{position:absolute;right:8px;top:8px;z-index:3;font-size:12px;font-weight:800;color:var(--parch);background:rgba(12,14,17,.7);border:1px solid var(--line);border-radius:99px;padding:3px 10px;pointer-events:none}
+.tal{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px;align-items:start} .tal .col{gap:6px}
+.talc.got{border-color:#8a6a1e} .talc.locked{opacity:.55} .talc.cap{border-color:var(--gold)} .pips{display:inline-flex;gap:3px} .pips i{width:9px;height:9px;border-radius:50%;background:#0c0e11;border:1px solid var(--line)} .pips i.on{background:var(--gold);border-color:#fff0b0}
+.frole{position:absolute;z-index:99;translate:-50% 0;font:800 11px var(--ui);letter-spacing:.06em;padding:2px 8px;border-radius:99px;pointer-events:none;color:#fff;text-shadow:0 1px 2px #000;white-space:nowrap}
+.frole.guard{background:#2c5596;border:1px solid #9fd0ff} .frole.healer{background:#2f7a3a;border:1px solid #a8e88a} .frole.chg{background:#a8241c;border:1px solid #ffb0a0;animation:chgp .6s ease-in-out infinite alternate}
+@keyframes chgp{to{transform:scale(1.12);box-shadow:0 0 12px #ff5040}}
+.bsp.foe.shielded{filter:drop-shadow(0 0 1.2px rgba(0,0,0,.85)) drop-shadow(0 0 9px #6fb0ff)} .bsp.foe.charging{filter:drop-shadow(0 0 1.2px rgba(0,0,0,.85)) drop-shadow(0 0 12px #ff4030)}
 .lookov{position:fixed;inset:0;z-index:40;background:rgba(8,9,11,.82);display:flex;align-items:center;justify-content:center;padding:12px max(16px,env(safe-area-inset-left,0px))}
 .lookbox{display:grid;grid-template-columns:minmax(0,46%) minmax(0,1fr);gap:12px;width:min(900px,100%);height:min(560px,100%);cursor:default} .lookbox .hero-stage{max-height:none} .lookbox .info{overflow-y:auto;display:flex;flex-direction:column;gap:8px}
 .lookbox .bigicon{display:flex;align-items:center;justify-content:center;height:100%;border:2px solid var(--line);border-radius:10px;background:#0c0e11}
@@ -2775,7 +2781,8 @@ function petItemStats(it){ const p=ipow(it), b=BASE[it.s], o={atk:Math.round((b.
   for(const k in it.a){ const v=attrVal(it,k); if(k==='str')o.atk+=v; else if(k==='vit')o.hp+=v; else if(k==='crit')o.crit+=v; } return o; }
 function petStats(h){ const p=h.pet; if(!p)return null; const P=PETS[p.k], g={atk:0,hp:0,crit:0};
   for(const k of PSLOTS){ const it=eqItem(h,k); if(it){ const o=petItemStats(it); g.atk+=o.atk; g.hp+=o.hp; g.crit+=o.crit; } }
-  return {hp:Math.round((30+9*h.lvl)*P.hp*(1+.15*p.lv))+g.hp,atk:Math.round((5+2*h.lvl)*P.atk*(1+.12*p.lv))+g.atk,crit:(P.crit||.06)+g.crit/100}; }
+  const bd=1+.08*tal(h,'bond');
+  return {hp:Math.round(((30+9*h.lvl)*P.hp*(1+.15*p.lv)+g.hp)*bd),atk:Math.round(((5+2*h.lvl)*P.atk*(1+.12*p.lv)+g.atk)*bd),crit:(P.crit||.06)+g.crit/100}; }
 /* pets grow up (session 4): a grown form from pet level 5 (its own rendered sheet), bigger with a glow from level 15 */
 const PET_GROW=5, PET_GLOW=15;
 const petForm=h=>ART.pets&&h.pet&&h.pet.lv>=PET_GROW?'2':'';
@@ -3020,6 +3027,10 @@ function makeFoes(n,kind){ const w=Math.floor(n/10), out=[makeFoe(n,kind)]; let 
   const sc=(f,h,a,x)=>{f.hp=f.max=Math.max(1,Math.round(f.hp*h)); f.atk*=a; f.xp=Math.round(f.xp*x); f.gold=Math.round(f.gold*x); return f};
   if(kind==='mob'&&extra)sc(out[0],.75,.7,.8);
   for(let i=0;i<extra;i++)out.push(sc(makeFoe(n,'mob'),.75,.7,.8));
+  /* smarter enemies (session 5): in groups, one may carry a shield (protects the others, a bit frailer) and one may heal (hits softer) */
+  if(out.length>=2&&n>=2){ const pool=out.filter(f=>f.kind==='mob'), R_=Math.random;
+    if(pool.length&&R_()<.45){ const g=pool.splice(Math.floor(R_()*pool.length),1)[0]; g.role='guard'; g.hp=g.max=Math.round(g.max*.85); g.n='Shield '+g.n; }
+    if(pool.length&&R_()<.4){ const h=pool.splice(Math.floor(R_()*pool.length),1)[0]; h.role='healer'; h.atk*=.8; h.n=h.n+' Healer'; } }
   /* elite (session 4): about 1 in 14 surprise fights from level 1-4 on. Bigger, glowing, crowned, a title; much tougher; always drops gear */
   if(kind==='mob'&&n>=3&&Math.random()<.07){ const e=out[0], T=['the Ancient','the Dread','Ironhide','the Savage','Bloodfang','the Cursed','Doomhowl','the Unbroken'];
     e.elite=1; e.big=true; e.n=e.n+' '+T[Math.floor(Math.random()*T.length)]; sc(e,2.2,1.3,3); }
@@ -3066,11 +3077,31 @@ function fixHero(h){ if(!h||!CLASSES[h.cls])return null;   // older saves: fill 
   if(h.cleared==null)h.cleared=Array.isArray(h.prog)?Math.min(LEVELS-1,h.prog.reduce((a,b)=>a+b,0)):0;
   h.relics=(h.relics||[]).filter(r=>r<WORLDS.length); migrateGear(h); fixClassGear(h); h.embers=h.embers||0; GSLOTS.forEach(k=>{ if(h.eq[k]&&!eqItem(h,k))h.eq[k]=null });
   h.pow=h.pow||0; h.feats=h.feats||[]; h.kills=h.kills||0; return h; }
+/* ----- talent tree (session 5, idea 5): one point per hero level after the first, spent in three trees + a class capstone. Free to reset at camp. ----- */
+const TALENTS=[
+ {k:'str',t:'might',n:'Strength',max:5,d:r=>'+'+r*4+'% attack'},
+ {k:'keen',t:'might',n:'Keen Eye',max:5,d:r=>'+'+r*2+'% critical chance'},
+ {k:'exec',t:'might',n:'Finisher',max:3,need:5,d:r=>'+'+r*10+'% damage to foes under 30% health'},
+ {k:'tough',t:'guard',n:'Toughness',max:5,d:r=>'+'+r*5+'% health'},
+ {k:'skin',t:'guard',n:'Iron Skin',max:5,d:r=>'Take '+r*3+'% less damage'},
+ {k:'breath',t:'guard',n:'Second Breath',max:3,need:5,d:r=>'Heal '+r*2+'% health at the start of each of your turns'},
+ {k:'focus',t:'spirit',n:'Focus',max:5,d:r=>'Power bar fills '+r*8+'% faster'},
+ {k:'bond',t:'spirit',n:'Bond',max:5,d:r=>'Your pet gets +'+r*8+'% attack and health'},
+ {k:'swift',t:'spirit',n:'Quick Hands',max:1,need:5,d:()=>'Every skill is ready one turn sooner'}];
+const TTREES={might:'Might',guard:'Guard',spirit:'Spirit'};
+const CAPSTONE={knight:{n:'Bulwark',d:'Take 10% less damage, and Iron Guard and Lionheart also heal 15% health'},
+ wizard:{n:'Arcane Surge',d:'Your skills and power move hit 25% harder'}, ranger:{n:'Deadeye',d:'Critical hits deal 2.3x damage instead of 1.8x'},
+ barbarian:{n:'Bloodlust',d:'Heal 10% of all the damage you deal'}, paladin:{n:'Beacon of Light',d:'All your healing is 30% stronger and also heals your pet'}};
+const CAP_NEED=15;
+const tal=(h,k)=>(h&&h.tal&&h.tal[k])||0;
+const talSpent=(h,t)=>Object.entries((h&&h.tal)||{}).reduce((a,[k,v])=>a+((!t||(TALENTS.find(x=>x.k===k)||{}).t===t)?v:0),0);
+const talPoints=h=>Math.max(0,h.lvl-1)-talSpent(h);
+function talCan(h,T){ if(T.k==='cap')return !tal(h,'cap')&&talSpent(h)>=CAP_NEED&&talPoints(h)>0; return tal(h,T.k)<T.max&&talPoints(h)>0&&(!T.need||talSpent(h,T.t)>=T.need); }
 function stats(h){ const c=CLASSES[h.cls], r=h.relics||[], g={atk:0,hp:0,def:0,crit:0,luck:0,focus:0,leech:0};
   for(const k of GSLOTS){ const it=eqItem(h,k); if(it){ const o=itemStats(it); for(const x in g)g[x]+=o[x]; } }
-  let hp=(40+12*h.lvl+g.hp)*c.hp; if(r.includes(3))hp*=1.15;
-  let atk=(6+2.2*h.lvl+g.atk)*c.atk; if(r.includes(1))atk*=1.1; if(r.includes(4))atk*=1.15;
-  return {hp:Math.round(hp),atk:Math.round(atk),def:g.def,crit:c.crit+g.crit/100+(r.includes(4)?.1:0),luck:g.luck/100,focus:g.focus/100,leech:g.leech/100};}
+  let hp=(40+12*h.lvl+g.hp)*c.hp*(1+.05*tal(h,'tough')); if(r.includes(3))hp*=1.15;
+  let atk=(6+2.2*h.lvl+g.atk)*c.atk*(1+.04*tal(h,'str')); if(r.includes(1))atk*=1.1; if(r.includes(4))atk*=1.15;
+  return {hp:Math.round(hp),atk:Math.round(atk),def:g.def,crit:c.crit+g.crit/100+(r.includes(4)?.1:0)+.02*tal(h,'keen'),luck:g.luck/100,focus:g.focus/100+.08*tal(h,'focus'),leech:g.leech/100+(h.cls==='barbarian'&&tal(h,'cap')?.1:0)};}
 function newHero(name,cls){const h={name,cls,lvl:1,xp:0,hp:0,pow:0,gold:20,potions:2,embers:0,cleared:0,relics:[],kills:0,raidNo:world.no,raidDmg:0,raidDay:'',raidTries:0,scales:0,feats:[],rev:0};
   starterKit(h,1); h.hp=stats(h).hp; return h;}
 function feat(x){H.feats=(H.feats||[]).concat([{t:Date.now(),x}]).slice(-6)}
@@ -3591,7 +3622,8 @@ function battle(foes,opt){ opt=opt||{}; if(!Array.isArray(foes))foes=[foes];
     const es=foes.map((f,i)=>Object.assign({stun:0,weak:0,poison:0,pdmg:0,charge:false,et:i},f)), lead=es[0];
     const intro=opt.raid?'Ashmaw towers over you. You have 8 turns to strike!':lead.kind==='mob'?(lead.elite?'An elite foe! '+lead.n+' attacks!':es.length>1?'Ambush! '+es.length+' monsters attack!':'Ambush! '+lead.n+' attacks!')
       :lead.n+' stands in your way'+(es.length>1?' with '+(es.length-1)+' minion'+(es.length>2?'s':'')+'!':'!');
-    B=Object.assign({es,tgt:0,cd:[0,0,0,0],loot:[],guard:0,bless:0,eagle:0,busy:false,anim:false,log:[intro].concat(es.length>1?['Tap a monster to choose who you strike.']:[]),resolve},opt.raid?{raid:true,turns:8,dealt:0}:{});
+    const hints=es.filter(f=>f.role).map(f=>f.role==='guard'?f.n+' carries a shield that protects the others: defeat it first!':f.n+' can heal its friends: take it down quickly!');
+    B=Object.assign({es,tgt:0,cd:[0,0,0,0],loot:[],guard:0,bless:0,eagle:0,busy:false,anim:false,log:[intro].concat(hints,es.length>1?['Tap a monster to choose who you strike.']:[]),resolve},opt.raid?{raid:true,turns:8,dealt:0}:{});
     B.ally=opt.raid?null:allyHero(); if(B.ally)preloadHero(B.ally); preloadHero(H); preloadPet(H); es.forEach(f=>loadImg(mobSheet(f.id))); S.screen='battle'; render(); });
 }
 function foeGeom(e,i){ const P=SLOTPOS[B.es.length-1][i], big=e.big||B.raid, rig=isRig(e.id), fs=(rig?4.4:5)*BU*(big?1.3:1)*P.s, foot=rig?.776:.743;
@@ -3608,7 +3640,7 @@ function vBattle(){ const hs=4.4*BU*(1+rank(H)*.02), multi=B.es.length>1;
     ${H.pet&&!B.raid?(()=>{ const ps=5*BU*.5*petScale(H); return petSpr(H,'bsp pet'+(H.pet.hp>0?'':' gone'),`height:${ps}%;top:${PET_Y-.743*ps}%;left:${PET_X}%;z-index:${PET_Y};animation-delay:-.7s;`,'id="bp"')+`<div class="fbar petbar${H.pet.hp>0?'':' gone'}" id="pbar" style="left:${PET_X+1}%;top:${PET_Y-ps*.62}%"><i></i></div>`; })():''}
     ${B.es.map((e,i)=>{ const g=foeGeom(e,i);
       return `<div class="shadow${e.hp<=0?' gone':''}" id="bs${i}" style="left:${g.x}%;top:${g.y}%;width:${g.fs*.38}%"></div>`+(e.elite?`<div class="eliteaura${e.hp<=0?' gone':''}" id="ea${i}" style="left:${g.x}%;top:${g.y}%;width:${g.fs*.6}%"></div><div class="crown${e.hp<=0?' gone':''}" id="cr${i}" style="left:${g.x}%;top:${Math.max(10,g.head-7)}%"></div>`:'')+mobSpr(e.id,'bsp foe'+(e.elite?' elite':'')+(e.hp<=0?' gone':''),`height:${g.fs}%;top:${g.top}%;left:${g.x}%;z-index:${g.y};animation-delay:-${(i*.9+1.3).toFixed(1)}s;`,`id="bf${i}" data-act="tgt" data-i="${i}" role="button" aria-label="Target ${esc(e.n)}"`)
-        +(multi?`<div class="fbar${e.hp<=0?' gone':''}" id="fb${i}" style="left:${g.x}%;top:${Math.max(16,g.head)}%"><i></i></div>`:''); }).join('')}
+        +(multi?`<div class="fbar${e.hp<=0?' gone':''}" id="fb${i}" style="left:${g.x}%;top:${Math.max(16,g.head)}%"><i></i></div>`:'')+`<div class="frole" id="fr${i}" style="left:${g.x}%;top:${Math.max(8,g.head-(multi?6:3))}%;display:none"></div>`; }).join('')}
   </div><div class="side" id="bside"></div></div>`; }
 let bIdle=0;
 function mountBattle(){ clearInterval(bIdle); ambMount(B.raid?6:B.es[0].scene); battleUI();
@@ -3627,10 +3659,13 @@ function battleUI(){ if(!B)return; if(!B.es[B.tgt]||B.es[B.tgt].hp<=0){const a=B
   set('bhp',100*H.hp/st.hp); set('bpw',pw); set('bfhp',100*e.hp/e.max); const pb=$b('bpwb'); if(pb)pb.classList.toggle('full',pw>=100);
   if($b('bhpT'))$b('bhpT').textContent=H.hp+' / '+st.hp; if($b('bfT'))$b('bfT').textContent=e.hp+' / '+e.max; if($b('bfN'))$b('bfN').textContent=e.n;
   const pb2=$b('pbar'); if(pb2&&H.pet){ const ps=petStats(H); pb2.firstElementChild.style.width=Math.max(0,100*H.pet.hp/ps.hp)+'%'; pb2.classList.toggle('gone',H.pet.hp<=0); }
+  const gUp=B.es.some(f=>f.role==='guard'&&f.hp>0);
+  B.es.forEach((f,i)=>{ const pl=$b('fr'+i), bf=$b('bf'+i); if(pl){ const t=f.hp<=0||res?'':f.charge?'CHARGING!':f.role==='guard'?'SHIELD':f.role==='healer'?'HEALER':''; pl.textContent=t; pl.className='frole '+(f.charge?'chg':f.role||''); pl.style.display=t?'':'none'; }
+    if(bf){ bf.classList.toggle('shielded',gUp&&f.role!=='guard'&&f.hp>0); bf.classList.toggle('charging',!!f.charge&&f.hp>0); } });
   B.es.forEach((f,i)=>{ const fb=$b('fb'+i); if(fb){ fb.firstElementChild.style.width=Math.max(0,100*f.hp/f.max)+'%'; fb.classList.toggle('on',i===B.tgt&&!res); fb.classList.toggle('gone',f.hp<=0); } });
   const chips=[]; if(B.guard>0)chips.push('Guard '+B.guard); if(B.bless>0)chips.push('War Cry '+B.bless); if(B.eagle>0)chips.push('Eagle Eye '+B.eagle);
   if(e.stun>0)chips.push('Stunned'); if(e.weak>0)chips.push('Weakened '+e.weak); if(e.poison>0)chips.push('Poisoned '+e.poison);
-  B.es.forEach(f=>{ if(f.hp>0&&f.charge)chips.push(f.n+': mighty blow coming!') }); if(B.raid&&!res)chips.push(B.turns+' turns left');
+  B.es.forEach(f=>{ if(f.hp>0&&f.charge)chips.push(f.n+': mighty blow coming!') }); if(gUp&&!res)chips.push('Shield up: defeat the shield-bearer first'); if(B.raid&&!res)chips.push(B.turns+' turns left');
   let h;
   if(res){ let t;
     if(res.raid)t=`<h2>${res.win?'Ashmaw falls!':res.flew?'Time is up':'Knocked back'}</h2><p>You dealt <b class="gold">${res.dealt}</b> damage for the family.</p>`;
@@ -3680,7 +3715,8 @@ async function attackAnim(fromId,toIds,ranged,col,onHit,kind,base,fx){ const her
 /* the last blow: a white flash and a short freeze */
 function killMoment(){ const st=$b('bstage'); if(!st)return; const f=document.createElement('div'); f.className='killflash'; st.appendChild(f); setTimeout(()=>f.remove(),600); st.classList.remove('quake'); void st.offsetWidth; st.classList.add('quake'); }
 function strike(e,mult,forceCrit){ const st=stats(H); let d=st.atk*mult*rnd(.88,1.12); if(B.bless>0)d*=1.4;
-  let crit=forceCrit||Math.random()<st.crit; if(!forceCrit&&B.eagle>0){crit=true;B.eagle--} if(crit)d*=1.8;
+  if(e.hp<e.max*.3)d*=1+.1*tal(H,'exec'); if(H.cls==='wizard'&&tal(H,'cap')&&B.skill)d*=1.25; d*=guardMul(e);
+  let crit=forceCrit||Math.random()<st.crit; if(!forceCrit&&B.eagle>0){crit=true;B.eagle--} if(crit)d*=H.cls==='ranger'&&tal(H,'cap')?2.3:1.8;
   d=Math.max(1,Math.round(d)); const was=e.hp; e.hp=Math.max(0,e.hp-d); if(B.raid)B.dealt+=was-e.hp; return {d,crit}; }
 /* monsters that fell this turn fade away */
 function reap(){ B.es.forEach((e,i)=>{ if(e.hp<=0&&!e.dead){ e.dead=true; const el=$b('bf'+i); if(el){ if(fxMount())burst(fxPos(el,.5),['#ffffff','#ffd870','#ff8a3c','#c8b0ff'],46,520,7,.7,{drag:.86}); el.classList.add('die'); el.classList.add('gone'); } const sh=$b('bs'+i); if(sh)sh.classList.add('gone'); for(const k of ['ea','cr']){ const x=$b(k+i); if(x)x.classList.add('gone'); } if(B.es.length>1)blog(e.n+' is defeated!'); } }); battleUI(); }
@@ -3689,7 +3725,8 @@ async function heroAct(kind){ if(!B||B.busy||B.result)return; const st=stats(H),
   if(kind==='treat'){ if(!H.pet||!(H.treats>0)||H.pet.hp>=petStats(H).hp)return; }
   const sk=kind==='potion'||kind==='treat'?null:kind==='atk'?{n:'Attack',mult:1,anim:'a'}:kind==='pow'?Object.assign({anim:2},c.power):SK[kind], power=kind==='pow';
   if(!sk&&kind!=='potion'&&kind!=='treat')return; if(power&&(H.pow||0)<100)return; if(typeof kind==='number'&&(B.cd[kind]>0||H.lvl<sk.lv))return;
-  B.busy=true; for(let i=0;i<B.cd.length;i++)if(B.cd[i]>0)B.cd[i]--; if(typeof kind==='number')B.cd[kind]=sk.cd; if(power){H.pow=0; questTick('pow');}
+  B.busy=true; B.skill=typeof kind==='number'||power; for(let i=0;i<B.cd.length;i++)if(B.cd[i]>0)B.cd[i]--; if(typeof kind==='number')B.cd[kind]=Math.max(1,sk.cd-tal(H,'swift'));
+  if(tal(H,'breath')&&H.hp<st.hp){ const hb_=Math.max(1,Math.round(st.hp*.02*tal(H,'breath'))); H.hp=Math.min(st.hp,H.hp+hb_); bpop('bh','+'+hb_,'heal'); } if(power){H.pow=0; questTick('pow');}
   let tgt=B.es[B.tgt]; if(!tgt||tgt.hp<=0){ tgt=alive()[0]; B.tgt=B.es.indexOf(tgt); }
   battleUI();
   if(kind==='treat'){ const ps=petStats(H), was=H.pet.hp; H.treats--; H.pet.hp=Math.min(ps.hp,H.pet.hp+Math.round(ps.hp*.5)); blog(H.pet.name+(was>0?' munches a treat and heals.':' wakes up, ready to fight!'));
@@ -3710,8 +3747,9 @@ async function heroAct(kind){ if(!B||B.busy||B.result)return; const st=stats(H),
       line+=(targets.length>1||dmg.size>1?' and hit '+dmg.size+' foes':'')+' for '+total+(anyCrit?', a critical hit!':'.'); if(!power)H.pow=Math.min(100,(H.pow||0)+Math.round(11*(1+st.focus)));
       const steal=Math.round(total*((sk.drain||0)+st.leech)); if(steal>0){ H.hp=Math.min(st.hp,H.hp+steal); bpop('bh','+'+steal,'heal'); }
     } else { line+='.'; const el=$b('bh'); B.anim=true; for(let k=0;k<5;k++){ bFrame(el,base+k,HN); await sleep(95); } bFrame(el,0,HN); B.anim=false; }
-    if(sk.heal){ const h=Math.round(st.hp*sk.heal); H.hp=Math.min(st.hp,H.hp+h); bpop('bh','+'+h,'heal'); auraFx($b('bh'),H.cls==='paladin'?'#fff2b0':'#a8e88a'); sfx.heal(); if(sk.holy)holyBeam($b('bh'),'#ffe9a0'); }
-    if(sk.petheal&&petUp()){ const ps=petStats(H), h=Math.round(ps.hp*sk.petheal); H.pet.hp=Math.min(ps.hp,H.pet.hp+h); bpop('bp','+'+h,'heal'); auraFx($b('bp'),'#fff2b0'); line+=' '+H.pet.name+' is healed too.'; }
+    const capHeal=tal(H,'cap')&&(H.cls==='paladin'||(H.cls==='knight'&&sk.guard)), hv=(sk.heal||0)+(capHeal&&H.cls==='knight'?.15:0), phv=sk.petheal||(capHeal&&H.cls==='paladin'&&hv?.3:0);
+    if(hv){ const h=Math.round(st.hp*hv*(capHeal&&H.cls==='paladin'?1.3:1)); H.hp=Math.min(st.hp,H.hp+h); bpop('bh','+'+h,'heal'); auraFx($b('bh'),H.cls==='paladin'?'#fff2b0':'#a8e88a'); sfx.heal(); if(sk.holy)holyBeam($b('bh'),'#ffe9a0'); }
+    if(phv&&petUp()){ const ps=petStats(H), h=Math.round(ps.hp*phv); H.pet.hp=Math.min(ps.hp,H.pet.hp+h); bpop('bp','+'+h,'heal'); auraFx($b('bp'),'#fff2b0'); line+=' '+H.pet.name+' is healed too.'; }
     if(sk.guard||sk.bless)auraFx($b('bh'),sk.guard?'#9fd0ff':'#ff8a3c');
     for(const e of targets){ if(e.hp<=0)continue; if(sk.stun&&!B.raid)e.stun=sk.stun; if(sk.weak)e.weak=sk.weak; if(sk.poison){e.poison=sk.poison;e.pdmg=Math.max(1,Math.round(st.atk*.45))} }
     if(sk.guard)B.guard=sk.guard; if(sk.bless)B.bless=sk.bless; if(sk.eagle)B.eagle=sk.eagle;
@@ -3722,9 +3760,11 @@ async function heroAct(kind){ if(!B||B.busy||B.result)return; const st=stats(H),
   await enemyTurn(); if(!B||B.result)return; B.busy=false; battleUI(); }
 /* the pet's turn: it attacks the monster you are targeting (melee pets run in and bite, ranged pets cast) */
 async function petAct(){ if(!petUp())return; const P=PETS[H.pet.k], ps=petStats(H); let t=B.es[B.tgt]; if(!t||t.hp<=0)t=alive()[0]; if(!t)return;
-  await attackAnim('bp',[fid(t)],!P.melee,P.col,()=>{ let d=Math.round(ps.atk*rnd(.88,1.12)); const cr=Math.random()<ps.crit; if(cr)d=Math.round(d*1.8); const was=t.hp; t.hp=Math.max(0,t.hp-d);
+  await attackAnim('bp',[fid(t)],!P.melee,P.col,()=>{ let d=Math.max(1,Math.round(ps.atk*rnd(.88,1.12)*guardMul(t))); const cr=Math.random()<ps.crit; if(cr)d=Math.round(d*1.8); const was=t.hp; t.hp=Math.max(0,t.hp-d);
     bpop(fid(t),'-'+d,cr?'crit':''); bShake(fid(t),MF.hit,MN); blog(H.pet.name+(cr?' lands a critical ':' hits ')+t.n+' for '+d+'.'); battleUI(); },P.melee?'orb':P.fx,MF.atk,P.melee?'spin':P.fx);
   await sleep(150); }
+/* smarter enemies (session 5, idea 6): a shield-bearer halves the damage its friends take while it stands */
+const guardMul=e=>B&&!B.raid&&e.role!=='guard'&&B.es.some(f=>f.role==='guard'&&f.hp>0&&f!==e)?.5:1;
 /* a pillar of holy light over a sprite (Paladin: Judgment, Lay on Hands) */
 function holyBeam(el,col){ const st=$b('bstage'); if(!el||!st)return; const r=el.getBoundingClientRect(), s=st.getBoundingClientRect(), b=document.createElement('div');
   b.className='lvbeam'; b.style.setProperty('--c',col||'#fff2b0'); b.style.left=((r.left+r.width/2-s.left)/s.width*100)+'%'; b.style.width='13%'; st.appendChild(b); setTimeout(()=>b.remove(),1900); }
@@ -3732,7 +3772,7 @@ function holyBeam(el,col){ const st=$b('bstage'); if(!el||!st)return; const r=el
 async function allyAct(){ const A=B&&B.ally; if(!A)return; const st=stats(H), as=stats(A);
   if(!B.allyHeal&&H.hp>0&&H.hp<st.hp*.4){ B.allyHeal=1; const h=Math.round(st.hp*.25); H.hp=Math.min(st.hp,H.hp+h); bpop('bh','+'+h,'heal'); if(sfx.heal)sfx.heal(); blog(A.name+' throws you a healing draught: +'+h+' health!'); battleUI(); await sleep(500); return; }
   let t=B.es[B.tgt]; if(!t||t.hp<=0)t=alive()[0]; if(!t)return; const rg=animRanged(A.cls), col=CLASSES[A.cls].shot||(rg?'#cfe3ff':'#ffffff');
-  await attackAnim('ba',[fid(t)],rg,col,()=>{ let d=Math.round(as.atk*.6*rnd(.88,1.12)); const cr=Math.random()<as.crit; if(cr)d=Math.round(d*1.8); const was=t.hp; t.hp=Math.max(0,t.hp-d); if(B.raid)B.dealt+=was-t.hp;
+  await attackAnim('ba',[fid(t)],rg,col,()=>{ let d=Math.max(1,Math.round(as.atk*.6*rnd(.88,1.12)*guardMul(t))); const cr=Math.random()<as.crit; if(cr)d=Math.round(d*1.8); const was=t.hp; t.hp=Math.max(0,t.hp-d); if(B.raid)B.dealt+=was-t.hp;
     bpop(fid(t),'-'+d,cr?'crit':''); bShake(fid(t),MF.hit,MN); cr?sfx.crit():sfx.hit(); blog(A.name+(cr?' lands a critical hit on ':' strikes ')+t.n+' for '+d+'.'); battleUI(); },A.cls==='ranger'?'arrow':'orb',HF.atk,null);
   await sleep(150); }
 /* bosses transform at half health (session 4): a scene, a new look (glow in the world's colour, bigger, pulsing), harder hits and a second strike sometimes */
@@ -3748,10 +3788,13 @@ async function enemyTurn(){ const st=stats(H);
   for(const e of B.es){ if(!B||B.result)return; if(e.hp<=0)continue; const id=fid(e);
     if(e.poison>0){ const was=e.hp; e.hp=Math.max(0,e.hp-e.pdmg); if(B.raid)B.dealt+=was-e.hp; e.poison--; blog('Poison burns '+e.n+' for '+e.pdmg+'.'); bpop(id,'-'+e.pdmg); bShake(id,MF.hit,MN); battleUI(); await sleep(450); if(!B)return;
       if(e.hp<=0){ reap(); if(!alive().length)return finishBattle(true); continue; } }
-    if(e.stun>0){ e.stun--; blog(e.n+' is stunned and cannot move!'); battleUI(); await sleep(500); continue; }
+    if(e.stun>0){ e.stun--; if(e.charge){ e.charge=false; blog(e.n+' is stunned and its mighty blow is broken!'); } else blog(e.n+' is stunned and cannot move!'); battleUI(); await sleep(500); continue; }
+    if(e.role==='healer'){ e.hcd=(e.hcd||0)-1; const hurt=B.es.filter(f=>f.hp>0&&f.hp<f.max*.65).sort((a,b)=>a.hp/a.max-b.hp/b.max)[0];   // smarter enemies (session 5)
+      if(hurt&&e.hcd<=0){ e.hcd=3; const amt=Math.round(hurt.max*.18); hurt.hp=Math.min(hurt.max,hurt.hp+amt); const he=$b(fid(hurt)); if(he)auraFx(he,'#7dffb0'); bpop(fid(hurt),'+'+amt,'heal'); if(sfx.heal)sfx.heal();
+        blog(e.n+' heals '+(hurt===e?'itself':hurt.n)+' for '+amt+'!'); battleUI(); await sleep(700); e.et++; continue; } }
     let d=e.atk*rnd(.85,1.15); if(e.weak>0){d*=.7;e.weak--} const heavy=e.charge; if(heavy){d*=1.8;e.charge=false}
     const crit=!heavy&&Math.random()<.08; if(crit)d*=1.6;
-    d=Math.max(1,Math.round(d-st.def)); if(B.guard>0)d=Math.ceil(d/2);
+    d*=1-.03*tal(H,'skin')-(H.cls==='knight'&&tal(H,'cap')?.1:0); d=Math.max(1,Math.round(d-st.def)); if(B.guard>0)d=Math.ceil(d/2);
     const sp=foeSpell(e.id), caster=!!sp;
     if(petUp()&&Math.random()<.3){   // sometimes the monster goes for your pet
       const ps=petStats(H); let pd=Math.max(1,Math.round(e.atk*rnd(.85,1.15)*(e.weak>0?.7:1)*.85));
@@ -3764,7 +3807,7 @@ async function enemyTurn(){ const st=stats(H);
     if(e.phase2&&H.hp>0&&Math.random()<.35){ const d2=Math.max(1,Math.round(d*.6)); await sleep(150);   // a transformed boss sometimes strikes twice
       await attackAnim(id,['bh'],caster,sp?sp[1]:'#ff6a5a',()=>{ H.hp=Math.max(0,H.hp-d2); bpop('bh','-'+d2); bShake('bh',HF.hit,HN); sfx.hurt(); blog(e.n+' strikes again for '+d2+'!'); battleUI(); },'orb',null,sp?sp[0]:null); if(!B)return; }
     e.et++; if(H.hp<=0)break;
-    if(e.big||B.raid?e.et%3===2:e.et%4===3){ e.charge=true; blog(e.n+' is gathering power…'); battleUI(); }
+    if(e.big||B.raid?e.et%3===2:e.et%4===3){ e.charge=true; blog(e.n+' is gathering power for a mighty blow! Stun it or raise your guard.'); battleUI(); }
     await sleep(120); }
   if(B.guard>0)B.guard--; if(B.bless>0)B.bless--;
   if(H.hp<=0)return finishBattle(false);
@@ -3908,6 +3951,18 @@ function allyOverlay(){ if(!S.allyPick)return ''; const all=allHeroes(), ids=Obj
     <p class="small dim">Pick a family hero to fight beside you. The game plays their turns with their own gear and strength, they follow you on the map, and when you finish a level together they get a share: 40 gold and 3 embers.</p>
     ${ids.length?`<div class="grid2">${ids.map(id=>{ const h=all[id]; return `<button class="card ${id===cur?'go':''}" data-act="allyset" data-id="${id}">${heroPort(h,'mini')}<span class="grow"><b>${esc(h.name)}</b><span class="sub">Level ${h.lvl} ${CLASSES[h.cls].name}${id===cur?' · fighting with you':''}</span></span></button>`; }).join('')}</div>`:'<p>No other heroes in the guild yet. When someone else in the family makes a hero, they show up here.</p>'}
     ${cur?'<button data-act="allyset" data-id="">Go alone</button>':''}</div></div>`; }
+function vTalents(){ const pts=talPoints(H), C=CAPSTONE[H.cls], pip=(r,m)=>`<span class="pips">${Array.from({length:m},(_,i)=>`<i class="${i<r?'on':''}"></i>`).join('')}</span>`;
+  const card=T=>{ const r=tal(H,T.k), ok=talCan(H,T), lock=T.need&&talSpent(H,T.t)<T.need;
+    return `<div class="panel col talc ${r?'got':''} ${lock?'locked':''}" style="gap:4px"><div class="stat"><b>${T.n}</b>${pip(r,T.max)}</div>
+      <div class="small">${T.d(Math.max(1,r))}${r&&r<T.max?` <span class="dim">(next: ${T.d(r+1)})</span>`:''}</div>
+      ${lock?`<div class="small dim">Spend ${T.need} points in ${TTREES[T.t]} first</div>`:''}
+      ${r<T.max?`<button class="${ok?'go':''}" data-act="talup" data-k="${T.k}" ${ok?'':'disabled'} style="min-height:38px">Learn</button>`:'<span class="chip">mastered</span>'}</div>`; };
+  return page(heroPane(H),`${topBar('Talents')}
+  <div class="panel stat"><span>Points to spend: <b class="gold">${pts}</b></span><span class="small dim">One point every level. Resetting is free.</span></div>
+  <div class="tal">${Object.keys(TTREES).map(t=>`<div class="col"><h3>${TTREES[t]}</h3>${TALENTS.filter(T=>T.t===t).map(card).join('')}</div>`).join('')}</div>
+  <div class="panel col talc cap ${tal(H,'cap')?'got':''}" style="gap:4px"><div class="stat"><b class="gold">${CLASSES[H.cls].name} mastery: ${C.n}</b>${pip(tal(H,'cap'),1)}</div><div class="small">${C.d}</div>
+    ${tal(H,'cap')?'<span class="chip">mastered</span>':`<div class="small dim">Unlocks after ${CAP_NEED} points in any trees (you have ${talSpent(H)}).</div><button class="${talCan(H,{k:'cap'})?'go':''}" data-act="talup" data-k="cap" ${talCan(H,{k:'cap'})?'':'disabled'}>Learn</button>`}</div>
+  ${talSpent(H)?'<button class="ghost" data-act="talreset">Reset all talents (free)</button>':''}`); }
 function vCamp(){ const st=stats(H), left=raidLeft(), nx=Math.min(LEVELS-1,H.cleared);
   return page(heroPane(H,1),`${topBar('The Camp',`<button class="ghost" data-act="mute">${muted?'Sound off':'Sound on'}</button><button class="ghost" data-act="go" data-to="who">Switch hero</button>`)}
   ${heroCard()}
@@ -3920,6 +3975,7 @@ function vCamp(){ const st=stats(H), left=raidLeft(), nx=Math.min(LEVELS-1,H.cle
     ${(()=>{ const A=allyHero(); return `<button data-act="allypick">${A?'Ally: '+esc(A.name):'Call an ally'}<span class="sub">${A?'Level '+A.lvl+' '+CLASSES[A.cls].name+' fights beside you · change':'A family hero fights beside you'}</span></button>`; })()}
     <button data-act="go" data-to="guild">Guild Hall<span class="sub">${left} strike${left===1?'':'s'} left on Ashmaw</span></button>
     <button data-act="go" data-to="hero">My Hero<span class="sub">Skills and relics</span></button>
+    <button data-act="go" data-to="talents" ${talPoints(H)?'class="go"':''}>Talents<span class="sub">${talPoints(H)?talPoints(H)+' point'+(talPoints(H)===1?'':'s')+' to spend':'Choose how your hero grows'}</span></button>
     <button data-act="go" data-to="journal">The Tale So Far<span class="sub">${(H.story||[]).length} chapter${(H.story||[]).length===1?'':'s'} of the story</span></button>
     ${window.HG_CLOUD?'<button data-act="go" data-to="share">Share the game<span class="sub">QR code to add it on another phone or iPad</span></button>':''}
   </div>${offline?'<p class="dim small">Offline: saved on this device only for now.</p>':''}${questPanel()}`)+allyOverlay();
@@ -3996,7 +4052,7 @@ function vShare(){ const url=shareLink(), back=H?'camp':'who', t=topBar('Share t
   <div class="panel col"><p>Scan this with a phone or iPad camera. Then tap Share, Add to Home Screen, and play from that icon.</p>
   <p class="dim small">Only share this with family. Anyone who scans it joins our guild.</p>
   <button class="go" data-act="sendlink">Send the link</button></div>`); }
-const VIEWS={journal:vJournal,share:vShare,lock:vLock,who:vWho,create:vCreate,camp:vCamp,world:vWorld,shop:vForge,forge:vForge,gear:vGear,hero:vHero,guild:vGuild,explore:vExplore,battle:vBattle};
+const VIEWS={talents:vTalents,journal:vJournal,share:vShare,lock:vLock,who:vWho,create:vCreate,camp:vCamp,world:vWorld,shop:vForge,forge:vForge,gear:vGear,hero:vHero,guild:vGuild,explore:vExplore,battle:vBattle};
 function render(){ if(!['who','create','lock','share'].includes(S.screen)&&!H)S.screen='who'; if(S.screen==='battle'&&!B)S.screen='camp'; if(S.screen==='explore'&&!EX)S.screen='camp';
   app.dataset.screen=S.screen; app.innerHTML=VIEWS[S.screen](); if(S.screen==='explore')mountExplore(); if(S.screen==='battle')mountBattle(); }
 
@@ -4006,6 +4062,8 @@ app.addEventListener('click',ev=>{ const b=ev.target.closest('[data-act]'); if(!
   if(a==='tgt'){ pickTarget(+d.i); return; }
   if(a==='storynext'){ storyNext(); return; }
   if(a==='noop')return;
+  if(a==='talup'){ const T=d.k==='cap'?{k:'cap'}:TALENTS.find(x=>x.k===d.k); if(!T||!talCan(H,T))return; H.tal=H.tal||{}; H.tal[T.k]=(H.tal[T.k]||0)+1; const st=stats(H); H.hp=Math.min(H.hp,st.hp); sfx.tap(); save(); render(); return; }
+  if(a==='talreset'){ H.tal={}; const st=stats(H); H.hp=Math.min(H.hp,st.hp); save(); render(); toast('Talents reset. All your points are back.'); return; }
   if(a==='allypick'){ sfx.tap(); S.allyPick=1; render(); return; }
   if(a==='allyclose'){ S.allyPick=0; render(); return; }
   if(a==='allyset'){ sfx.tap(); lsSet('hg_ally_'+me,d.id||null); S.allyPick=0; render(); const A=allyHero(); toast(A?A.name+' will fight beside you!':'You set out alone.'); return; }
