@@ -2677,7 +2677,7 @@ const HN=35, MN=8, HF={idle:0,walk:1,atk:7,s0:12,s1:17,s2:22,hit:27,cheer:28}, M
 const animBase=a=>a==='a'||a==null?HF.atk:HF['s'+a];
 /* Forge looks (session 4): +3 runes, +6 glowing edges and tip crystals (their own rendered sheets), +9 a live pulsing blaze */
 /* art switches: turned on as each batch of new pictures ships (session 4) */
-const ART={wtier:1,pets:1,alooks:/github.io$|localhost|127.0/.test(location.hostname)?1:0};   // the claude.ai copy can't hold every armour-look file (511-file limit): plain armour there   // alooks: class armour looks (session 5) once their art ships
+const ART={wtier:1,pets:1,alooks:1};   // alooks: class armour looks (session 5) once their art ships
 const weaponTier=w=>!ART.wtier?'':w&&w.lv>=6?'_t2':w&&w.lv>=3?'_t1':'';
 const CLASS_LOOK_LV=25, CLASS_LOOK_LV2=50;
 function heroLayers(h){ const w=eqItem(h,'weapon'), wk=w?w.k:STARTER[h.cls], base='hl_'+h.cls+'_'+WEAPONS[wk].g+'_', it=s=>eqItem(h,s), L=[];
