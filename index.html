@@ -3262,11 +3262,11 @@ function drawGate(c,g,open,t){ const x=g.x, y=g.y+40; circ(c,'rgba(0,0,0,.25)',x
 /* Hearthguard battle screen: turn-based. You pick a move (tap a monster to choose who you hit), your hero plays its attack animation,
    then every monster still standing takes its turn. battle(foes, {raid}) switches to the battle screen and resolves with {win, ...}
    when the player taps Continue. foes is one monster or a list of up to 3. */
-const BU=11.5;   // % of stage height per Blender unit of a sprite
+const BU=10;   // zoomed out a little more so the two sides have a wide gap of open ground (owner)   // % of stage height per Blender unit of a sprite
 const $b=id=>document.getElementById(id);
 /* where monsters stand: by group size. x = % of stage width, y = feet (% of height), s = size. The first (the leader / boss) stands at the back. */
-const SLOTPOS=[[{x:72,y:85,s:1}],[{x:64,y:81,s:.94},{x:84,y:89,s:1}],[{x:74,y:79,s:.9},{x:59,y:90,s:1},{x:89,y:90,s:1}]];
-const HERO_X=22, HERO_Y=84, PET_X=9, PET_Y=94;
+const SLOTPOS=[[{x:78,y:85,s:1}],[{x:73,y:81,s:.94},{x:89,y:89,s:1}],[{x:80,y:79,s:.9},{x:69,y:90,s:1},{x:92,y:90,s:1}]];
+const HERO_X=19, HERO_Y=84, PET_X=8, PET_Y=94;
 const petUp=()=>!!(H.pet&&H.pet.hp>0&&!B.raid);
 const alive=()=>B.es.filter(e=>e.hp>0);
 const fid=e=>'bf'+B.es.indexOf(e);
