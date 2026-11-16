@@ -2395,6 +2395,7 @@ button.wsk{border-color:#c07bff;box-shadow:inset 0 0 10px rgba(192,123,255,.35)}
 .petpick{max-width:min(720px,94vw);max-height:92%;overflow:auto;text-align:center}
 .petgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px} .petgrid .card{align-items:center;text-align:center;gap:2px}
 .fbar.petbar i{background:var(--moss)}
+.icon{position:relative;flex:none;border-radius:10px;overflow:hidden;display:inline-block} .icon>i{position:absolute;inset:0;background-repeat:no-repeat;filter:drop-shadow(0 2px 2px rgba(0,0,0,.6))}
 .campsc{position:absolute;inset:0;overflow:hidden;container-type:size;background:#0b0d12}
 .campbg{position:absolute;left:42%;top:50%;width:max(122cqw,175cqh);aspect-ratio:1.6;translate:-50% -52%;background:url(img/bg_camp.webp) 0 0/100% 100%}
 .cfire{position:absolute;left:50%;top:49%;width:7%;aspect-ratio:1;translate:-50% -78%}
@@ -2613,6 +2614,8 @@ function migrateGear(h){ if(h.bag)return;
   starterKit(h,1+(h.armor||0)*5,W[wl],[0,1,2][al],al>=1,al>=1,Math.min(3,Math.floor((h.weapon||0)/2)));
   const w=eqItem(h,'weapon'); if(w)w.il=1+(h.weapon||0)*5; }
 
+/* item pictures (to-do 3): where each gear piece sits in its front-facing picture (x0,y0,x1,y1 as fractions), made by a script from img/p_*.webp */
+const ICONBOX={"hl_barbarian_1h_chest":[0.268,0.551,0.746,0.823],"hl_barbarian_1h_cloak":[0.28,0.571,0.54,0.881],"hl_barbarian_1h_hat":[0.101,0.088,0.911,0.46],"hl_barbarian_1h_head":[0.302,0.264,0.696,0.619],"hl_barbarian_1h_helm":[0.294,0.179,0.732,0.62],"hl_barbarian_1h_hood":[0.294,0.235,0.712,0.591],"hl_barbarian_1h_horns":[0.291,0.198,0.707,0.464],"hl_barbarian_1h_legs":[0.387,0.793,0.662,0.937],"hl_barbarian_2h_chest":[0.34,0.551,0.72,0.822],"hl_barbarian_2h_cloak":[0.311,0.571,0.676,0.881],"hl_barbarian_2h_hat":[0.106,0.09,0.915,0.468],"hl_barbarian_2h_head":[0.306,0.265,0.702,0.628],"hl_barbarian_2h_helm":[0.296,0.183,0.733,0.627],"hl_barbarian_2h_hood":[0.298,0.234,0.714,0.6],"hl_barbarian_2h_horns":[0.294,0.202,0.712,0.479],"hl_barbarian_2h_legs":[0.387,0.797,0.665,0.937],"hl_barbarian_dual_chest":[0.268,0.551,0.746,0.823],"hl_barbarian_dual_cloak":[0.28,0.571,0.54,0.881],"hl_barbarian_dual_hat":[0.101,0.088,0.911,0.46],"hl_barbarian_dual_head":[0.302,0.264,0.698,0.619],"hl_barbarian_dual_helm":[0.294,0.179,0.732,0.62],"hl_barbarian_dual_hood":[0.294,0.235,0.712,0.591],"hl_barbarian_dual_horns":[0.291,0.198,0.707,0.464],"hl_barbarian_dual_legs":[0.387,0.793,0.662,0.937],"hl_knight_1h_chest":[0.273,0.529,0.746,0.819],"hl_knight_1h_cloak":[0.28,0.625,0.537,0.881],"hl_knight_1h_hat":[0.101,0.088,0.911,0.46],"hl_knight_1h_head":[0.302,0.226,0.698,0.579],"hl_knight_1h_helm":[0.293,0.179,0.732,0.62],"hl_knight_1h_hood":[0.294,0.235,0.712,0.591],"hl_knight_1h_horns":[0.291,0.198,0.707,0.464],"hl_knight_1h_legs":[0.387,0.801,0.662,0.939],"hl_knight_2h_chest":[0.33,0.536,0.717,0.821],"hl_knight_2h_cloak":[0.309,0.577,0.676,0.88],"hl_knight_2h_hat":[0.106,0.09,0.915,0.468],"hl_knight_2h_head":[0.306,0.227,0.702,0.586],"hl_knight_2h_helm":[0.296,0.183,0.733,0.627],"hl_knight_2h_hood":[0.298,0.234,0.714,0.6],"hl_knight_2h_horns":[0.294,0.202,0.712,0.479],"hl_knight_2h_legs":[0.387,0.806,0.665,0.939],"hl_knight_dual_chest":[0.273,0.529,0.746,0.819],"hl_knight_dual_cloak":[0.28,0.625,0.537,0.881],"hl_knight_dual_hat":[0.101,0.088,0.911,0.46],"hl_knight_dual_head":[0.302,0.226,0.698,0.579],"hl_knight_dual_helm":[0.294,0.179,0.732,0.62],"hl_knight_dual_hood":[0.294,0.235,0.712,0.591],"hl_knight_dual_horns":[0.291,0.198,0.707,0.464],"hl_knight_dual_legs":[0.387,0.801,0.662,0.939],"hl_ranger_bow_chest":[0.35,0.561,0.732,0.819],"hl_ranger_bow_cloak":[0.276,0.609,0.411,0.869],"hl_ranger_bow_hat":[0.115,0.094,0.925,0.466],"hl_ranger_bow_head":[0.317,0.27,0.725,0.606],"hl_ranger_bow_helm":[0.307,0.185,0.745,0.625],"hl_ranger_bow_hood":[0.309,0.24,0.725,0.596],"hl_ranger_bow_horns":[0.304,0.203,0.722,0.47],"hl_ranger_bow_legs":[0.397,0.805,0.636,0.949],"hl_wizard_2h_chest":[0.34,0.547,0.724,0.834],"hl_wizard_2h_cloak":[0.309,0.558,0.676,0.891],"hl_wizard_2h_hat":[0.106,0.09,0.915,0.468],"hl_wizard_2h_head":[0.306,0.263,0.702,0.586],"hl_wizard_2h_helm":[0.296,0.183,0.733,0.627],"hl_wizard_2h_hood":[0.298,0.234,0.714,0.6],"hl_wizard_2h_horns":[0.294,0.202,0.712,0.479],"hl_wizard_2h_legs":[0.387,0.815,0.665,0.937],"hw_b_axe":[0.25,0.45,0.992,0.846],"hw_b_bone":[0.309,0.623,0.46,0.987],"hw_b_hatchet":[0.314,0.722,0.436,1.0],"hw_b_mug":[0.234,0.718,0.436,1.0],"hw_b_shield":[0.314,0.547,0.872,1.0],"hw_b_twin":[0.314,0.691,0.938,1.0],"hw_k_grave":[0.304,0.526,0.904,0.916],"hw_k_great":[0.27,0.555,1.0,0.818],"hw_k_rune":[0.27,0.555,1.0,0.818],"hw_k_shield":[0.319,0.54,0.875,0.913],"hw_k_spike":[0.319,0.522,0.893,0.913],"hw_k_sword":[0.319,0.67,0.449,0.913],"hw_k_twin":[0.319,0.635,1.0,0.913],"hw_r_bow":[0.517,0.471,0.753,0.933],"hw_r_dragon":[0.389,0.325,0.763,1.0],"hw_r_elven":[0.416,0.354,0.763,1.0],"hw_r_long":[0.489,0.408,0.766,0.996],"hw_r_recurve":[0.434,0.393,0.758,0.976],"hw_w_crystal":[0.052,0.559,1.0,0.86],"hw_w_ember":[0.052,0.54,0.974,0.86],"hw_w_frost":[0.052,0.551,1.0,0.86],"hw_w_lich":[0.08,0.59,1.0,0.846],"hw_w_staff":[0.052,0.536,0.964,0.86],"hw_w_tome":[0.052,0.526,0.964,0.86],"s_hl_barbarian_1h_cloak":[0.404,0.535,0.479,0.777],"s_hl_barbarian_2h_cloak":[0.373,0.533,0.477,0.777],"s_hl_barbarian_dual_cloak":[0.404,0.535,0.479,0.777],"s_hl_knight_1h_cloak":[0.404,0.535,0.457,0.777],"s_hl_knight_2h_cloak":[0.373,0.541,0.475,0.779],"s_hl_knight_dual_cloak":[0.404,0.535,0.457,0.777],"s_hl_ranger_bow_cloak":[0.363,0.518,0.514,0.771],"s_hl_wizard_2h_cloak":[0.373,0.52,0.473,0.779]};
 /* ---------- drawing the layered hero ---------- */
 const HN=29, MN=8, HF={idle:0,walk:1,atk:7,s0:12,s1:17,s2:22,hit:27,cheer:28}, MF={idle:0,atk:2,hit:7};
 const animBase=a=>a==='a'||a==null?HF.atk:HF['s'+a];
@@ -2637,6 +2640,14 @@ const tintCol=t=>(TINTS[t]||TINTS[0]).c;
 function layerDiv(l,portrait){ const src=layerSrc(l,portrait), col=tintCol(l.t), u=tinted(src,col);
   const glow=l.w>=2?`filter:drop-shadow(0 0 ${l.w*2}px ${RARITY[l.w].c});`:'';
   return `<i ${l.w>=4?'class="legend" ':l.w>=3?'class="epic" ':''}${col?`data-tk="${esc(src+'|'+col)}"`:''} style="background-image:url(${u});${portrait?'background-size:100% 100%':'background-size:'+HN*100+'% 100%'};${glow}"></i>`; }
+/* an item's picture for the bag and the Forge: the piece cut out of its front-facing picture, in its tint, on a rarity-coloured tile */
+function itemIcon(it,size){ size=size||58; const f=it.s==='weapon'?'hw_'+it.k:'hl_'+H.cls+'_'+heroGrip(H)+'_'+(it.s==='head'?it.k:it.s); let b=ICONBOX[f];
+  const rc=RARITY[it.r].c, tile=`width:${size}px;height:${size}px;background:radial-gradient(circle at 50% 45%,${rc}55,#0c0e11 72%);border:2px solid ${rc}aa`;
+  if(!b)return `<span class="icon" style="${tile}"></span>`;
+  const side=it.s==='cloak'&&ICONBOX['s_'+f]; if(side)b=side;   // a cloak hides behind the hero from the front: show it from the side (sheet frame 0)
+  const src=side?'img/'+f+'.webp':'img/p_'+f+'.webp', col=it.s==='weapon'?null:tintCol(it.t), u=tinted(src,col), W=side?512:615, Hh=side?512:758, bw=(b[2]-b[0])*W, bh=(b[3]-b[1])*Hh, k=size*.84/Math.max(bw,bh);
+  const ox=size/2-(b[0]+b[2])/2*W*k, oy=size/2-(b[1]+b[3])/2*Hh*k;
+  return `<span class="icon" style="${tile}"><i ${col?`data-tk="${esc(src+'|'+col)}"`:''} style="background-image:url(${u});background-size:${((side?512*29:W)*k).toFixed(1)}px ${(Hh*k).toFixed(1)}px;background-position:${ox.toFixed(1)}px ${oy.toFixed(1)}px"></i></span>`; }
 /* battle / side view: one frame of the layered sheets. bFrame moves every layer via --fx. */
 /* SPEED: all of a hero's layers (tinted, weapon glow and outline/shadow baked in) are merged ONCE into one sheet per look.
    Stacking 5-7 huge see-through sheets with live CSS shadow filters made attacks lag on the iPad once gear (a helmet) was added.
@@ -2742,8 +2753,13 @@ async function spellFx(kind,fromEl,toEl,col){ if(!fxMount()||!fromEl||!toEl)retu
   else if(kind==='lightning'){
     const bolt={a,b,seg:9,pts:fxZig(a,b,9),col:col==='#ffffff'?'#bfe4ff':col,life:0,max:.32}; bolt.br=[0,1].map(()=>{ const s=bolt.pts[3+Math.floor(Math.random()*4)]; return fxZig(s,{x:s.x+rr(-60,60)*D,y:s.y+rr(20,90)*D},4); });
     FX.bolts.push(bolt); fxRun(); await sleep(90); burst(b,['#ffffff','#bfe4ff','#7fb0ff'],30,600,5,.4,{drag:.82}); fxAdd({x:b.x,y:b.y,col:'#bfe4ff',size:26,max:.25,grow:1}); await sleep(80); }
+  else if(kind==='starfall'){   // the wizard's power move: a shower of falling stars out of the sky onto the foe (owner: it must come from the sky)
+    await Promise.all([0,1,2,3].map(i=>new Promise(res=>setTimeout(()=>{ const t={x:b.x+rr(-40,40)*D,y:b.y+rr(-25,25)*D}, s0={x:t.x-rr(40,110)*D,y:-80*D};
+      fly(s0,t,360,(x,y)=>{ fxAdd({x,y,col:'#fff3a0',core:'#ffffff',size:18,max:.12}); for(let k=0;k<2;k++)fxAdd({x:x+rr(-8,8)*D,y:y+rr(-8,8)*D,vx:rr(-40,40)*D,vy:rr(-90,-20)*D,col:k?'#ffd040':'#bfe4ff',size:rr(3,7),max:rr(.3,.6)}); })
+      .then(()=>{ burst(t,['#ffffff','#fff3a0','#ffd040','#bfe4ff'],34,560,9,.6,{drag:.86,grav:300*D}); fxAdd({x:t.x,y:t.y,col:'#fff3a0',core:'#ffffff',size:40,max:.35,grow:1.6}); res(); }); },i*140))));
+    await sleep(60); }
   else if(kind==='meteor'){
-    const s={x:b.x-260*D,y:-60*D}; await fly(s,b,420,(x,y)=>{ fxAdd({x,y,col:'#ff6a10',core:'#fff0b0',size:26,max:.1}); fxAdd({x,y,col:'#ff9a30',size:22,max:.08,shape:'rock',rot:performance.now()/90});
+    const s={x:b.x-110*D,y:-90*D}; await fly(s,b,440,(x,y)=>{ fxAdd({x,y,col:'#ff6a10',core:'#fff0b0',size:26,max:.1}); fxAdd({x,y,col:'#ff9a30',size:22,max:.08,shape:'rock',rot:performance.now()/90});
       for(let i=0;i<4;i++)fxAdd({x:x+rr(-12,12)*D,y:y+rr(-12,12)*D,vx:rr(-80,20)*D,vy:rr(-120,-20)*D,col:i%2?'#ff4a10':'#ffd040',size:rr(4,9),max:rr(.3,.6)}); });
     burst(b,['#fff3a0','#ffb040','#ff5010','#ff2a00'],80,780,13,.8,{drag:.85,grav:420*D}); fxAdd({x:b.x,y:b.y,col:'#ffb040',core:'#ffffff',size:60,max:.45,grow:1.8});
     for(let i=0;i<14;i++)fxAdd({x:b.x+rr(-50,50)*D,y:b.y+rr(-10,20)*D,vx:rr(-50,50)*D,vy:rr(-110,-40)*D,col:'#4a3a34',size:rr(14,24),max:rr(.8,1.3),grow:1.6,glow:0,alpha:.4}); }
@@ -2833,7 +2849,7 @@ const CLASSES={
     skills:[{n:'Fireball',lv:1,cd:2,mult:1.8,fx:'fire',d:'A blast of flame'},
             {n:'Frost Bind',lv:3,cd:4,mult:1.1,weak:3,shot:'#9fdcff',fx:'frost',d:'Hit and weaken the enemy'},
             {n:'Meteor',lv:6,cd:6,mult:2.5,aoe:1,fx:'meteor',d:'A falling star that hits every foe'}],
-    power:{n:'Starfall',mult:4.2,aoe:1,shot:'#fff3a0',d:'The sky comes down on every foe'}},
+    power:{n:'Starfall',mult:4.2,aoe:1,fx:'starfall',shot:'#fff3a0',d:'The sky comes down on every foe'}},
   ranger:{name:'Ranger',hp:1,atk:1.05,crit:.25,shot:'#e9edf1',blurb:'Quick and lucky. Lands critical hits often.',
     skills:[{n:'Twin Shot',lv:1,cd:2,mult:.95,hits:2,spread:1,d:'Two arrows, the second at any foe'},
             {n:'Venom Arrow',lv:3,cd:4,mult:1,poison:3,shot:'#8fe86a',fx:'poison',d:'Poison that keeps hurting'},
@@ -3400,8 +3416,8 @@ function bFrame(el,f,n){ if(!el)return; const p=fpos(f,n); el.style.backgroundPo
 function foeSpell(id){ if(id.includes('lich')||id==='cultist')return ['hex','#b070ff']; if(id.includes('flame')||id==='fire_imp'||id==='whelp')return ['fire','#ff8a3c']; if(id==='ice_witch'||id==='eye_frost')return ['frost','#9fdcff'];
   if(id==='jelly')return ['lightning','#9fd8ff']; if(id==='sk_archer')return ['bolt','#e9edf1']; if(id.startsWith('ghost')||id.startsWith('eye'))return ['arcane','#c08fff']; if(id.startsWith('sk_mage'))return ['arcane','#9fe8ff']; return null; }
 function heroSkills(){ const c=CLASSES[H.cls], w=eqItem(H,'weapon'), ws=w&&WEAPONS[w.k].sk; return c.skills.map((s,i)=>Object.assign({anim:i},s)).concat(ws?[Object.assign({lv:1,weapon:1},ws)]:[]); }
-const SPELLS=['fire','frost','lightning','meteor','arcane','drain','hex','poison','arrow'];
-const FXC={fire:'#ff8a3c',frost:'#9fdcff',meteor:'#fff3a0',poison:'#8fe86a',stun:'#ffd84a',spin:'#ffffff',heavy:'#ffcf8a',bleed:'#ff5a4a',drain:'#7dffb0',rune:'#7fe0ff',arcane:'#c08fff',lightning:'#d8f0ff',pierce:'#ffffff',hex:'#b070ff',heal:'#a8e88a'};
+const SPELLS=['fire','frost','lightning','meteor','starfall','arcane','drain','hex','poison','arrow'];
+const FXC={starfall:'#fff3a0',fire:'#ff8a3c',frost:'#9fdcff',meteor:'#fff3a0',poison:'#8fe86a',stun:'#ffd84a',spin:'#ffffff',heavy:'#ffcf8a',bleed:'#ff5a4a',drain:'#7dffb0',rune:'#7fe0ff',arcane:'#c08fff',lightning:'#d8f0ff',pierce:'#ffffff',hex:'#b070ff',heal:'#a8e88a'};
 function pickTarget(i){ if(!B||B.result||!B.es[i]||B.es[i].hp<=0)return; B.tgt=i; sfx.tap(); battleUI(); }
 function battleUI(){ if(!B)return; if(!B.es[B.tgt]||B.es[B.tgt].hp<=0){const a=B.es.findIndex(x=>x.hp>0); if(a>=0)B.tgt=a}
   const e=B.es[B.tgt], st=stats(H), c=CLASSES[H.cls], res=B.result, pw=H.pow||0, set=(id,v)=>{const x=$b(id); if(x)x.style.width=Math.max(0,Math.min(100,v))+'%'};
@@ -3415,7 +3431,7 @@ function battleUI(){ if(!B)return; if(!B.es[B.tgt]||B.es[B.tgt].hp<=0){const a=B
   let h;
   if(res){ let t;
     if(res.raid)t=`<h2>${res.win?'Ashmaw falls!':res.flew?'Time is up':'Knocked back'}</h2><p>You dealt <b class="gold">${res.dealt}</b> damage for the family.</p>`;
-    else if(res.win)t=`<h2>Victory!</h2><p>+${res.gold} gold · +${res.xp} XP${res.embers?` · <span style="color:#ff9a50">+${res.embers} embers</span>`:''}</p>${res.ups?`<p class="gold">Level up! You are now level ${H.lvl}.</p>`:''}${res.rank?`<p class="gold">New rank: ${RANKS[res.rank]}!</p>`:''}${(res.loot||[]).map(g=>`<p>Found: ${itemTitle(g.it)} <span class="small dim">(${RARITY[g.it.r].n} ${SLOT_NAME[g.it.s].toLowerCase()}${g.auto?', bag full: melted into '+g.auto+' embers':', in your bag'})</span></p>`).join('')}`;
+    else if(res.win)t=`<h2>Victory!</h2><p>+${res.gold} gold · +${res.xp} XP${res.embers?` · <span style="color:#ff9a50">+${res.embers} embers</span>`:''}</p>${res.ups?`<p class="gold">Level up! You are now level ${H.lvl}.</p>`:''}${res.rank?`<p class="gold">New rank: ${RANKS[res.rank]}!</p>`:''}${(res.loot||[]).map(g=>`<p class="row" style="gap:8px;justify-content:center">${itemIcon(g.it,40)}<span>Found: ${itemTitle(g.it)} <span class="small dim">(${RARITY[g.it.r].n} ${SLOT_NAME[g.it.s].toLowerCase()}${g.auto?', bag full: melted into '+g.auto+' embers':', in your bag'})</span></span></p>`).join('')}`;
     else t=`<h2>Knocked out</h2><p class="dim">Your friends carry you back to the fire${res.lost?`, but you dropped <b class="gold">${res.lost} gold</b> on the way`:''}. Rest, gear up, and try again.</p>`;
     h=`<div class="panel col" style="text-align:center">${t}</div><button class="go" data-act="bdone">Continue</button>`;
   } else {
@@ -3454,7 +3470,7 @@ async function attackAnim(fromId,toIds,ranged,col,onHit,kind,base,fx){ const her
   for(let k=0;k<5;k++){ bFrame(el,base+k,n); if(k===1)sfx.swing();
     if(k===2){ if(ranged){ sfx.shot(); await Promise.all(tg.map(t=>spellFx(SPELLS.includes(fx)?fx:kind,el,t,col))); }
       else { tg.forEach(t=>{ slashFx(t.id,col,!hero); if(fx==='spin'){ setTimeout(()=>slashFx(t.id,col,hero),90); setTimeout(()=>slashFx(t.id,col,!hero),180); } }); }
-      tg.forEach(t=>burstFx(t.id,col)); if(fx==='heavy'||kind==='meteor'){ const stg=$b('bstage'); if(stg){ stg.classList.remove('quake'); void stg.offsetWidth; stg.classList.add('quake'); } }
+      tg.forEach(t=>burstFx(t.id,col)); if(fx==='heavy'||kind==='meteor'||fx==='starfall'){ const stg=$b('bstage'); if(stg){ stg.classList.remove('quake'); void stg.offsetWidth; stg.classList.add('quake'); } }
       if(fx==='stun')tg.forEach(t=>bpop(t.id,'★ ★','stun')); onHit(); }
     await sleep(85); }
   el.style.setProperty('--dx','0px'); if(!ranged&&!reach&&hero){ for(let k=4;k<6;k++){ bFrame(el,HF.walk+k,n); await sleep(70); } } bFrame(el,0,n); await sleep(ranged?90:160); B.anim=false; }
@@ -3482,7 +3498,7 @@ async function heroAct(kind){ if(!B||B.busy||B.result)return; const st=stats(H),
     const targets=sk.aoe?alive():[tgt], grip=heroGrip(H), base=animBase(sk.anim);
     if(sk.mult){ let total=0, anyCrit=false; const dmg=new Map();
       const rg=animRanged(H.cls,grip,sk.anim), col=FXC[sk.fx]||sk.shot||(rg?c.shot||'#e9edf1':'#ffffff');
-      const kindP=sk.fx==='meteor'?'meteor':sk.fx==='fire'||power?'big':H.cls==='ranger'?'arrow':sk.fx==='lightning'||sk.fx==='pierce'?'bolt':'orb';
+      const kindP=sk.fx==='meteor'||sk.fx==='starfall'?'meteor':sk.fx==='fire'||power?'big':H.cls==='ranger'?'arrow':sk.fx==='lightning'||sk.fx==='pierce'?'bolt':'orb';
       await attackAnim('bh',targets.map(fid),rg,col,()=>{
         for(const e of targets)for(let i=0;i<(sk.hits||1);i++){ let t=e; if(sk.spread&&i>0){ const al=alive(); if(!al.length)break; t=al[Math.floor(Math.random()*al.length)]; } if(t.hp<=0)continue;
           const s=strike(t,sk.mult,sk.allcrit); dmg.set(t,(dmg.get(t)||0)+s.d); total+=s.d; anyCrit=anyCrit||s.crit; }
@@ -3648,7 +3664,7 @@ function vWorld(){
 }
 /* an item card. opts: equip/upgrade/salvage buttons */
 function itemCard(it,o){ o=o||{}; const w=it.s==='weapon'?WEAPONS[it.k]:null, eq=H.eq[it.s]===it.i, c=upCost(it), max=!canUp(it);
-  return `<div class="panel col item r${it.r}" style="gap:4px;border-color:${RARITY[it.r].c}66"><div class="row" style="justify-content:space-between;align-items:flex-start"><div>${itemTitle(it)}${eq?' <span class="chip">worn</span>':''}
+  return `<div class="panel col item r${it.r}" style="gap:4px;border-color:${RARITY[it.r].c}66"><div class="row" style="align-items:center">${itemIcon(it)}<div class="grow">${itemTitle(it)}${eq?' <span class="chip">worn</span>':''}
       <div class="small dim">${RARITY[it.r].n} ${SLOT_NAME[it.s].toLowerCase()} · item level ${it.il} · upgrades ${it.lv} / ${RARITY[it.r].max}</div></div></div>
     <div class="small">${itemLines(it).join(' · ')}</div>${w&&w.sk?`<div class="small"><b class="gold">${w.sk.n}</b> <span class="dim">(weapon skill) ${w.sk.d}</span></div>`:''}
     <div class="row" style="flex-wrap:wrap;gap:6px">
@@ -3666,7 +3682,7 @@ function petForge(){ if(!H.pet)return '';
 function vGear(){ const tab=S.gtab||'all', list=H.bag.filter(it=>tab==='all'||it.s===tab).sort((a,b)=>(H.eq[b.s]===b.i)-(H.eq[a.s]===a.i)||b.r-a.r||b.il-a.il);
   return page(heroPane(H),`${topBar('Gear')}
   <h3>Pet</h3>${petCard()}
-  <div class="panel col" style="gap:4px"><h3>Wearing</h3>${GSLOTS.map(k=>{const it=eqItem(H,k); return `<div class="stat small"><span class="dim">${SLOT_NAME[k]}</span>${it?itemTitle(it):'<span class="dim">nothing</span>'}</div>`}).join('')}
+  <div class="panel col" style="gap:4px"><h3>Wearing</h3>${GSLOTS.map(k=>{const it=eqItem(H,k); return `<div class="stat small" style="align-items:center"><span class="dim">${SLOT_NAME[k]}</span><span class="row" style="gap:6px">${it?itemTitle(it)+itemIcon(it,30):'<span class="dim">nothing</span>'}</span></div>`}).join('')}
     <p class="small dim">Gear is found on adventures: chests, monsters, mimics and bosses. Every piece keeps its own upgrades and attributes.</p></div>
   <div class="tabs">${['all'].concat(GSLOTS).map(k=>`<button class="ghost ${tab===k?'on':''}" data-act="gtab" data-id="${k}">${k==='all'?'All':SLOT_NAME[k]}</button>`).join('')}</div>
   <p class="small dim">Bag ${H.bag.length} / ${BAGMAX}. Equipping swaps it with what you wear; the old piece stays in your bag, upgrades and all.</p>
