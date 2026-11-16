@@ -2387,6 +2387,21 @@ input[type=text]{font:inherit;color:var(--parch);background:#0c0e11;border:2px s
 .frole.guard{background:#2c5596;border:1px solid #9fd0ff} .frole.healer{background:#2f7a3a;border:1px solid #a8e88a} .frole.chg{background:#a8241c;border:1px solid #ffb0a0;animation:chgp .6s ease-in-out infinite alternate}
 @keyframes chgp{to{transform:scale(1.12);box-shadow:0 0 12px #ff5040}}
 .bsp.foe.shielded{filter:drop-shadow(0 0 1.2px rgba(0,0,0,.85)) drop-shadow(0 0 9px #6fb0ff)} .bsp.foe.charging{filter:drop-shadow(0 0 1.2px rgba(0,0,0,.85)) drop-shadow(0 0 12px #ff4030)}
+.bookgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:6px}
+.bookc{display:flex;flex-direction:column;align-items:center;text-align:center;gap:1px;padding:4px;border:1px solid var(--line);border-radius:8px;background:#0c0e11;font-size:12px}
+.bookc{overflow:hidden} .bookc .sp{width:150%!important;max-width:none;margin:-18% 0 -26%} .bookc.unk .sp,.bookc.unk .icon{filter:brightness(0) opacity(.45)} .bookc.boss{border-color:#c06040} .bookc.mini{border-color:#a08040}
+.hall{background:repeating-linear-gradient(0deg,transparent 0 38px,rgba(0,0,0,.25) 38px 40px),repeating-linear-gradient(90deg,transparent 0 78px,rgba(0,0,0,.18) 78px 80px),linear-gradient(#4a505a,#30353d 62%,#3b2f26 62%,#2a221c)}
+.hall .banners{position:absolute;top:0;left:3%;right:3%;height:30%;display:flex;justify-content:space-around}
+.hall .banner{width:13%;height:100%;background:linear-gradient(90deg,rgba(0,0,0,.25),transparent 30%,transparent 70%,rgba(0,0,0,.25)),var(--bc);clip-path:polygon(0 0,100% 0,100% 82%,50% 100%,0 82%);display:flex;justify-content:center;padding-top:22%;border-top:5px solid #c8a04a}
+.hall .banner span{font-family:var(--display);font-size:22px;color:#ffe08a;text-shadow:0 2px 0 #000}
+.hall .banner.empty{background:none;border-top:5px solid rgba(200,160,74,.25);clip-path:none}
+.hall .trophies{position:absolute;top:33%;left:6%;right:6%;height:22%;display:flex;justify-content:space-around;align-items:flex-end;border-bottom:8px solid #6a4e34;box-shadow:0 6px 0 #3a2a1c}
+.hall .trophy{width:15%;position:relative;display:flex;align-items:flex-end;justify-content:center} .hall .trophy .sp{width:260%!important;flex:none;margin:0 0 -22%} .hall .trophy i{position:absolute;left:15%;right:15%;bottom:-2px;height:8px;background:#c8a04a;border-radius:2px}
+.hall .trophy.empty{height:30%} .hall .trophy.empty i{background:rgba(200,160,74,.25)}
+.hall .statues{position:absolute;bottom:2%;left:2%;right:2%;height:42%;display:flex;justify-content:space-around;align-items:flex-end}
+.hall .statue{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;min-width:0}
+.hall .statue .port{height:84%;filter:grayscale(1) brightness(.92) contrast(1.15) drop-shadow(0 3px 2px rgba(0,0,0,.5))} .hall .statue.gold .port{filter:grayscale(1) sepia(1) saturate(3) brightness(1.05) drop-shadow(0 0 6px #ffd870)}
+.hall .plinth{width:88%;min-width:60px;padding:2px 4px;text-align:center;font:800 11px var(--ui);color:#2a2620;background:linear-gradient(#b8b4ac,#86827a);border-radius:3px;box-shadow:0 3px 0 #4a4640;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lookov{position:fixed;inset:0;z-index:40;background:rgba(8,9,11,.82);display:flex;align-items:center;justify-content:center;padding:12px max(16px,env(safe-area-inset-left,0px))}
 .lookbox{display:grid;grid-template-columns:minmax(0,46%) minmax(0,1fr);gap:12px;width:min(900px,100%);height:min(560px,100%);cursor:default} .lookbox .hero-stage{max-height:none} .lookbox .info{overflow-y:auto;display:flex;flex-direction:column;gap:8px}
 .lookbox .bigicon{display:flex;align-items:center;justify-content:center;height:100%;border:2px solid var(--line);border-radius:10px;background:#0c0e11}
@@ -2659,7 +2674,7 @@ function dropItem(h,n,min){ if(ART.pets&&h.pet&&Math.random()<.15){ const sl=pic
   if(slot==='weapon')kind=pick(Object.keys(WEAPONS).filter(k=>WEAPONS[k].c===h.cls&&(k!==STARTER[h.cls]||r<2)));
   else { const lk=slot==='cloak'?'':lookFor(r); kind=slot==='head'?CLASS_HEAD[h.cls]+(lk?'_'+lk:''):lk; t=r<1?Math.floor(rnd(0,2)):1+Math.floor(Math.random()*(TINTS.length-1)); }
   return mkItem(slot,kind,r,il,t); }
-function gainItem(h,it){ if(h.bag.length>=BAGMAX){ const e=salvageValue(it); h.embers=(h.embers||0)+e; return {it,auto:e}; } h.bag.push(it); return {it}; }
+function gainItem(h,it){ markFound(h,it); if(h.bag.length>=BAGMAX){ const e=salvageValue(it); h.embers=(h.embers||0)+e; return {it,auto:e}; } h.bag.push(it); return {it}; }
 function starterKit(h,il,wk,tint,head,cloak,wr){ il=il||1; h.bag=[]; h.eq={};
   const add=it=>{ h.bag.push(it); h.eq[it.s]=it.i; };
   add(mkItem('weapon',wk||STARTER[h.cls],wr||0,il)); add(mkItem('chest','',0,il,tint||0)); add(mkItem('legs','',0,il,tint||0));
@@ -2777,6 +2792,16 @@ const PETS={
  sprite:{n:'Spark Sprite',melee:0,hp:.45,atk:.6,fx:'lightning',col:'#bfe8ff',d:'Zaps foes with lightning.'},
 };
 const PET_MAX=20;
+/* pet tricks (session 5, idea 7): every pet learns two special moves as it is upgraded at the Forge (+3 and +8).
+   In battle the pet uses a trick every third turn on its own, with its name called out and its own effect. */
+const PET_TRICKS={
+ wolf:[{lv:3,n:'Howl',bless:2,col:'#9fd0ff',d:'A howl that makes you hit 40% harder for 2 turns'},{lv:8,n:'Pack Bite',mult:.95,hits:2,col:'#ffffff',d:'Two lightning-fast bites'}],
+ bear:[{lv:3,n:'Maul',mult:1.8,stun:1,col:'#ffcf8a',fx:'heavy',d:'A huge swipe that stuns'},{lv:8,n:'Mighty Roar',aoe:1,weak:2,col:'#d8a070',d:'Every foe is weakened for 2 turns'}],
+ fox:[{lv:3,n:'Fox Fire',mult:1,aoe:1,col:'#ff9a50',fx:'fire',d:'Ghostly flames hit every foe'},{lv:8,n:'Trickster',mult:1.6,crit:1,col:'#ffd870',d:'A sneaky bite that is always critical'}],
+ dragon:[{lv:3,n:'Dragon Breath',mult:1.1,aoe:1,col:'#ff8a3c',fx:'fire',d:'A blast of fire at every foe'},{lv:8,n:'Wing Gust',mult:.5,aoe:1,stun:1,col:'#ffd0a0',d:'A gust that knocks every foe off its feet'}],
+ owl:[{lv:3,n:'Moon Dive',mult:2,crit:1,col:'#9fd8ff',fx:'arcane',d:'A swooping dive that is always critical'},{lv:8,n:'Moon Feathers',heal:.15,col:'#d8f0ff',d:'Glowing feathers heal you 15%'}],
+ sprite:[{lv:3,n:'Pixie Dust',heal:.12,col:'#fff2b0',d:'Sparkles that heal you 12%'},{lv:8,n:'Starlight',mult:1,aoe:1,weak:2,col:'#bfe8ff',fx:'lightning',d:'Starlight hits and weakens every foe'}]};
+const petTricks=h=>h&&h.pet?(PET_TRICKS[h.pet.k]||[]).filter(t=>h.pet.lv>=t.lv):[];
 function petItemStats(it){ const p=ipow(it), b=BASE[it.s], o={atk:Math.round((b.patk||0)*p),hp:Math.round((b.php||0)*p),crit:0};
   for(const k in it.a){ const v=attrVal(it,k); if(k==='str')o.atk+=v; else if(k==='vit')o.hp+=v; else if(k==='crit')o.crit+=v; } return o; }
 function petStats(h){ const p=h.pet; if(!p)return null; const P=PETS[p.k], g={atk:0,hp:0,crit:0};
@@ -3001,6 +3026,11 @@ const WORLDS=[
 ];
 const LEVELS=50;
 const RAID=['Ashmaw the Ember Titan','golem_lava'];
+/* collection book (session 5, idea 8): every monster you have beaten (H.book: id -> count) and every kind of gear you have found (H.found) */
+function bookMonsters(){ const out=[]; WORLDS.forEach((W,w)=>{ W.mobs.forEach(m=>out.push({id:m[1],n:m[0],w,k:'mob'})); out.push({id:W.mini[1],n:W.mini[0],w,k:'mini'}); out.push({id:W.boss[1],n:W.boss[0],w,k:'boss'}); });
+  out.push({id:'mimic',n:'Mimic',w:-1,k:'mob'}); const seen=new Set(); return out.filter(x=>!seen.has(x.id)&&seen.add(x.id)); }
+const foundKey=it=>it.s==='weapon'?'w:'+it.k:PSLOTS.includes(it.s)?'':it.s==='cloak'?'':'a:'+it.s+':'+lookIdx(it);
+function markFound(h,it){ const k=foundKey(it); if(!k)return; h.found=h.found||{}; h.found[k]=1; }
 const raidMax=no=>Math.round(1200*Math.pow(1.6,no-1));
 const need=l=>30+l*l*12;   // slower levelling (owner, 2026-11-15); max level 100
 /* Balance (made harder 2026-11-15): a level expects a hero of about level .9n+1 with gear of tier n/6. A lone monster takes about 5 hits and needs about 7 to beat you;
@@ -3075,7 +3105,7 @@ const busy=()=>!!B||S.screen==='explore';   // don't swap the hero or pop messag
 
 function fixHero(h){ if(!h||!CLASSES[h.cls])return null;   // older saves: fill in new fields
   if(h.cleared==null)h.cleared=Array.isArray(h.prog)?Math.min(LEVELS-1,h.prog.reduce((a,b)=>a+b,0)):0;
-  h.relics=(h.relics||[]).filter(r=>r<WORLDS.length); migrateGear(h); fixClassGear(h); h.embers=h.embers||0; GSLOTS.forEach(k=>{ if(h.eq[k]&&!eqItem(h,k))h.eq[k]=null });
+  h.relics=(h.relics||[]).filter(r=>r<WORLDS.length); migrateGear(h); fixClassGear(h); (h.bag||[]).forEach(it=>markFound(h,it)); h.embers=h.embers||0; GSLOTS.forEach(k=>{ if(h.eq[k]&&!eqItem(h,k))h.eq[k]=null });
   h.pow=h.pow||0; h.feats=h.feats||[]; h.kills=h.kills||0; return h; }
 /* ----- talent tree (session 5, idea 5): one point per hero level after the first, spent in three trees + a class capstone. Free to reset at camp. ----- */
 const TALENTS=[
@@ -3759,7 +3789,20 @@ async function heroAct(kind){ if(!B||B.busy||B.result)return; const st=stats(H),
   await allyAct(); if(!B)return; reap(); if(!alive().length){ killMoment(); await sleep(450); return finishBattle(true); }
   await enemyTurn(); if(!B||B.result)return; B.busy=false; battleUI(); }
 /* the pet's turn: it attacks the monster you are targeting (melee pets run in and bite, ranged pets cast) */
-async function petAct(){ if(!petUp())return; const P=PETS[H.pet.k], ps=petStats(H); let t=B.es[B.tgt]; if(!t||t.hp<=0)t=alive()[0]; if(!t)return;
+async function petTrick(T){ const P=PETS[H.pet.k], ps=petStats(H), st=$b('bstage'); let t=B.es[B.tgt]; if(!t||t.hp<=0)t=alive()[0]; if(!t)return;
+  if(st){ const c=document.createElement('div'); c.className='shout'; c.style.fontSize='40px'; c.style.color=T.col; c.textContent=H.pet.name+': '+T.n+'!'; st.appendChild(c); setTimeout(()=>c.remove(),1100); }
+  if(sfx.power)sfx.power(); auraFx($b('bp'),T.col); await sleep(500); if(!B)return;
+  if(T.heal||T.bless){ const s=stats(H); if(T.heal){ const h=Math.round(s.hp*T.heal); H.hp=Math.min(s.hp,H.hp+h); bpop('bh','+'+h,'heal'); sfx.heal(); }
+    if(T.bless)B.bless=Math.max(B.bless||0,T.bless); auraFx($b('bh'),T.col); bShake('bp',MF.atk,petN(H.pet.k)); blog(H.pet.name+' uses '+T.n+'! '+T.d+'.'); battleUI(); await sleep(450); return; }
+  const tg=T.aoe?alive():[t];
+  await attackAnim('bp',tg.map(fid),!P.melee||!!T.aoe,T.col,()=>{ let tot=0;
+    for(const e of tg){ for(let k=0;k<(T.hits||1);k++){ if(e.hp<=0)break; let d=Math.max(1,Math.round(ps.atk*(T.mult||1)*rnd(.9,1.1)*guardMul(e))); const cr=T.crit||Math.random()<ps.crit; if(cr)d=Math.round(d*1.8); const was=e.hp; e.hp=Math.max(0,e.hp-d); if(B.raid)B.dealt+=was-e.hp; tot+=d; bpop(fid(e),'-'+d,cr?'crit':''); }
+      bShake(fid(e),MF.hit,MN); if(T.stun&&!B.raid&&e.hp>0){ e.stun=T.stun; e.charge=false; bpop(fid(e),'★ ★','stun'); } if(T.weak)e.weak=Math.max(e.weak||0,T.weak); }
+    sfx.crit(); blog(H.pet.name+' uses '+T.n+' for '+tot+'!'); battleUI(); },T.fx==='fire'?'big':'orb',MF.atk,T.fx||(P.melee?'spin':P.fx));
+  await sleep(150); }
+async function petAct(){ if(!petUp())return; const tr=petTricks(H); B.ptCd=(B.ptCd==null?1:B.ptCd)-1;
+  if(tr.length&&B.ptCd<=0){ B.ptCd=3; B.ptI=((B.ptI||0)+1)%tr.length; return petTrick(tr[B.ptI]); }
+  const P=PETS[H.pet.k], ps=petStats(H); let t=B.es[B.tgt]; if(!t||t.hp<=0)t=alive()[0]; if(!t)return;
   await attackAnim('bp',[fid(t)],!P.melee,P.col,()=>{ let d=Math.max(1,Math.round(ps.atk*rnd(.88,1.12)*guardMul(t))); const cr=Math.random()<ps.crit; if(cr)d=Math.round(d*1.8); const was=t.hp; t.hp=Math.max(0,t.hp-d);
     bpop(fid(t),'-'+d,cr?'crit':''); bShake(fid(t),MF.hit,MN); blog(H.pet.name+(cr?' lands a critical ':' hits ')+t.n+' for '+d+'.'); battleUI(); },P.melee?'orb':P.fx,MF.atk,P.melee?'spin':P.fx);
   await sleep(150); }
@@ -3819,6 +3862,8 @@ function finishBattle(win,flew){ const st=stats(H), es=B.es; B.anim=true;
     H.raidDmg=(H.raidDmg||0)+dealt; H.hp=st.hp; if(dealt>0)feat('struck Ashmaw for '+dealt); save();
     B.result={raid:true,dealt,win,flew}; win?sfx.win():sfx.hit(); battleUI(); return; }
   const res={win};
+  if(win&&!B.raid){ H.book=H.book||{}; const nw=[]; for(const e of es){ if(!H.book[e.id])nw.push(e.n.replace(/^Shield | Healer$/g,'')); H.book[e.id]=(H.book[e.id]||0)+1; }
+    if(nw.length){ H.embers=(H.embers||0)+2*nw.length; setTimeout(()=>toast('New in your Collection Book: '+nw.join(', ')+'! +'+2*nw.length+' embers'),700); } }
   if(win){ const gold=es.reduce((a,e)=>a+e.gold,0), xp=es.reduce((a,e)=>a+e.xp,0), n=es[0].lv||0;
     const g=Math.round(gold*rnd(.85,1.15)*((H.relics||[]).includes(0)?1.2:1)*(1+st.luck)); H.gold+=g; H.kills=(H.kills||0)+es.length; res.gold=g; res.xp=xp; questTick('kill',es.length); questTick('win'); if(es.some(e=>e.elite||e.kind==='boss'||e.kind==='mini'))questTick('elite');
     const r0=rank(H); res.ups=addXp(xp); if(rank(H)>r0)res.rank=rank(H);
@@ -3963,6 +4008,26 @@ function vTalents(){ const pts=talPoints(H), C=CAPSTONE[H.cls], pip=(r,m)=>`<spa
   <div class="panel col talc cap ${tal(H,'cap')?'got':''}" style="gap:4px"><div class="stat"><b class="gold">${CLASSES[H.cls].name} mastery: ${C.n}</b>${pip(tal(H,'cap'),1)}</div><div class="small">${C.d}</div>
     ${tal(H,'cap')?'<span class="chip">mastered</span>':`<div class="small dim">Unlocks after ${CAP_NEED} points in any trees (you have ${talSpent(H)}).</div><button class="${talCan(H,{k:'cap'})?'go':''}" data-act="talup" data-k="cap" ${talCan(H,{k:'cap'})?'':'disabled'}>Learn</button>`}</div>
   ${talSpent(H)?'<button class="ghost" data-act="talreset">Reset all talents (free)</button>':''}`); }
+function vBook(){ const tab=S.btab||'mon', M=bookMonsters(), got=M.filter(m=>(H.book||{})[m.id]).length;
+  const tabs=`<div class="tabs"><button class="ghost ${tab==='mon'?'on':''}" data-act="btab" data-id="mon">Monsters ${got}/${M.length}</button><button class="ghost ${tab==='gear'?'on':''}" data-act="btab" data-id="gear">Gear</button></div>`;
+  let body='';
+  if(tab==='mon'){ const groups=[...WORLDS.map((W,w)=>({t:W.n,w})),{t:'Hidden among the chests',w:-1}];
+    body=groups.map(g=>{ const L=M.filter(m=>m.w===g.w), n=L.filter(m=>(H.book||{})[m.id]).length; return `<div class="panel col" style="gap:6px"><div class="stat"><h3>${esc(g.t)}</h3><span class="small ${n===L.length?'gold':'dim'}">${n} / ${L.length}${n===L.length?' complete!':''}</span></div>
+      <div class="bookgrid">${L.map(m=>{ const c=(H.book||{})[m.id]; return `<div class="bookc ${c?'':'unk'} ${m.k}">${mobSpr(m.id,'','width:100%;height:auto;')}<b>${c?esc(m.n):'???'}</b><span class="small dim">${c?'beaten '+c+'x':m.k==='boss'?'world boss':m.k==='mini'?'mini-boss':'not met yet'}</span></div>`; }).join('')}</div></div>`; }).join(''); }
+  else { const A=ARMOUR[H.cls], W=Object.keys(WEAPONS).filter(k=>WEAPONS[k].c===H.cls), f=H.found||{};
+    const tile=(it,key,name)=>`<div class="bookc ${f[key]?'':'unk'}">${itemIcon(it,64)}<b>${f[key]?esc(name):'???'}</b></div>`;
+    body=`<div class="panel col"><h3>${CLASSES[H.cls].name} weapons</h3><div class="bookgrid">${W.map(k=>tile(mkItem('weapon',k,3,1),'w:'+k,WEAPONS[k].n)).join('')}</div></div>`
+      +['head','chest','legs'].map(sl=>`<div class="panel col"><h3>${SLOT_NAME[sl]}</h3><div class="bookgrid">${[0,1,2].map(i=>{ const lk=['','b','c'][i], it=mkItem(sl,sl==='head'?CLASS_HEAD[H.cls]+(lk?'_'+lk:''):lk,[0,2,4][i],1,0); return tile(it,'a:'+sl+':'+i,A[sl][i]); }).join('')}</div></div>`).join('')
+      +'<p class="small dim">Upgraded looks drop as Rare or Epic gear; the finest look only as Legendary.</p>'; }
+  return page(heroPane(H),`${topBar('Collection Book')}<p class="small dim">Every new monster you beat earns 2 embers.</p>${tabs}${body}`); }
+/* the Guild Hall (session 5, idea 10): it fills up as the family plays. A banner for every world anyone has cleared, a trophy for every world boss
+   anyone has beaten, and a stone statue of every hero in the gear they wear now (gold once they reach level 50). */
+const BANNER_COL=['#3f7a34','#7a5a3a','#3a6a64','#4f86c0','#6a3a9a'];
+function hallScene(all){ const best=Math.max(0,...all.map(x=>x.h.cleared||0)), rel=new Set(); all.forEach(x=>(x.h.relics||[]).forEach(r=>rel.add(r)));
+  const banners=WORLDS.map((W,w)=>best>=(w+1)*10?`<div class="banner" style="--bc:${BANNER_COL[w]}" title="${esc(W.n)}"><span>${'IVXLC'[0]?['I','II','III','IV','V'][w]:''}</span></div>`:`<div class="banner empty"></div>`).join('');
+  const troph=WORLDS.map((W,w)=>rel.has(w)?`<div class="trophy">${mobSpr(W.boss[1],'','width:100%;height:auto;')}<i></i></div>`:'<div class="trophy empty"><i></i></div>').join('');
+  const stat=all.slice(0,6).map(x=>`<div class="statue ${x.h.lvl>=50?'gold':''}">${heroPort(x.h,'')}<div class="plinth">${esc(x.h.name)}</div></div>`).join('');
+  return `<div class="hero-stage hall"><div class="banners">${banners}</div><div class="trophies">${troph}</div><div class="statues">${stat}</div></div>`; }
 function vCamp(){ const st=stats(H), left=raidLeft(), nx=Math.min(LEVELS-1,H.cleared);
   return page(heroPane(H,1),`${topBar('The Camp',`<button class="ghost" data-act="mute">${muted?'Sound off':'Sound on'}</button><button class="ghost" data-act="go" data-to="who">Switch hero</button>`)}
   ${heroCard()}
@@ -3975,6 +4040,7 @@ function vCamp(){ const st=stats(H), left=raidLeft(), nx=Math.min(LEVELS-1,H.cle
     ${(()=>{ const A=allyHero(); return `<button data-act="allypick">${A?'Ally: '+esc(A.name):'Call an ally'}<span class="sub">${A?'Level '+A.lvl+' '+CLASSES[A.cls].name+' fights beside you · change':'A family hero fights beside you'}</span></button>`; })()}
     <button data-act="go" data-to="guild">Guild Hall<span class="sub">${left} strike${left===1?'':'s'} left on Ashmaw</span></button>
     <button data-act="go" data-to="hero">My Hero<span class="sub">Skills and relics</span></button>
+    <button data-act="go" data-to="book">Collection Book<span class="sub">${Object.keys(H.book||{}).length} of ${bookMonsters().length} monsters</span></button>
     <button data-act="go" data-to="talents" ${talPoints(H)?'class="go"':''}>Talents<span class="sub">${talPoints(H)?talPoints(H)+' point'+(talPoints(H)===1?'':'s')+' to spend':'Choose how your hero grows'}</span></button>
     <button data-act="go" data-to="journal">The Tale So Far<span class="sub">${(H.story||[]).length} chapter${(H.story||[]).length===1?'':'s'} of the story</span></button>
     ${window.HG_CLOUD?'<button data-act="go" data-to="share">Share the game<span class="sub">QR code to add it on another phone or iPad</span></button>':''}
@@ -4001,6 +4067,7 @@ function petCard(){ if(!H.pet)return `<div class="panel"><b>No pet yet</b><div c
   return `<div class="panel row" style="align-items:center">${petImg(H.pet.k,'mini')}<div class="grow"><b>${esc(H.pet.name)}${H.pet.lv?' +'+H.pet.lv:''}</b> <span class="small dim">${P.n} · ${P.melee?'fights up close':'attacks from range'}</span>
     ${bar(H.pet.hp,ps.hp)}<div class="stat small dim"><span>${H.pet.hp>0?'Health':'Knocked out: rest or feed a Pet Treat'}</span><span>${H.pet.hp} / ${ps.hp} · attack ${ps.atk}</span></div>
     ${ART.pets?'':'<!--'}<div class="small dim">${H.pet.lv>=PET_GLOW?'Fully grown and glowing with power.':H.pet.lv>=PET_GROW?'Grown up! At +'+PET_GLOW+' it grows bigger and glows.':'Grows up at +'+PET_GROW+' (Forge upgrades).'}</div>${ART.pets?'':'-->'}
+    <div class="small" style="margin-top:4px"><b>Tricks</b> ${(PET_TRICKS[H.pet.k]||[]).map(T=>`<div class="${H.pet.lv>=T.lv?'':'dim'}">${H.pet.lv>=T.lv?'★':'☆'} <b>${T.n}</b> (+${T.lv}): ${T.d}</div>`).join('')}</div>
     ${(ART.pets?PSLOTS:[]).map(k=>{const it=eqItem(H,k); return `<div class="stat small" style="align-items:center"><span class="dim">${SLOT_NAME[k]}</span><span class="row" style="gap:6px">${it?itemTitle(it)+itemIcon(it,28):'<span class="dim">nothing</span>'}</span></div>`}).join('')}</div></div>`; }
 function petForge(){ if(!H.pet)return '';
   const c=petUpCost(H.pet), max=H.pet.lv>=PET_MAX, can=H.embers>=c.e&&H.gold>=c.g;
@@ -4034,7 +4101,8 @@ function vGuild(){ const AH=allHeroes(), all=Object.keys(AH).map(id=>({s:{id},h:
   const hp=raidHp(), max=raidMax(world.no), left=raidLeft();
   const feats=[]; all.forEach(x=>(x.h.feats||[]).forEach(f=>feats.push({t:f.t,x:x.h.name+' '+f.x}))); feats.sort((a,b)=>b.t-a.t);
   const mineDmg=H.raidNo===world.no?(H.raidDmg||0):0;
-  return page(`<div class="hero-stage">${scene(6)}${mobSpr(RAID[1],'h idle8','height:120%;max-height:300px;')}</div>`,`${topBar('Guild Hall')}
+  return page(hallScene(all),`${topBar('Guild Hall')}
+  <p class="small dim">The hall grows as the family plays: banners for cleared worlds, trophies for beaten world bosses, and a statue of every hero.</p>
   <div class="panel col"><b>${RAID[0]}</b><div class="small dim">Family raid ${world.no}. Everyone’s damage adds up.</div>${bar(hp,max,'raid')}<div class="stat small dim"><span>${hp} / ${max}</span><span>You: ${mineDmg}</span></div>
     <button class="go" data-act="raid" ${left<1?'disabled':''}>Strike Ashmaw<span class="sub">${left<1?'Come back tomorrow':left+' of 3 strikes left today'}</span></button></div>
   <div class="panel col"><h3>The Hearthguard</h3>${all.map(x=>`<div class="row" style="flex-wrap:wrap">${heroPort(x.h,'mini')}<div class="grow"><b>${esc(x.h.name)}</b>${x.s.id===me?' <span class="chip">you</span>':''}<div class="small dim">Level ${x.h.lvl} ${CLASSES[x.h.cls].name} · ${x.h.cleared||0} levels · ${(x.h.relics||[]).length} relic${(x.h.relics||[]).length===1?'':'s'}</div></div>
@@ -4052,7 +4120,7 @@ function vShare(){ const url=shareLink(), back=H?'camp':'who', t=topBar('Share t
   <div class="panel col"><p>Scan this with a phone or iPad camera. Then tap Share, Add to Home Screen, and play from that icon.</p>
   <p class="dim small">Only share this with family. Anyone who scans it joins our guild.</p>
   <button class="go" data-act="sendlink">Send the link</button></div>`); }
-const VIEWS={talents:vTalents,journal:vJournal,share:vShare,lock:vLock,who:vWho,create:vCreate,camp:vCamp,world:vWorld,shop:vForge,forge:vForge,gear:vGear,hero:vHero,guild:vGuild,explore:vExplore,battle:vBattle};
+const VIEWS={book:vBook,talents:vTalents,journal:vJournal,share:vShare,lock:vLock,who:vWho,create:vCreate,camp:vCamp,world:vWorld,shop:vForge,forge:vForge,gear:vGear,hero:vHero,guild:vGuild,explore:vExplore,battle:vBattle};
 function render(){ if(!['who','create','lock','share'].includes(S.screen)&&!H)S.screen='who'; if(S.screen==='battle'&&!B)S.screen='camp'; if(S.screen==='explore'&&!EX)S.screen='camp';
   app.dataset.screen=S.screen; app.innerHTML=VIEWS[S.screen](); if(S.screen==='explore')mountExplore(); if(S.screen==='battle')mountBattle(); }
 
@@ -4062,6 +4130,7 @@ app.addEventListener('click',ev=>{ const b=ev.target.closest('[data-act]'); if(!
   if(a==='tgt'){ pickTarget(+d.i); return; }
   if(a==='storynext'){ storyNext(); return; }
   if(a==='noop')return;
+  if(a==='btab'){ S.btab=d.id; render(); return; }
   if(a==='talup'){ const T=d.k==='cap'?{k:'cap'}:TALENTS.find(x=>x.k===d.k); if(!T||!talCan(H,T))return; H.tal=H.tal||{}; H.tal[T.k]=(H.tal[T.k]||0)+1; const st=stats(H); H.hp=Math.min(H.hp,st.hp); sfx.tap(); save(); render(); return; }
   if(a==='talreset'){ H.tal={}; const st=stats(H); H.hp=Math.min(H.hp,st.hp); save(); render(); toast('Talents reset. All your points are back.'); return; }
   if(a==='allypick'){ sfx.tap(); S.allyPick=1; render(); return; }
