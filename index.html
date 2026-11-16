@@ -2426,9 +2426,13 @@ button.wsk{border-color:#c07bff;box-shadow:inset 0 0 10px rgba(192,123,255,.35)}
 .encflash b{font-family:var(--display);font-size:160px;color:var(--blood);text-shadow:0 6px 0 #000}
 @keyframes enc{0%{opacity:0}12%{opacity:.9}30%{opacity:.15}48%{opacity:.9}70%{opacity:.35}100%{opacity:1;background:#14171b}}
 /* battle */
-.bt{display:grid;grid-template-columns:minmax(0,1fr) minmax(230px,34%);gap:10px;height:100%}
+/* the battle uses the full width; moves sit in a bar along the bottom (owner: more space between the two sides) */
+.bt{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto;gap:6px;height:100%}
 .stage{position:relative;height:100%;min-height:0;border:2px solid var(--line);border-radius:10px;overflow:hidden}
-.side{display:flex;flex-direction:column;gap:6px;min-height:0;overflow-y:auto;justify-content:flex-end}
+.side{display:grid;grid-template-columns:minmax(150px,22%) minmax(0,1fr);gap:8px;align-items:end;max-height:34vh;overflow-y:auto}
+.side>.panel,.side>button{grid-column:1/-1}
+.side .log{grid-row:span 2;align-self:stretch;justify-content:center;background:rgba(12,14,17,.6);border:1px solid var(--line);border-radius:10px;padding:6px 8px}
+.side .chips{grid-column:2}
 .stage .tag{position:absolute;top:8px;width:40%;display:flex;flex-direction:column;gap:4px;z-index:100;text-shadow:0 1px 3px #000,0 0 6px #000;font-weight:800}
 .stage .tag.l{left:8px} .stage .tag.r{right:8px}
 .bsp{position:absolute;z-index:1;transform:translateX(calc(-50% + var(--dx,0px)));transition:transform .25s ease-out;animation:breathe 2.8s ease-in-out infinite;transform-origin:50% 78%}
@@ -2461,8 +2465,8 @@ button.wsk{border-color:#c07bff;box-shadow:inset 0 0 10px rgba(192,123,255,.35)}
 @keyframes pop{0%{transform:translateY(0) scale(.4);opacity:1}18%{transform:translateY(-14px) scale(1.35)}35%{transform:translateY(-20px) scale(1)}100%{transform:translateY(-58px) scale(1);opacity:0}}
 .log{font-size:13px;display:flex;flex-direction:column;justify-content:flex-end;gap:1px;min-height:52px}
 .log p:last-child{color:var(--parch)} .log p{color:var(--dim)}
-.acts{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.acts button{min-height:42px;padding:5px 6px} .acts button.wide{grid-column:1/-1}
+.acts{grid-column:2;display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:6px}
+.acts button{min-height:46px;padding:4px 6px} .acts button.wide{grid-column:auto} .acts button.pow{grid-column:1/-1}
 #toast{position:fixed;left:50%;top:calc(58px + env(safe-area-inset-top,0px));transform:translateX(-50%);background:#0c0e11;border:2px solid var(--gold);
   border-radius:10px;padding:8px 14px;max-width:min(90vw,460px);text-align:center;z-index:20;box-shadow:0 4px 0 #000}
 .tip{position:fixed;left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:30;background:#252a30;color:#e9edf1;border:2px solid #e8c45e;border-radius:10px;padding:10px 48px 10px 14px;box-shadow:0 6px 24px rgba(0,0,0,.5)}
@@ -2471,6 +2475,7 @@ button.wsk{border-color:#c07bff;box-shadow:inset 0 0 10px rgba(192,123,255,.35)}
 #rot .ph{width:70px;height:120px;border:4px solid var(--gold);border-radius:12px;animation:turn 2s ease-in-out infinite}
 @keyframes turn{0%,20%{transform:rotate(0)}60%,100%{transform:rotate(90deg)}}
 @media (orientation:portrait){#rot{display:flex}}
+@media (max-height:520px){.side{grid-template-columns:minmax(120px,18%) minmax(0,1fr);max-height:30vh;gap:6px} .acts{grid-template-columns:repeat(auto-fit,minmax(84px,1fr));gap:4px} .acts button{min-height:40px;font-size:13px;padding:3px 4px} .acts button .sub{display:none} .acts button.pow .sub{display:none} .side .log{font-size:11px;padding:4px 6px} .side .log p:not(:last-child){display:none}}
 @media (max-height:430px){h1{font-size:34px} h2{font-size:24px} body{font-size:14px} .sp.mini{width:46px;height:46px}}
 @media (prefers-reduced-motion:reduce){.sp.idle,.sp.idle8,.bsp,button.pow,#rot .ph{animation:none}.bar i{transition:none}}
 </style>
@@ -3265,8 +3270,8 @@ function drawGate(c,g,open,t){ const x=g.x, y=g.y+40; circ(c,'rgba(0,0,0,.25)',x
 const BU=10;   // zoomed out a little more so the two sides have a wide gap of open ground (owner)   // % of stage height per Blender unit of a sprite
 const $b=id=>document.getElementById(id);
 /* where monsters stand: by group size. x = % of stage width, y = feet (% of height), s = size. The first (the leader / boss) stands at the back. */
-const SLOTPOS=[[{x:78,y:85,s:1}],[{x:73,y:81,s:.94},{x:89,y:89,s:1}],[{x:80,y:79,s:.9},{x:69,y:90,s:1},{x:92,y:90,s:1}]];
-const HERO_X=19, HERO_Y=84, PET_X=8, PET_Y=94;
+const SLOTPOS=[[{x:80,y:85,s:1}],[{x:76,y:81,s:.94},{x:90,y:89,s:1}],[{x:82,y:79,s:.9},{x:72,y:90,s:1},{x:93,y:90,s:1}]];
+const HERO_X=16, HERO_Y=84, PET_X=6, PET_Y=94;
 const petUp=()=>!!(H.pet&&H.pet.hp>0&&!B.raid);
 const alive=()=>B.es.filter(e=>e.hp>0);
 const fid=e=>'bf'+B.es.indexOf(e);
