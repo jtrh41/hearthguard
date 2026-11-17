@@ -4173,7 +4173,7 @@ function render(){ if(!['who','create','lock','share'].includes(S.screen)&&!H)S.
 
 /* ---------- input ---------- */
 app.addEventListener('click',ev=>{ const b=ev.target.closest('[data-act]'); if(!b||b.disabled)return; const a=b.dataset.act, d=b.dataset;
-  if(a==='act'){ heroAct(d.k==='atk'||d.k==='potion'||d.k==='pow'?d.k:+d.k); return; }
+  if(a==='act'){ heroAct(/^\d+$/.test(d.k)?+d.k:d.k); return; }
   if(a==='tgt'){ pickTarget(+d.i); return; }
   if(a==='storynext'){ storyNext(); return; }
   if(a==='noop')return;
