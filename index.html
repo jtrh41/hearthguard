@@ -4087,6 +4087,7 @@ function vCamp(){ const st=stats(H), left=raidLeft(), nx=Math.min(LEVELS-1,H.cle
     ${(()=>{ const A=allyHero(); return `<button data-act="allypick">${A?'Ally: '+esc(A.name):'Call an ally'}<span class="sub">${A?'Level '+A.lvl+' '+CLASSES[A.cls].name+' fights beside you · change':'A family hero fights beside you'}</span></button>`; })()}
     <button data-act="go" data-to="guild">Guild Hall<span class="sub">${left} strike${left===1?'':'s'} left on Ashmaw</span></button>
     <button data-act="go" data-to="hero">My Hero<span class="sub">Skills and relics</span></button>
+    <button data-act="go" data-to="pet">My Pet<span class="sub">${H.pet?esc(H.pet.name)+(H.pet.lv?' +'+H.pet.lv:'')+' · '+(H.pet.hp>0?H.pet.hp+' / '+petStats(H).hp+' health':'knocked out'):'No companion yet'}</span></button>
     <button data-act="go" data-to="book">Collection Book<span class="sub">${Object.keys(H.book||{}).length} of ${bookMonsters().length} monsters</span></button>
     <button data-act="go" data-to="talents" ${talPoints(H)?'class="go"':''}>Talents<span class="sub">${talPoints(H)?talPoints(H)+' point'+(talPoints(H)===1?'':'s')+' to spend':'Choose how your hero grows'}</span></button>
     <button data-act="go" data-to="journal">The Tale So Far<span class="sub">${(H.story||[]).length} chapter${(H.story||[]).length===1?'':'s'} of the story</span></button>
@@ -4144,6 +4145,32 @@ function vHero(){ const st=stats(H), c=CLASSES[H.cls];
   <div class="panel col"><h3>Skills</h3>${heroSkills().map(s=>`<div class="${H.lvl<s.lv?'locked':''}">${s.weapon?'<span class="chip">from your weapon</span> ':''}<b>${s.n}</b> <span class="small dim">${H.lvl<s.lv?'unlocks at level '+s.lv:'ready every '+s.cd+' turns'}</span><div class="small dim">${s.d}</div></div>`).join('')}</div>
   <div class="panel col"><h3>Relics</h3>${H.relics.length?H.relics.map(r=>`<div><b class="gold">${WORLDS[r].relic}</b><div class="small dim">${WORLDS[r].rd}</div></div>`).join(''):'<p class="dim small">Defeat a world’s boss to win its relic.</p>'}</div>`);
 }
+/* the pet page: a closer look at your companion, its numbers, tricks, worn gear and care */
+function vPet(){ const kinds=`<div class="panel col" style="gap:6px"><h3>Companions of the realm</h3>${Object.keys(PETS).map(k=>{ const P=PETS[k], mine=H.pet&&H.pet.k===k;
+    return `<div class="row" style="align-items:center">${petImg(k,'mini')}<div class="grow"><b>${P.n}</b>${mine?' <span class="chip">yours</span>':''}<div class="small dim">${P.d} ${P.melee?'Fights up close.':'Attacks from range.'}</div></div></div>`; }).join('')}</div>`;
+  if(!H.pet)return page(heroPane(H),`${topBar('My Pet')}${petCard()}${kinds}`);
+  const p=H.pet, P=PETS[p.k], ps=petStats(H), max=p.lv>=PET_MAX, c=petUpCost(p), can=H.embers>=c.e&&H.gold>=c.g, full=p.hp>=ps.hp, bond=tal(H,'bond');
+  let nx=null; if(!max){ p.lv++; nx=petStats(H); p.lv--; }
+  const up=(a,b)=>nx&&b>a?` <span class="small gold">→ ${b}</span>`:'';
+  const stage=`<div class="hero-stage">${scene(5)}${petSpr(H,'idle','position:absolute;left:50%;bottom:8%;width:min(78%,360px);translate:-50% 0;z-index:1;')}</div>`;
+  return page(stage,`${topBar(esc(p.name)+(p.lv?' +'+p.lv:''))}
+  <div class="panel col" style="gap:4px"><div><b>${P.n}</b> <span class="small dim">${P.d}</span></div>
+    ${bar(p.hp,ps.hp)}<div class="stat small dim"><span>${p.hp>0?'Health':'Knocked out: rest or feed a Pet Treat'}</span><span>${p.hp} / ${ps.hp}</span></div>
+    <div class="row" style="flex-wrap:wrap;gap:6px">
+      <button class="${!full&&H.treats>0?'go':''}" data-act="feedtreat" ${full||!(H.treats>0)?'disabled':''}>${p.hp>0?'Feed a treat':'Wake with a treat'}<span class="sub">${full?'Already at full health':'Heals half its health'} · ${H.treats||0} left</span></button>
+      <button data-act="buytreat" ${H.gold<treatPrice()||(H.treats||0)>=9?'disabled':''}>Buy a Pet Treat<span class="sub">${treatPrice()} gold · you have ${H.treats||0} of 9</span></button></div></div>
+  <div class="panel col" style="gap:4px"><h3>Strength</h3>
+    <div class="stat"><span>Health</span><b>${ps.hp}${up(ps.hp,nx&&nx.hp)}</b></div><div class="stat"><span>Attack</span><b>${ps.atk}${up(ps.atk,nx&&nx.atk)}</b></div>
+    <div class="stat"><span>Critical chance</span><b>${Math.round(ps.crit*100)}%</b></div><div class="stat"><span>Fighting style</span><b>${P.melee?'Up close':'From range'}</b></div>
+    ${bond?`<div class="stat"><span>Bond (talent)</span><b>+${Math.round(bond*8)}%</b></div>`:''}
+    <div class="stat"><span>Upgrades</span><b>+${p.lv} of ${PET_MAX}</b></div>${bar(p.lv,PET_MAX,'pw')}
+    ${ART.pets?`<div class="small dim">${p.lv>=PET_GLOW?'Fully grown and glowing with power.':p.lv>=PET_GROW?'Grown up! At +'+PET_GLOW+' it grows bigger and glows.':'Grows up at +'+PET_GROW+'.'}</div>`:''}
+    ${max?'<span class="small gold">Fully upgraded</span>':`<button class="${can?'go':''}" data-act="petup" ${can?'':'disabled'}>Upgrade to +${p.lv+1}<span class="sub"><span class="ember">${c.e} embers</span> · ${c.g} gold${can?'':' · you have '+(H.embers||0)+' embers, '+H.gold+' gold'}</span></button>`}</div>
+  <div class="panel col"><h3>Tricks</h3><div class="small dim">In battle ${esc(p.name)} uses a trick every third turn on its own.</div>${(PET_TRICKS[p.k]||[]).map(T=>`<div class="${p.lv>=T.lv?'':'locked'}"><b>${p.lv>=T.lv?'★':'☆'} ${T.n}</b> <span class="small dim">${p.lv>=T.lv?'learned':'learned at +'+T.lv}</span><div class="small dim">${T.d}</div></div>`).join('')}</div>
+  ${ART.pets?`<div class="panel col" style="gap:6px"><h3>Pet gear</h3>${PSLOTS.map(k=>{ const it=eqItem(H,k), o=it?petItemStats(it):null;
+      return `<div class="row" style="align-items:center">${it?itemIcon(it,36):''}<div class="grow"><span class="small dim">${SLOT_NAME[k]}</span><div>${it?itemTitle(it):'<span class="dim">nothing worn</span>'}</div>${o?`<div class="small dim">${[o.atk?'+'+o.atk+' attack':'',o.hp?'+'+o.hp+' health':'',o.crit?'+'+o.crit+'% critical':''].filter(Boolean).join(' · ')}</div>`:''}</div></div>`; }).join('')}
+    <button data-act="petgear">Change pet gear<span class="sub">Opens your bag</span></button></div>`:''}
+  ${kinds}`); }
 function vGuild(){ const AH=allHeroes(), all=Object.keys(AH).map(id=>({s:{id},h:AH[id]})).sort((a,b)=>b.h.lvl-a.h.lvl||b.h.xp-a.h.xp);
   const hp=raidHp(), max=raidMax(world.no), left=raidLeft();
   const feats=[]; all.forEach(x=>(x.h.feats||[]).forEach(f=>feats.push({t:f.t,x:x.h.name+' '+f.x}))); feats.sort((a,b)=>b.t-a.t);
@@ -4167,7 +4194,7 @@ function vShare(){ const url=shareLink(), back=H?'camp':'who', t=topBar('Share t
   <div class="panel col"><p>Scan this with a phone or iPad camera. Then tap Share, Add to Home Screen, and play from that icon.</p>
   <p class="dim small">Only share this with family. Anyone who scans it joins our guild.</p>
   <button class="go" data-act="sendlink">Send the link</button></div>`); }
-const VIEWS={book:vBook,talents:vTalents,journal:vJournal,share:vShare,lock:vLock,who:vWho,create:vCreate,camp:vCamp,world:vWorld,shop:vForge,forge:vForge,gear:vGear,hero:vHero,guild:vGuild,explore:vExplore,battle:vBattle};
+const VIEWS={book:vBook,talents:vTalents,journal:vJournal,share:vShare,lock:vLock,who:vWho,create:vCreate,camp:vCamp,world:vWorld,shop:vForge,forge:vForge,gear:vGear,hero:vHero,pet:vPet,guild:vGuild,explore:vExplore,battle:vBattle};
 function render(){ if(!['who','create','lock','share'].includes(S.screen)&&!H)S.screen='who'; if(S.screen==='battle'&&!B)S.screen='camp'; if(S.screen==='explore'&&!EX)S.screen='camp';
   app.dataset.screen=S.screen; app.innerHTML=VIEWS[S.screen](); if(S.screen==='explore')mountExplore(); if(S.screen==='battle')mountBattle(); }
 
@@ -4205,6 +4232,8 @@ app.addEventListener('click',ev=>{ const b=ev.target.closest('[data-act]'); if(!
   else if(a==='rest'){ H.hp=stats(H).hp; if(H.pet)H.pet.hp=petStats(H).hp; sfx.heal(); save(); render(); }
   else if(a==='freepet'){ if(window.freePet)freePet(d.id); }
   else if(a==='petup'){ if(!H.pet||H.pet.lv>=PET_MAX)return; const c=petUpCost(H.pet); if(H.embers<c.e||H.gold<c.g)return; const was=petStats(H).hp; H.embers-=c.e; H.gold-=c.g; H.pet.lv++; H.pet.hp=Math.min(petStats(H).hp,H.pet.hp+petStats(H).hp-was); sfx.win(); toast(H.pet.name+' is now +'+H.pet.lv+'!'); save(); render(); }
+  else if(a==='feedtreat'){ if(!H.pet||!(H.treats>0))return; const ps=petStats(H); if(H.pet.hp>=ps.hp)return; H.treats--; H.pet.hp=Math.min(ps.hp,H.pet.hp+Math.round(ps.hp*.5)); sfx.heal(); save(); render(); }
+  else if(a==='petgear'){ S.gtab='pet'; S.salv=null; S.look=null; S.screen='gear'; render(); }
   else if(a==='buytreat'){ if(H.gold<treatPrice()||(H.treats||0)>=9)return; H.gold-=treatPrice(); H.treats=(H.treats||0)+1; sfx.heal(); save(); render(); }
   else if(a==='mute'){ muted=!muted; lsSet('hg_mute',muted); render(); }
   else if(a==='level'){ const n=+d.n; if(n>H.cleared)return; startLevel(Math.min(LEVELS-1,n)); }
