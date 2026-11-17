@@ -3508,7 +3508,7 @@ function freePet(k){ const E=EX; if(!E||H.pet||!PETS[k])return; H.pet={k,name:PE
   feat('freed a '+PETS[k].n+' from a hunter\'s cage'); save(); loadImg(petSheet(k)); sfx.win(); toast(PETS[k].n+' joins you! It fights by your side. Upgrade it at the Forge.'); render(); }
 window.freePet=freePet;
 function saveCkpt(){ const E=EX, L=E.L; H.ckpt={n:E.n,x:E.x,y:E.y,open:L.chests.map((c,i)=>c.open?i:-1).filter(i=>i>=0),boss:E.bossAlive}; }
-function campfire(i){ const E=EX, st=stats(H); E.lit=i; const h=Math.round(st.hp*.3); H.hp=Math.min(st.hp,H.hp+h); if(H.pet){ const ps=petStats(H); H.pet.hp=Math.min(ps.hp,H.pet.hp+Math.round(ps.hp*.3)); } saveCkpt(); save(); sfx.heal(); hudExplore(); toast('Campfire: progress saved here and you heal a little.'); }
+function campfire(i){ const E=EX, st=stats(H); E.lit=i; const h=Math.round(st.hp*.3); H.hp=Math.min(st.hp,H.hp+h); if(H.pet){ const ps=petStats(H); H.pet.hp=Math.min(ps.hp,H.pet.hp+Math.round(ps.hp*.3)); } saveCkpt(); save(); sfx.heal(); hudExplore(); toast('Campfire: progress saved here and you'+(H.pet?' and '+H.pet.name:'')+' heal a little.'); }
 async function openChest(c){ c.open=true; questTick('chest'); const E=EX, n=E.n, w=Math.floor(n/10);
   if(c.mimic){ E.busy=true; E.joy={x:0,y:0}; E.keys={}; E.moving=false; sfx.alarm(); toast('The chest has teeth! A mimic!'); await sleep(700); if(EX!==E)return;
     const res=await battle([makeMimic(n)]); if(EX!==E)return; if(!res.win){ stopExplore(); S.screen='camp'; render(); return; }
